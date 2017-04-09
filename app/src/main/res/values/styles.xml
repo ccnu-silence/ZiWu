@@ -8,4 +8,25 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+
+    <style name="add_plan_popup_window">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">20dp</item>
+        <item name="android:background">#ECF0F1</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">#AF7AC5</item>
+    </style>
+
+
+
+    <declare-styleable name="AddImageButton">
+        <attr name="AddButtonBackground" format="reference"/>
+        <attr name="AddButtonImageSrc" format="reference"/>
+    </declare-styleable>
+
+    <declare-styleable name="TabIndicatorItemView">
+        <attr name="IndicatorButton" format="reference"/>
+        <attr name="IndicatorText" format="reference"/>
+    </declare-styleable>
 </resources>

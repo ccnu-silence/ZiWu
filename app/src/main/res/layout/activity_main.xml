@@ -1,18 +1,84 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.github.tinkerti.ziwu.MainActivity">
+    tools:context="com.github.tinkerti.ziwu.ui.activity.MainActivity">
 
-    <TextView
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <android.support.v4.view.ViewPager
+            android:id="@+id/ac_view_pager"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+    </FrameLayout>
+
+    <LinearLayout
+        android:id="@+id/ac_ll_add_plan_popup_window"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello World!"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginBottom="120dp"
+        android:layout_marginRight="15dp"
+        android:orientation="vertical"
+        android:visibility="gone"
+        tools:visibility="visible">
 
-</android.support.constraint.ConstraintLayout>
+        <TextView
+            android:id="@+id/ac_tv_add_today_plan"
+            style="@style/add_plan_popup_window"
+            android:text="@string/add_plan_today" />
+
+        <TextView
+            android:id="@+id/ac_tv_add_this_week_plan"
+            style="@style/add_plan_popup_window"
+            android:text="@string/add_plan_this_week" />
+
+        <TextView
+            android:id="@+id/ac_tv_add_this_long_time_plan"
+            style="@style/add_plan_popup_window"
+            android:text="@string/add_plan_long_time" />
+    </LinearLayout>
+
+    <com.github.tinkerti.ziwu.ui.widget.AddPlanButton
+        android:id="@+id/ac_bt_add_plan"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginBottom="75dp"
+        android:layout_marginRight="15dp"
+        app:AddButtonBackground="@drawable/wi_add_plan_button_background"
+        app:AddButtonImageSrc="@drawable/wi_add_plan_button_vector" />
+
+    <LinearLayout
+        android:id="@+id/ac_ll_bottom_indicator"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:orientation="horizontal"
+        android:layout_alignParentBottom="true"
+        android:gravity="center_vertical"
+        android:background="@color/baseColor">
+        <com.github.tinkerti.ziwu.ui.widget.TabIndicatorItemView
+            android:id="@+id/bottom_indicator_plan"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            app:IndicatorText="@string/bottom_indicator_plan"/>
+        <com.github.tinkerti.ziwu.ui.widget.TabIndicatorItemView
+            android:id="@+id/bottom_indicator_record"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            app:IndicatorText="@string/bottom_indicator_record"/>
+        <com.github.tinkerti.ziwu.ui.widget.TabIndicatorItemView
+            android:id="@+id/bottom_indicator_me"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            app:IndicatorText="@string/bottom_indicator_me"/>
+    </LinearLayout>
+</RelativeLayout>
