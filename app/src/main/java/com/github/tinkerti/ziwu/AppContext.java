@@ -11,24 +11,35 @@ import java.io.File;
  * Created by tiankui on 4/9/17.
  */
 
-public class AppContext extends ContextWrapper{
+public class AppContext extends ContextWrapper {
+
+    private String dbPath;
 
     public AppContext(Context base) {
         super(base);
     }
 
+    public AppContext(Context base, String dbPath) {
+        this(base);
+        this.dbPath = dbPath;
+    }
+
     @Override
     public File getDatabasePath(String name) {
-        return super.getDatabasePath(name);
+        File file=new File(dbPath+File.separator+name);
+        if (!file.getParentFile().exists()) {
+            file.getParentFile().mkdir();
+        }
+        return file;
     }
 
     @Override
     public SQLiteDatabase openOrCreateDatabase(String name, int mode, SQLiteDatabase.CursorFactory factory) {
-        return super.openOrCreateDatabase(name, mode, factory);
+        return SQLiteDatabase.openOrCreateDatabase(getDatabasePath(name),factory);
     }
 
     @Override
     public SQLiteDatabase openOrCreateDatabase(String name, int mode, SQLiteDatabase.CursorFactory factory, DatabaseErrorHandler errorHandler) {
-        return super.openOrCreateDatabase(name, mode, factory, errorHandler);
+        return SQLiteDatabase.openOrCreateDatabase(getDatabasePath(name).getAbsolutePath(),factory,errorHandler);
     }
 }

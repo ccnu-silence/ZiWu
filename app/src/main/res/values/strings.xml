@@ -9,4 +9,11 @@
     <string name="bottom_indicator_plan">计划</string>
     <string name="bottom_indicator_record">记录</string>
     <string name="bottom_indicator_me">我的</string>
+
+    <string name="add_plan_detail_ok">确定</string>
+    <string name="add_plan_detail_cancel">取消</string>
+
+    <string name="add_plan_detail_edit_name">名称</string>
+    <string name="add_plan_detail_edit_add">添加</string>
+    <string name="add_plan_detail_edit_more">更多选项</string>
 </resources>
