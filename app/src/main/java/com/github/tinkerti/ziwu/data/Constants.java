@@ -11,10 +11,10 @@ public class Constants {
     public static final int YEAR_TYPE = 3;
     public static final int LONG_TERM_TYPE = 4;
 
-    public static final String CREATE_PLAN_DETAIL_TABLE="create table PlanDetail (planName text not null," +
-            "createTime integer not null, planPriority integer not null, planTime integer, planJoinParentId text, " +
-            "planTag text, planDuration integer)";
+    public static final String CREATE_PLAN_DETAIL_TABLE="create table PlanDetail ( planName text not null, " +
+            "createTime integer not null , planPriority integer not null , planTime integer , planJoinParentId text ," +
+            "planTag text , planDuration integer )";
 
-    public static final String CREATE_RECORD_DETAIL_TABLE="create table RecordDetail ( recordId text not null," +
-            "planId text , beginTime integer , endTime integer, timeDuration integer, recordState integer )";
+    public static final String CREATE_RECORD_DETAIL_TABLE="create table if not exists RecordDetail ( recordId text not null ," +
+            "planId text , beginTime integer , endTime integer , timeDuration integer, recordState integer )";
 }

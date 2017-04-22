@@ -1,7 +1,6 @@
 package com.github.tinkerti.ziwu.data.db;
 
 import android.content.Context;
-import android.database.DatabaseErrorHandler;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
@@ -23,16 +22,10 @@ public class DBHelper extends SQLiteOpenHelper {
         super(new AppContext(context,DBPath), name, factory, version);
     }
 
-
-    public DBHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version, DatabaseErrorHandler errorHandler) {
-        super(new AppContext(context,DBPath), name, factory, version, errorHandler);
+    public static void setDBPath(Context context,String userId) {
+        DBPath = context.getFilesDir().getAbsolutePath();
+        DBPath = DBPath + File.separator + userId;
     }
-
-    public void setDBPath(Context context,String userId){
-        DBPath=context.getFilesDir().getAbsolutePath();
-        DBPath=DBPath+ File.separator+userId;
-    }
-
 
     @Override
     public void onCreate(SQLiteDatabase db) {
