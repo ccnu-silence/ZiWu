@@ -38,7 +38,7 @@ public class App extends Application{
         });
 
         TaskManager.init(this);
-        TaskManager.openDB(this,"userId");
+        TaskManager.getInstance().loginSuccess(this,"userId");
 
     }
 }

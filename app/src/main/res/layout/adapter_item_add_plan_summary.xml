@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="45dp"
+    xmlns:tools="http://schemas.android.com/tools">
+    <TextView
+        android:id="@+id/ad_tv_add_plan_summary_name"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:gravity="center_vertical"
+        android:layout_marginLeft="25dp"
+        tools:text="锻炼"/>
+    <TextView
+        android:id="@+id/ad_tv_add_plan_summary_delete"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:text="@string/add_plan_summary_delete"
+        android:gravity="center_vertical"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="25dp"
+        tools:text="删除"/>
+</RelativeLayout>

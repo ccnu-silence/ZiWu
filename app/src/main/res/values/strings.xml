@@ -14,6 +14,13 @@
     <string name="add_plan_detail_cancel">取消</string>
 
     <string name="add_plan_detail_edit_name">名称</string>
+    <string name="add_plan_detail_edit_tag">标签</string>
+    <string name="add_plan_detail_edit_priority">优先级</string>
+    <string name="add_plan_detail_edit_plan_time">计划用时</string>
+    <string name="add_plan_detail_edit_join_parent_id">加入周计划</string>
+
     <string name="add_plan_detail_edit_add">添加</string>
     <string name="add_plan_detail_edit_more">更多选项</string>
+    <string name="add_plan_summary_delete">删除</string>
+
 </resources>

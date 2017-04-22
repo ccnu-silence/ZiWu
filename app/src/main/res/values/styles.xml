@@ -18,7 +18,31 @@
         <item name="android:textColor">#AF7AC5</item>
     </style>
 
+    <style name="add_plan_detail_item_left_text_view">
+        <item name="android:layout_width">45dp</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:layout_marginLeft">15dp</item>
+    </style>
+    <style name="add_plan_detail_item_right_edit_text">
+        <item name="android:layout_width">120dp</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:gravity">center_vertical</item>
+    </style>
 
+    <style name="plan_detail_item_left_text_view">
+        <item name="android:layout_width">45dp</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:layout_marginLeft">35dp</item>
+        <item name="android:gravity">center_vertical</item>
+    </style>
+    <style name="plan_detail_item_right_text_view">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:layout_marginRight">35dp</item>
+        <item name="android:layout_alignParentRight">true</item>
+        <item name="android:gravity">center_vertical</item>
+    </style>
 
     <declare-styleable name="AddImageButton">
         <attr name="AddButtonBackground" format="reference"/>

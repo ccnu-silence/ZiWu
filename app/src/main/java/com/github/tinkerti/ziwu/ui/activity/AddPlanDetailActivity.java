@@ -8,7 +8,9 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.github.tinkerti.ziwu.R;
+import com.github.tinkerti.ziwu.data.AddPlanTask;
 import com.github.tinkerti.ziwu.data.Constants;
+import com.github.tinkerti.ziwu.data.model.PlanDetailInfo;
 import com.github.tinkerti.ziwu.ui.adapter.AddPlanAdapter;
 
 import java.util.ArrayList;
@@ -20,6 +22,7 @@ import java.util.List;
 
 public class AddPlanDetailActivity extends BaseActivity{
 
+    //Todo:点击查看和收起计划详情；2、根据计划制定类型来显示计划列表；3、需要在planDetail表中添加计划类型column；
     RecyclerView addPlanRecyclerView;
     private int type;
     @Override
@@ -31,6 +34,13 @@ public class AddPlanDetailActivity extends BaseActivity{
         addPlanRecyclerView.setLayoutManager(new LinearLayoutManager(getBaseContext()));
         AddPlanAdapter addPlanAdapter=new AddPlanAdapter();
         List<AddPlanAdapter.ItemModel> modelList=new ArrayList<>();
+        List<PlanDetailInfo> planDetailInfoList= AddPlanTask.getInstance().getPlanDetailInfo() ;
+        for(PlanDetailInfo planDetailInfo:planDetailInfoList){
+            AddPlanAdapter.AddSummaryModel addSummaryModel=new AddPlanAdapter.AddSummaryModel();
+            addSummaryModel.setName(planDetailInfo.getPlanName());
+            addSummaryModel.setId(planDetailInfo.getPlanId());
+            modelList.add(addSummaryModel);
+        }
         AddPlanAdapter.AddEditModel addEditModel=new AddPlanAdapter.AddEditModel();
         modelList.add(addEditModel);
         addPlanAdapter.setModelList(modelList);

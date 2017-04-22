@@ -2,14 +2,14 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools">
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="45dp"
-        android:orientation="horizontal">
+        android:layout_height="45dp">
         <TextView
             android:id="@+id/ad_tv_add_plan_edit_name"
-            android:layout_width="wrap_content"
+            android:layout_width="45dp"
             android:layout_height="match_parent"
             android:layout_alignParentLeft="true"
             android:layout_marginLeft="15dp"
@@ -30,7 +30,61 @@
             android:text="@string/add_plan_detail_edit_add"
             android:gravity="center_vertical"/>
     </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/ad_ll_add_plan_more_item_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="gone">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="45dp"
+            android:orientation="horizontal">
+            <TextView
+                style="@style/add_plan_detail_item_left_text_view"
+                android:text="@string/add_plan_detail_edit_tag"/>
+            <EditText
+                android:id="@+id/ad_et_add_plan_edit_plan_tag"
+                style="@style/add_plan_detail_item_right_edit_text"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="45dp"
+            android:orientation="horizontal">
+            <TextView
+                style="@style/add_plan_detail_item_left_text_view"
+                android:text="@string/add_plan_detail_edit_priority"/>
+            <EditText
+                android:id="@+id/ad_et_add_plan_edit_priority"
+                style="@style/add_plan_detail_item_right_edit_text"/>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="45dp"
+            android:orientation="horizontal">
+            <TextView
+                style="@style/add_plan_detail_item_left_text_view"
+                android:text="@string/add_plan_detail_edit_plan_time"/>
+            <EditText
+                android:id="@+id/ad_et_add_plan_edit_plan_time"
+                style="@style/add_plan_detail_item_right_edit_text"/>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="45dp"
+            android:orientation="horizontal">
+            <TextView
+                style="@style/add_plan_detail_item_left_text_view"
+                android:text="@string/add_plan_detail_edit_join_parent_id"/>
+            <EditText
+                android:id="@+id/ad_et_add_plan_edit_join_parent_id"
+                style="@style/add_plan_detail_item_right_edit_text"/>
+        </LinearLayout>
+    </LinearLayout>
     <TextView
+        android:id="@+id/ad_tv_add_plan_more_item"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/add_plan_detail_edit_more"
