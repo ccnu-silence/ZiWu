@@ -19,6 +19,7 @@ public class PlanDetailInfo implements Parcelable {
 
     private String planId;
     private String planName;
+    private int planType;
     private long createTime;
     private int planPriority;
     private long planTime;
@@ -31,6 +32,7 @@ public class PlanDetailInfo implements Parcelable {
     protected PlanDetailInfo(Parcel in) {
         planId=in.readString();
         planName = in.readString();
+        planType=in.readInt();
         createTime = in.readLong();
         planPriority = in.readInt();
         planTime = in.readLong();
@@ -107,6 +109,15 @@ public class PlanDetailInfo implements Parcelable {
         this.planDuration = planDuration;
     }
 
+    public int getPlanType() {
+        return planType;
+    }
+
+    public void setPlanType(int planType) {
+        this.planType = planType;
+    }
+
+
     @Override
     public int describeContents() {
         return 0;
@@ -116,6 +127,7 @@ public class PlanDetailInfo implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(planId);
         dest.writeString(planName);
+        dest.writeInt(planType);
         dest.writeLong(createTime);
         dest.writeInt(planPriority);
         dest.writeLong(planTime);

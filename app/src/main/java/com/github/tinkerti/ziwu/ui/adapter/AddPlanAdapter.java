@@ -6,9 +6,11 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.github.tinkerti.ziwu.R;
 import com.github.tinkerti.ziwu.data.AddPlanTask;
@@ -24,9 +26,9 @@ import java.util.UUID;
 
 public class AddPlanAdapter extends RecyclerView.Adapter {
 
-    private static final int ADD_EDIT_TYPE = 1;
-    private static final int ADD_SUMMARY_TYPE = 2;
-    private static final int ADD_DETAIL_TYPE = 3;
+    private static final int MODEL_ADD_EDIT_TYPE = 1;
+    private static final int MODEL_ADD_SUMMARY_TYPE = 2;
+    private static final int MODEL_ADD_DETAIL_TYPE = 3;
 
     private List<ItemModel> modelList;
 
@@ -40,15 +42,15 @@ public class AddPlanAdapter extends RecyclerView.Adapter {
         LayoutInflater inflater = (LayoutInflater) parent.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View view = null;
         switch (viewType) {
-            case ADD_EDIT_TYPE:
+            case MODEL_ADD_EDIT_TYPE:
                 view = inflater.inflate(R.layout.adapter_item_add_plan_edit, parent, false);
                 itemViewHolder = new AddEditViewHolder(view);
                 break;
-            case ADD_SUMMARY_TYPE:
+            case MODEL_ADD_SUMMARY_TYPE:
                 view = inflater.inflate(R.layout.adapter_item_add_plan_summary, parent, false);
                 itemViewHolder = new AddSummaryViewHolder(view);
                 break;
-            case ADD_DETAIL_TYPE:
+            case MODEL_ADD_DETAIL_TYPE:
                 view = inflater.inflate(R.layout.adapter_item_add_plan_detail, parent, false);
                 itemViewHolder = new AddDetailViewHolder(view);
                 break;
@@ -107,8 +109,12 @@ public class AddPlanAdapter extends RecyclerView.Adapter {
         private EditText planTimeEditText;
         private EditText planJoinParentEditText;
 
+        private View itemView;
+        List<EditText> editTextList;
+
         public AddEditViewHolder(View itemView) {
             super(itemView);
+            editTextList = new ArrayList<>();
             nameEditText = (EditText) itemView.findViewById(R.id.ad_et_add_plan_edit_name);
             addButton = (TextView) itemView.findViewById(R.id.ad_tv_add_plan_button);
             moreButton = (TextView) itemView.findViewById(R.id.ad_tv_add_plan_more_item);
@@ -117,18 +123,38 @@ public class AddPlanAdapter extends RecyclerView.Adapter {
             priorityEditText = (EditText) itemView.findViewById(R.id.ad_et_add_plan_edit_priority);
             planJoinParentEditText = (EditText) itemView.findViewById(R.id.ad_et_add_plan_edit_join_parent_id);
             planTimeEditText = (EditText) itemView.findViewById(R.id.ad_et_add_plan_edit_plan_time);
+            this.itemView = itemView;
+            editTextList.add(nameEditText);
+            editTextList.add(tagEditText);
+            editTextList.add(priorityEditText);
+            editTextList.add(planJoinParentEditText);
+            editTextList.add(planTimeEditText);
         }
 
         @Override
         public void update(int position) {
-            ItemModel itemModel = modelList.get(position);
-
+            final AddEditModel addEditModel = (AddEditModel) modelList.get(position);
             final PlanDetailInfo planDetailInfo = new PlanDetailInfo();
+            //editText 获取焦点问题
+            //初始化加载的时候，itemView获取焦点
+            itemView.setFocusable(true);
+            itemView.setFocusableInTouchMode(true);
+            itemView.requestFocus();
+
+            //设置editText获取焦点和失去焦点；
+
+            setEditTextFocus(editTextList);
+
             addButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    if (TextUtils.isEmpty(nameEditText.getText())) {
+                        Toast.makeText(itemView.getContext(), itemView.getContext().getString(R.string.add_plan_detail_edit_text_name_no_string), Toast.LENGTH_SHORT).show();
+                        return;
+                    }
                     planDetailInfo.setPlanId(UUID.randomUUID().toString());
                     planDetailInfo.setPlanName(nameEditText.getText().toString());
+                    planDetailInfo.setPlanType(addEditModel.getPlanType());
                     planDetailInfo.setPlanTag(TextUtils.isEmpty(tagEditText.getText().toString()) ? null : tagEditText.getText().toString());
                     planDetailInfo.setPlanPriority(TextUtils.isEmpty(priorityEditText.getText().toString()) ? 0 : Integer.valueOf(priorityEditText.getText().toString()));
                     planDetailInfo.setPlanJoinParentId(TextUtils.isEmpty(planJoinParentEditText.getText().toString()) ? null : planJoinParentEditText.getText().toString());
@@ -137,7 +163,8 @@ public class AddPlanAdapter extends RecyclerView.Adapter {
                     AddPlanTask.getInstance().addPlanToDb(planDetailInfo);
                     moreItemContainer.setVisibility(View.GONE);
                     moreButton.setVisibility(View.VISIBLE);
-                    nameEditText.setText("");
+                    //重置所有的EditText；
+                    clearText(editTextList);
 
                     AddSummaryModel addSummaryModel = new AddSummaryModel();
                     addSummaryModel.setId(planDetailInfo.getPlanId());
@@ -155,7 +182,6 @@ public class AddPlanAdapter extends RecyclerView.Adapter {
                 }
             });
 
-
         }
     }
 
@@ -172,33 +198,46 @@ public class AddPlanAdapter extends RecyclerView.Adapter {
         }
 
         @Override
-        public void update(int position) {
+        public void update(final int position) {
             final AddSummaryModel addSummaryModel = (AddSummaryModel) (modelList.get(position));
             planNameTextView.setText(addSummaryModel.getName());
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    PlanDetailInfo planDetailInfo = AddPlanTask.getInstance().getPlanDetailInfoById(addSummaryModel.getId());
-                    AddDetailModel addDetailModel = new AddDetailModel();
-                    if (planDetailInfo != null) {
-                        addDetailModel.setPlanName(planDetailInfo.getPlanName());
-                        addDetailModel.setPlanPriority(planDetailInfo.getPlanPriority());
-                        addDetailModel.setPlanTime(planDetailInfo.getPlanTime());
-                        addDetailModel.setPlanJoinParentId(planDetailInfo.getPlanJoinParentId());
-                        addDetailModel.setPlanTag(planDetailInfo.getPlanTag());
+                    if (!addSummaryModel.isShowDetail()) {
+                        PlanDetailInfo planDetailInfo = AddPlanTask.getInstance().getPlanDetailInfoById(addSummaryModel.getId());
+                        AddDetailModel addDetailModel = new AddDetailModel();
+                        if (planDetailInfo != null) {
+                            addDetailModel.setPlanName(planDetailInfo.getPlanName());
+                            addDetailModel.setPlanPriority(planDetailInfo.getPlanPriority());
+                            addDetailModel.setPlanTime(planDetailInfo.getPlanTime());
+                            addDetailModel.setPlanJoinParentId(planDetailInfo.getPlanJoinParentId());
+                            addDetailModel.setPlanTag(planDetailInfo.getPlanTag());
 
-                        int position = findPosition(addSummaryModel);
-                        if (position >= 0) {
-                            modelList.add(position + 1, addDetailModel);
-                            notifyDataSetChanged();
+                            int position = findPosition(addSummaryModel);
+                            if (position >= 0) {
+                                modelList.add(position + 1, addDetailModel);
+                                notifyDataSetChanged();
+//                                notifyItemRangeInserted(getAdapterPosition() + 1, 1);
+                            }
                         }
+                    } else {
+                        modelList.remove(position + 1);
+                        notifyItemRangeRemoved(getAdapterPosition() + 1, 1);
                     }
+
+                    addSummaryModel.setShowDetail(!addSummaryModel.isShowDetail());
                 }
             });
             deleteButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-
+                    AddPlanTask.getInstance().deletePlanDetailInfoById(addSummaryModel.getId());
+                    modelList.remove(position);
+                    if (addSummaryModel.isShowDetail()) {
+                        modelList.remove(position);
+                    }
+                    notifyDataSetChanged();
                 }
             });
         }
@@ -212,6 +251,8 @@ public class AddPlanAdapter extends RecyclerView.Adapter {
         private TextView planJoinParentId;
         private TextView planTag;
 
+        private View itemView;
+
         public AddDetailViewHolder(View itemView) {
             super(itemView);
             planName = (TextView) itemView.findViewById(R.id.ad_tv_plan_detail_name);
@@ -219,6 +260,7 @@ public class AddPlanAdapter extends RecyclerView.Adapter {
             planTime = (TextView) itemView.findViewById(R.id.ad_tv_plan_detail_plan_time);
             planJoinParentId = (TextView) itemView.findViewById(R.id.ad_tv_plan_detail_join_parent_id);
             planTag = (TextView) itemView.findViewById(R.id.ad_tv_plan_detail_tag);
+            this.itemView = itemView;
         }
 
         @Override
@@ -229,6 +271,8 @@ public class AddPlanAdapter extends RecyclerView.Adapter {
             planTag.setText(addDetailModel.getPlanTag());
             planTime.setText(String.valueOf(addDetailModel.getPlanTime()));
             planJoinParentId.setText(addDetailModel.getPlanJoinParentId());
+//            itemView.setVisibility(addDetailModel.isShow()?View.GONE:View.VISIBLE);
+//            addDetailModel.setShow(!addDetailModel.isShow());
         }
     }
 
@@ -253,15 +297,35 @@ public class AddPlanAdapter extends RecyclerView.Adapter {
 
     public static class AddEditModel extends ItemModel {
 
+        private int planType;
+
         @Override
         public int getType() {
-            return ADD_EDIT_TYPE;
+            return MODEL_ADD_EDIT_TYPE;
+        }
+
+        public int getPlanType() {
+            return planType;
+        }
+
+        public void setPlanType(int planType) {
+            this.planType = planType;
         }
     }
 
     public static class AddSummaryModel extends ItemModel {
 
         private String name;
+
+        public boolean isShowDetail() {
+            return isShowDetail;
+        }
+
+        public void setShowDetail(boolean showDetail) {
+            isShowDetail = showDetail;
+        }
+
+        private boolean isShowDetail = false;
 
         public String getName() {
             return name;
@@ -274,11 +338,23 @@ public class AddPlanAdapter extends RecyclerView.Adapter {
 
         @Override
         public int getType() {
-            return ADD_SUMMARY_TYPE;
+            return MODEL_ADD_SUMMARY_TYPE;
         }
     }
 
     public static class AddDetailModel extends ItemModel {
+        private String planName;
+        private long createTime;
+        private int planPriority;
+        private long planTime;
+        private String planJoinParentId;
+        private String planTag;
+        private boolean isShow = false;
+
+        @Override
+        public int getType() {
+            return MODEL_ADD_DETAIL_TYPE;
+        }
 
         public String getPlanName() {
             return planName;
@@ -328,16 +404,13 @@ public class AddPlanAdapter extends RecyclerView.Adapter {
             this.planTag = planTag;
         }
 
-        private String planName;
-        private long createTime;
-        private int planPriority;
-        private long planTime;
-        private String planJoinParentId;
-        private String planTag;
 
-        @Override
-        public int getType() {
-            return ADD_DETAIL_TYPE;
+        public boolean isShow() {
+            return isShow;
+        }
+
+        public void setShow(boolean show) {
+            isShow = show;
         }
     }
 
@@ -365,5 +438,60 @@ public class AddPlanAdapter extends RecyclerView.Adapter {
             position++;
         }
         return -1;
+    }
+
+
+    private void editTextGetFocus(final EditText editText) {
+        editText.requestFocus();
+        editText.post(new Runnable() {
+            @Override
+            public void run() {
+                InputMethodManager manager = (InputMethodManager) editText.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                manager.showSoftInput(editText, 0);
+            }
+        });
+        editText.setSelection(editText.getText().length());
+    }
+
+    private void editTextLoseFocus(final EditText editText) {
+        editText.clearFocus();
+        editText.post(new Runnable() {
+            @Override
+            public void run() {
+                InputMethodManager manager = (InputMethodManager) editText.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                manager.hideSoftInputFromWindow(editText.getWindowToken(), 0);
+            }
+        });
+    }
+
+    private void setEditTextFocus(List<EditText> editTextList) {
+        for (EditText editText : editTextList) {
+            editText.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    //点击editText的时候获取焦点
+                    editTextGetFocus((EditText) v);
+                }
+            });
+
+            //获取和失去焦点的监听
+            editText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+                @Override
+                public void onFocusChange(View v, boolean hasFocus) {
+                    if (hasFocus) {
+                        editTextGetFocus((EditText) v);
+                    } else {
+                        editTextLoseFocus((EditText) v);
+                    }
+                }
+            });
+        }
+
+    }
+
+    private void clearText(List<EditText> editTextList) {
+        for (EditText editText : editTextList) {
+            editText.setText("");
+        }
     }
 }

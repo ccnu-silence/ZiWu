@@ -23,4 +23,6 @@
     <string name="add_plan_detail_edit_more">更多选项</string>
     <string name="add_plan_summary_delete">删除</string>
 
+    <string name="add_plan_detail_edit_text_name_no_string">计划名称不能为空</string>
+
 </resources>

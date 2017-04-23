@@ -29,6 +29,9 @@ public class DBHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
+        //两个planTable,一个记录添加创建时候的表
+        //一个记录创建完成的表；
+        db.execSQL(Constants.CREATE_ADD_PLAN_DETAIL_TABLE);
         db.execSQL(Constants.CREATE_PLAN_DETAIL_TABLE);
         db.execSQL(Constants.CREATE_RECORD_DETAIL_TABLE);
     }
