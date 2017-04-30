@@ -14,7 +14,7 @@ import android.widget.Toast;
 
 import com.github.tinkerti.ziwu.R;
 import com.github.tinkerti.ziwu.data.AddPlanTask;
-import com.github.tinkerti.ziwu.data.model.PlanDetailInfo;
+import com.github.tinkerti.ziwu.data.model.AddPlanDetailInfo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -134,7 +134,7 @@ public class AddPlanAdapter extends RecyclerView.Adapter {
         @Override
         public void update(int position) {
             final AddEditModel addEditModel = (AddEditModel) modelList.get(position);
-            final PlanDetailInfo planDetailInfo = new PlanDetailInfo();
+            final AddPlanDetailInfo addPlanDetailInfo = new AddPlanDetailInfo();
             //editText 获取焦点问题
             //初始化加载的时候，itemView获取焦点
             itemView.setFocusable(true);
@@ -152,23 +152,23 @@ public class AddPlanAdapter extends RecyclerView.Adapter {
                         Toast.makeText(itemView.getContext(), itemView.getContext().getString(R.string.add_plan_detail_edit_text_name_no_string), Toast.LENGTH_SHORT).show();
                         return;
                     }
-                    planDetailInfo.setPlanId(UUID.randomUUID().toString());
-                    planDetailInfo.setPlanName(nameEditText.getText().toString());
-                    planDetailInfo.setPlanType(addEditModel.getPlanType());
-                    planDetailInfo.setPlanTag(TextUtils.isEmpty(tagEditText.getText().toString()) ? null : tagEditText.getText().toString());
-                    planDetailInfo.setPlanPriority(TextUtils.isEmpty(priorityEditText.getText().toString()) ? 0 : Integer.valueOf(priorityEditText.getText().toString()));
-                    planDetailInfo.setPlanJoinParentId(TextUtils.isEmpty(planJoinParentEditText.getText().toString()) ? null : planJoinParentEditText.getText().toString());
-                    planDetailInfo.setPlanTime(TextUtils.isEmpty(planTimeEditText.getText().toString()) ? 0 : Integer.valueOf(planTimeEditText.getText().toString()));
-                    planDetailInfo.setCreateTime(System.currentTimeMillis());
-                    AddPlanTask.getInstance().addPlanToDb(planDetailInfo);
+                    addPlanDetailInfo.setPlanId(UUID.randomUUID().toString());
+                    addPlanDetailInfo.setPlanName(nameEditText.getText().toString());
+                    addPlanDetailInfo.setPlanType(addEditModel.getPlanType());
+                    addPlanDetailInfo.setPlanTag(TextUtils.isEmpty(tagEditText.getText().toString()) ? null : tagEditText.getText().toString());
+                    addPlanDetailInfo.setPlanPriority(TextUtils.isEmpty(priorityEditText.getText().toString()) ? 0 : Integer.valueOf(priorityEditText.getText().toString()));
+                    addPlanDetailInfo.setPlanJoinParentId(TextUtils.isEmpty(planJoinParentEditText.getText().toString()) ? null : planJoinParentEditText.getText().toString());
+                    addPlanDetailInfo.setPlanTime(TextUtils.isEmpty(planTimeEditText.getText().toString()) ? 0 : Integer.valueOf(planTimeEditText.getText().toString()));
+                    addPlanDetailInfo.setCreateTime(System.currentTimeMillis());
+                    AddPlanTask.getInstance().addPlanToDb(addPlanDetailInfo);
                     moreItemContainer.setVisibility(View.GONE);
                     moreButton.setVisibility(View.VISIBLE);
                     //重置所有的EditText；
                     clearText(editTextList);
 
                     AddSummaryModel addSummaryModel = new AddSummaryModel();
-                    addSummaryModel.setId(planDetailInfo.getPlanId());
-                    addSummaryModel.setName(planDetailInfo.getPlanName());
+                    addSummaryModel.setId(addPlanDetailInfo.getPlanId());
+                    addSummaryModel.setName(addPlanDetailInfo.getPlanName());
                     modelList.add(0, addSummaryModel);
                     notifyDataSetChanged();
 
@@ -205,21 +205,22 @@ public class AddPlanAdapter extends RecyclerView.Adapter {
                 @Override
                 public void onClick(View v) {
                     if (!addSummaryModel.isShowDetail()) {
-                        PlanDetailInfo planDetailInfo = AddPlanTask.getInstance().getPlanDetailInfoById(addSummaryModel.getId());
+                        AddPlanDetailInfo addPlanDetailInfo = AddPlanTask.getInstance().getPlanDetailInfoById(addSummaryModel.getId());
                         AddDetailModel addDetailModel = new AddDetailModel();
-                        if (planDetailInfo != null) {
-                            addDetailModel.setPlanName(planDetailInfo.getPlanName());
-                            addDetailModel.setPlanPriority(planDetailInfo.getPlanPriority());
-                            addDetailModel.setPlanTime(planDetailInfo.getPlanTime());
-                            addDetailModel.setPlanJoinParentId(planDetailInfo.getPlanJoinParentId());
-                            addDetailModel.setPlanTag(planDetailInfo.getPlanTag());
-
-                            int position = findPosition(addSummaryModel);
-                            if (position >= 0) {
-                                modelList.add(position + 1, addDetailModel);
-                                notifyDataSetChanged();
-//                                notifyItemRangeInserted(getAdapterPosition() + 1, 1);
-                            }
+                        if (addPlanDetailInfo != null) {
+                            addDetailModel.setPlanName(addPlanDetailInfo.getPlanName());
+                            addDetailModel.setPlanPriority(addPlanDetailInfo.getPlanPriority());
+                            addDetailModel.setPlanTime(addPlanDetailInfo.getPlanTime());
+                            addDetailModel.setPlanJoinParentId(addPlanDetailInfo.getPlanJoinParentId());
+                            addDetailModel.setPlanTag(addPlanDetailInfo.getPlanTag());
+                            modelList.add(getAdapterPosition() + 1, addDetailModel);
+                            notifyDataSetChanged();
+//                            int position = findPosition(addSummaryModel);
+//                            if (position >= 0) {
+//                                modelList.add(position + 1, addDetailModel);
+//                                notifyDataSetChanged();
+////                                notifyItemRangeInserted(getAdapterPosition() + 1, 1);
+//                            }
                         }
                     } else {
                         modelList.remove(position + 1);
@@ -255,7 +256,7 @@ public class AddPlanAdapter extends RecyclerView.Adapter {
 
         public AddDetailViewHolder(View itemView) {
             super(itemView);
-            planName = (TextView) itemView.findViewById(R.id.ad_tv_plan_detail_name);
+            planName = (TextView) itemView.findViewById(R.id.ad_tv_add_plan_detail_name);
             planPriority = (TextView) itemView.findViewById(R.id.ad_tv_plan_detail_priority);
             planTime = (TextView) itemView.findViewById(R.id.ad_tv_plan_detail_plan_time);
             planJoinParentId = (TextView) itemView.findViewById(R.id.ad_tv_plan_detail_join_parent_id);
@@ -429,16 +430,16 @@ public class AddPlanAdapter extends RecyclerView.Adapter {
         notifyDataSetChanged();
     }
 
-    private int findPosition(ItemModel model) {
-        int position = 0;
-        for (ItemModel itemModel : modelList) {
-            if (itemModel.getId().equals(model.getId())) {
-                return position;
-            }
-            position++;
-        }
-        return -1;
-    }
+//    private int findPosition(ItemModel model) {
+//        int position = 0;
+//        for (ItemModel itemModel : modelList) {
+//            if (itemModel.getId().equals(model.getId())) {
+//                return position;
+//            }
+//            position++;
+//        }
+//        return -1;
+//    }
 
 
     private void editTextGetFocus(final EditText editText) {

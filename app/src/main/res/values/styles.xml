@@ -24,6 +24,7 @@
         <item name="android:gravity">center_vertical</item>
         <item name="android:layout_marginLeft">15dp</item>
     </style>
+
     <style name="add_plan_detail_item_right_edit_text">
         <item name="android:layout_width">120dp</item>
         <item name="android:layout_height">match_parent</item>
@@ -36,6 +37,7 @@
         <item name="android:layout_marginLeft">35dp</item>
         <item name="android:gravity">center_vertical</item>
     </style>
+
     <style name="plan_detail_item_right_text_view">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">match_parent</item>
@@ -44,13 +46,30 @@
         <item name="android:gravity">center_vertical</item>
     </style>
 
+    <style name="adapter_item_plan_summary_left_text_view">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:layout_marginLeft">25dp</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+
+    <style name="adapter_item_plan_summary_right_text_view">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:layout_alignParentRight">true</item>
+        <item name="android:layout_marginRight">25dp</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+
     <declare-styleable name="AddImageButton">
-        <attr name="AddButtonBackground" format="reference"/>
-        <attr name="AddButtonImageSrc" format="reference"/>
+        <attr name="AddButtonBackground" format="reference" />
+        <attr name="AddButtonImageSrc" format="reference" />
     </declare-styleable>
 
     <declare-styleable name="TabIndicatorItemView">
-        <attr name="IndicatorButton" format="reference"/>
-        <attr name="IndicatorText" format="reference"/>
+        <attr name="IndicatorButton" format="reference" />
+        <attr name="IndicatorText" format="reference" />
     </declare-styleable>
 </resources>

@@ -13,7 +13,7 @@ import android.widget.TextView;
 import com.github.tinkerti.ziwu.R;
 import com.github.tinkerti.ziwu.data.AddPlanTask;
 import com.github.tinkerti.ziwu.data.Constants;
-import com.github.tinkerti.ziwu.data.model.PlanDetailInfo;
+import com.github.tinkerti.ziwu.data.model.AddPlanDetailInfo;
 import com.github.tinkerti.ziwu.ui.adapter.AddPlanAdapter;
 
 import java.util.ArrayList;
@@ -38,11 +38,11 @@ public class AddPlanDetailActivity extends BaseActivity {
         addPlanRecyclerView.setLayoutManager(new LinearLayoutManager(getBaseContext()));
         AddPlanAdapter addPlanAdapter = new AddPlanAdapter();
         List<AddPlanAdapter.ItemModel> modelList = new ArrayList<>();
-        List<PlanDetailInfo> planDetailInfoList = AddPlanTask.getInstance().getPlanDetailInfoByType(type);
-        for (PlanDetailInfo planDetailInfo : planDetailInfoList) {
+        List<AddPlanDetailInfo> addPlanDetailInfoList = AddPlanTask.getInstance().getPlanDetailInfoByType(type);
+        for (AddPlanDetailInfo addPlanDetailInfo : addPlanDetailInfoList) {
             AddPlanAdapter.AddSummaryModel addSummaryModel = new AddPlanAdapter.AddSummaryModel();
-            addSummaryModel.setName(planDetailInfo.getPlanName());
-            addSummaryModel.setId(planDetailInfo.getPlanId());
+            addSummaryModel.setName(addPlanDetailInfo.getPlanName());
+            addSummaryModel.setId(addPlanDetailInfo.getPlanId());
             modelList.add(addSummaryModel);
         }
         AddPlanAdapter.AddEditModel addEditModel = new AddPlanAdapter.AddEditModel();

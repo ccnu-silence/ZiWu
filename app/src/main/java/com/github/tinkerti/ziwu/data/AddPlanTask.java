@@ -2,7 +2,7 @@ package com.github.tinkerti.ziwu.data;
 
 import android.database.Cursor;
 
-import com.github.tinkerti.ziwu.data.model.PlanDetailInfo;
+import com.github.tinkerti.ziwu.data.model.AddPlanDetailInfo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,7 +32,7 @@ public class AddPlanTask implements ITask {
         return SingleTonHolder.sIns;
     }
 
-    public void addPlanToDb(PlanDetailInfo info) {
+    public void addPlanToDb(AddPlanDetailInfo info) {
         //在插入的时候书写sql语句出现了问题，text类型的数据需要额外添加''引号来表示；
         String sql = "insert or replace into " + Constants.ADD_PLAN_DETAIL_TABLE_NAME +
                 " values ( '" +
@@ -48,70 +48,70 @@ public class AddPlanTask implements ITask {
         TaskManager.getInstance().getDb().execSQL(sql);
     }
 
-    public PlanDetailInfo getPlanDetailInfoById(String planId) {
+    public AddPlanDetailInfo getPlanDetailInfoById(String planId) {
         String sql = "select * from " +
                 Constants.ADD_PLAN_DETAIL_TABLE_NAME +
                 " where planId = '" +
                 planId + "'";
         Cursor cursor = TaskManager.getInstance().getDb().rawQuery(sql, null);
-        PlanDetailInfo planDetailInfo = null;
+        AddPlanDetailInfo addPlanDetailInfo = null;
         while (cursor.moveToNext()) {
-            planDetailInfo = new PlanDetailInfo();
-            planDetailInfo.setPlanId(cursor.getString(cursor.getColumnIndex(Constants.PLAN_DETAIL_TABLE_COLUMN_PLAN_ID)));
-            planDetailInfo.setPlanName(cursor.getString(cursor.getColumnIndex(Constants.PLAN_DETAIL_TABLE_COLUMN_PLAN_NAME)));
-            planDetailInfo.setCreateTime(cursor.getLong(cursor.getColumnIndex(Constants.PLAN_DETAIL_TABLE_COLUMN_PLAN_CREATE_TIME)));
-            planDetailInfo.setPlanPriority(cursor.getInt(cursor.getColumnIndex(Constants.PLAN_DETAIL_TABLE_COLUMN_PLAN_PRIORITY)));
-            planDetailInfo.setPlanTime(cursor.getLong(cursor.getColumnIndex(Constants.PLAN_DETAIL_TABLE_COLUMN_PLAN_TIME)));
-            planDetailInfo.setPlanJoinParentId(cursor.getString(cursor.getColumnIndex(Constants.PLAN_DETAIL_TABLE_COLUMN_PLAN_JOIN_PARENT_ID)));
-            planDetailInfo.setPlanTag(cursor.getString(cursor.getColumnIndex(Constants.PLAN_DETAIL_TABLE_COLUMN_PLAN_TAG)));
+            addPlanDetailInfo = new AddPlanDetailInfo();
+            addPlanDetailInfo.setPlanId(cursor.getString(cursor.getColumnIndex(Constants.PLAN_DETAIL_TABLE_COLUMN_PLAN_ID)));
+            addPlanDetailInfo.setPlanName(cursor.getString(cursor.getColumnIndex(Constants.PLAN_DETAIL_TABLE_COLUMN_PLAN_NAME)));
+            addPlanDetailInfo.setCreateTime(cursor.getLong(cursor.getColumnIndex(Constants.PLAN_DETAIL_TABLE_COLUMN_PLAN_CREATE_TIME)));
+            addPlanDetailInfo.setPlanPriority(cursor.getInt(cursor.getColumnIndex(Constants.PLAN_DETAIL_TABLE_COLUMN_PLAN_PRIORITY)));
+            addPlanDetailInfo.setPlanTime(cursor.getLong(cursor.getColumnIndex(Constants.PLAN_DETAIL_TABLE_COLUMN_PLAN_TIME)));
+            addPlanDetailInfo.setPlanJoinParentId(cursor.getString(cursor.getColumnIndex(Constants.PLAN_DETAIL_TABLE_COLUMN_PLAN_JOIN_PARENT_ID)));
+            addPlanDetailInfo.setPlanTag(cursor.getString(cursor.getColumnIndex(Constants.PLAN_DETAIL_TABLE_COLUMN_PLAN_TAG)));
         }
         cursor.close();
-        return planDetailInfo;
+        return addPlanDetailInfo;
     }
 
 
-    public List<PlanDetailInfo> getPlanDetailInfoByType(int type) {
-        List<PlanDetailInfo> planDetailInfoList = new ArrayList<>();
+    public List<AddPlanDetailInfo> getPlanDetailInfoByType(int type) {
+        List<AddPlanDetailInfo> addPlanDetailInfoList = new ArrayList<>();
         String sql = "select * from " +
                 Constants.ADD_PLAN_DETAIL_TABLE_NAME
                 + " where " + Constants.PLAN_DETAIL_TABLE_COLUMN_PLAN_TYPE
                 + " = " + type;
         Cursor cursor = TaskManager.getInstance().getDb().rawQuery(sql, null);
         while (cursor.moveToNext()) {
-            PlanDetailInfo planDetailInfo = new PlanDetailInfo();
-            planDetailInfo.setPlanId(cursor.getString(cursor.getColumnIndex(Constants.PLAN_DETAIL_TABLE_COLUMN_PLAN_ID)));
-            planDetailInfo.setPlanName(cursor.getString(cursor.getColumnIndex(Constants.PLAN_DETAIL_TABLE_COLUMN_PLAN_NAME)));
-            planDetailInfo.setPlanType(cursor.getInt(cursor.getColumnIndex(Constants.PLAN_DETAIL_TABLE_COLUMN_PLAN_TYPE)));
-            planDetailInfo.setCreateTime(cursor.getLong(cursor.getColumnIndex(Constants.PLAN_DETAIL_TABLE_COLUMN_PLAN_CREATE_TIME)));
-            planDetailInfo.setPlanPriority(cursor.getInt(cursor.getColumnIndex(Constants.PLAN_DETAIL_TABLE_COLUMN_PLAN_PRIORITY)));
-            planDetailInfo.setPlanTime(cursor.getLong(cursor.getColumnIndex(Constants.PLAN_DETAIL_TABLE_COLUMN_PLAN_TIME)));
-            planDetailInfo.setPlanJoinParentId(cursor.getString(cursor.getColumnIndex(Constants.PLAN_DETAIL_TABLE_COLUMN_PLAN_JOIN_PARENT_ID)));
-            planDetailInfo.setPlanTag(cursor.getString(cursor.getColumnIndex(Constants.PLAN_DETAIL_TABLE_COLUMN_PLAN_TAG)));
-            planDetailInfoList.add(planDetailInfo);
+            AddPlanDetailInfo addPlanDetailInfo = new AddPlanDetailInfo();
+            addPlanDetailInfo.setPlanId(cursor.getString(cursor.getColumnIndex(Constants.PLAN_DETAIL_TABLE_COLUMN_PLAN_ID)));
+            addPlanDetailInfo.setPlanName(cursor.getString(cursor.getColumnIndex(Constants.PLAN_DETAIL_TABLE_COLUMN_PLAN_NAME)));
+            addPlanDetailInfo.setPlanType(cursor.getInt(cursor.getColumnIndex(Constants.PLAN_DETAIL_TABLE_COLUMN_PLAN_TYPE)));
+            addPlanDetailInfo.setCreateTime(cursor.getLong(cursor.getColumnIndex(Constants.PLAN_DETAIL_TABLE_COLUMN_PLAN_CREATE_TIME)));
+            addPlanDetailInfo.setPlanPriority(cursor.getInt(cursor.getColumnIndex(Constants.PLAN_DETAIL_TABLE_COLUMN_PLAN_PRIORITY)));
+            addPlanDetailInfo.setPlanTime(cursor.getLong(cursor.getColumnIndex(Constants.PLAN_DETAIL_TABLE_COLUMN_PLAN_TIME)));
+            addPlanDetailInfo.setPlanJoinParentId(cursor.getString(cursor.getColumnIndex(Constants.PLAN_DETAIL_TABLE_COLUMN_PLAN_JOIN_PARENT_ID)));
+            addPlanDetailInfo.setPlanTag(cursor.getString(cursor.getColumnIndex(Constants.PLAN_DETAIL_TABLE_COLUMN_PLAN_TAG)));
+            addPlanDetailInfoList.add(addPlanDetailInfo);
         }
         cursor.close();
-        return planDetailInfoList;
+        return addPlanDetailInfoList;
     }
 
-    public List<PlanDetailInfo> getPlanDetailInfo() {
-        List<PlanDetailInfo> planDetailInfoList = new ArrayList<>();
+    public List<AddPlanDetailInfo> getPlanDetailInfo() {
+        List<AddPlanDetailInfo> addPlanDetailInfoList = new ArrayList<>();
         String sql = "select * from " +
                 Constants.ADD_PLAN_DETAIL_TABLE_NAME;
         Cursor cursor = TaskManager.getInstance().getDb().rawQuery(sql, null);
         while (cursor.moveToNext()) {
-            PlanDetailInfo planDetailInfo = new PlanDetailInfo();
-            planDetailInfo.setPlanId(cursor.getString(cursor.getColumnIndex(Constants.PLAN_DETAIL_TABLE_COLUMN_PLAN_ID)));
-            planDetailInfo.setPlanName(cursor.getString(cursor.getColumnIndex(Constants.PLAN_DETAIL_TABLE_COLUMN_PLAN_NAME)));
-            planDetailInfo.setPlanType(cursor.getInt(cursor.getColumnIndex(Constants.PLAN_DETAIL_TABLE_COLUMN_PLAN_TYPE)));
-            planDetailInfo.setCreateTime(cursor.getLong(cursor.getColumnIndex(Constants.PLAN_DETAIL_TABLE_COLUMN_PLAN_CREATE_TIME)));
-            planDetailInfo.setPlanPriority(cursor.getInt(cursor.getColumnIndex(Constants.PLAN_DETAIL_TABLE_COLUMN_PLAN_PRIORITY)));
-            planDetailInfo.setPlanTime(cursor.getLong(cursor.getColumnIndex(Constants.PLAN_DETAIL_TABLE_COLUMN_PLAN_TIME)));
-            planDetailInfo.setPlanJoinParentId(cursor.getString(cursor.getColumnIndex(Constants.PLAN_DETAIL_TABLE_COLUMN_PLAN_JOIN_PARENT_ID)));
-            planDetailInfo.setPlanTag(cursor.getString(cursor.getColumnIndex(Constants.PLAN_DETAIL_TABLE_COLUMN_PLAN_TAG)));
-            planDetailInfoList.add(planDetailInfo);
+            AddPlanDetailInfo addPlanDetailInfo = new AddPlanDetailInfo();
+            addPlanDetailInfo.setPlanId(cursor.getString(cursor.getColumnIndex(Constants.PLAN_DETAIL_TABLE_COLUMN_PLAN_ID)));
+            addPlanDetailInfo.setPlanName(cursor.getString(cursor.getColumnIndex(Constants.PLAN_DETAIL_TABLE_COLUMN_PLAN_NAME)));
+            addPlanDetailInfo.setPlanType(cursor.getInt(cursor.getColumnIndex(Constants.PLAN_DETAIL_TABLE_COLUMN_PLAN_TYPE)));
+            addPlanDetailInfo.setCreateTime(cursor.getLong(cursor.getColumnIndex(Constants.PLAN_DETAIL_TABLE_COLUMN_PLAN_CREATE_TIME)));
+            addPlanDetailInfo.setPlanPriority(cursor.getInt(cursor.getColumnIndex(Constants.PLAN_DETAIL_TABLE_COLUMN_PLAN_PRIORITY)));
+            addPlanDetailInfo.setPlanTime(cursor.getLong(cursor.getColumnIndex(Constants.PLAN_DETAIL_TABLE_COLUMN_PLAN_TIME)));
+            addPlanDetailInfo.setPlanJoinParentId(cursor.getString(cursor.getColumnIndex(Constants.PLAN_DETAIL_TABLE_COLUMN_PLAN_JOIN_PARENT_ID)));
+            addPlanDetailInfo.setPlanTag(cursor.getString(cursor.getColumnIndex(Constants.PLAN_DETAIL_TABLE_COLUMN_PLAN_TAG)));
+            addPlanDetailInfoList.add(addPlanDetailInfo);
         }
         cursor.close();
-        return planDetailInfoList;
+        return addPlanDetailInfoList;
     }
 
     public void deletePlanDetailInfoById(String planId) {
@@ -126,7 +126,8 @@ public class AddPlanTask implements ITask {
 
     public void savePlanDetailInfo() {
         String savePlanSql = "insert or replace into " + Constants.PLAN_DETAIL_TABLE_NAME +
-                "select * from " + Constants.ADD_PLAN_DETAIL_TABLE_NAME;
+                " select * from " + Constants.ADD_PLAN_DETAIL_TABLE_NAME;
         TaskManager.getInstance().getDb().execSQL(savePlanSql);
+        deletePlanDetailInfo();
     }
 }

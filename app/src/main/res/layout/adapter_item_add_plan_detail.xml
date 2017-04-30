@@ -11,7 +11,7 @@
             style="@style/plan_detail_item_left_text_view"
             android:text="@string/add_plan_detail_edit_name" />
         <TextView
-            android:id="@+id/ad_tv_plan_detail_name"
+            android:id="@+id/ad_tv_add_plan_detail_name"
             style="@style/plan_detail_item_right_text_view"
             tools:text="锻炼"/>
         <EditText

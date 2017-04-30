@@ -1,5 +1,16 @@
 <resources>
-    <string name="app_name">ZiWu</string>
+    <string name="app_name">子午</string>
+
+
+    <string name="plan_today">今天</string>
+    <string name="plan_this_week">近七天</string>
+    <string name="plan_long_time">长期计划</string>
+    <string name="ad_item_plan_no_plan">暂无计划</string>
+    <string name="ad_item_plan_recorded_time">%1$s已经进行了%2$s</string>
+    <string name="ad_item_plan_record_start">开始</string>
+    <string name="ad_item_plan_record_stop">停止</string>
+    <string name="ad_item_plan_record_finish">完成</string>
+
 
 
     <string name="add_plan_today">每日计划</string>
@@ -22,7 +33,7 @@
     <string name="add_plan_detail_edit_add">添加</string>
     <string name="add_plan_detail_edit_more">更多选项</string>
     <string name="add_plan_summary_delete">删除</string>
-
     <string name="add_plan_detail_edit_text_name_no_string">计划名称不能为空</string>
+
 
 </resources>

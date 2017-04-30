@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="60dp">
+
+    <TextView
+        android:id="@+id/ad_tv_plan_recorded_time"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="25dp"
+        android:gravity="center_vertical"
+        tools:text="今天已经进行了3个小时" />
+
+    <TextView
+        android:id="@+id/ad_tv_plan_record_finish"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="25dp"
+        android:gravity="center_vertical"
+        android:text="@string/ad_item_plan_record_finish"
+        tools:text="完成" />
+    <TextView
+        android:id="@+id/ad_tv_plan_record_stop"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_marginRight="25dp"
+        android:layout_toLeftOf="@id/ad_tv_plan_record_finish"
+        android:gravity="center_vertical"
+        android:text="@string/ad_item_plan_record_stop"
+        tools:text="停止" />
+    <TextView
+        android:id="@+id/ad_tv_plan_record_begin"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_marginRight="25dp"
+        android:layout_toLeftOf="@id/ad_tv_plan_record_stop"
+        android:text="@string/ad_item_plan_record_start"
+        android:gravity="center_vertical"
+        tools:text="开始" />
+
+
+
+
+</RelativeLayout>

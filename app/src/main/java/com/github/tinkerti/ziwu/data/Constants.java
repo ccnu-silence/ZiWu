@@ -12,7 +12,7 @@ public class Constants {
     public static final int LONG_TERM_TYPE = 4;
 
     public static final String PLAN_DETAIL_TABLE_NAME = "PlanDetail";
-    public static final String ADD_PLAN_DETAIL_TABLE_NAME = "PlanDetail";
+    public static final String ADD_PLAN_DETAIL_TABLE_NAME = "AddPlanDetail";
     public static final String RECORD_DETAIL_TABLE_NAME = "RecordDetail";
 
     public static final String PLAN_DETAIL_TABLE_COLUMN_PLAN_ID = "planId";
@@ -25,6 +25,14 @@ public class Constants {
 
     public static final String PLAN_DETAIL_TABLE_COLUMN_PLAN_JOIN_PARENT_ID = "planJoinParentId";
     public static final String PLAN_DETAIL_TABLE_COLUMN_PLAN_TAG = "planTag";
+
+
+    public static final int NOTIFICATION_START_ACTIVITY=11;
+
+    public static final int RECORD_STATE_IDLE=100;
+    public static final int RECORD_STATE_RECORDING=101;
+    public static final int RECORD_STATE_PAUSE=102;
+    public static final int RECORD_STATE_STOP=103;
 
 
     public static final String CREATE_ADD_PLAN_DETAIL_TABLE = "create table " + ADD_PLAN_DETAIL_TABLE_NAME + " ( planId text not null primary key, " +

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/ad_tv_plan_category"
+    android:layout_width="match_parent"
+    android:layout_height="30dp"
+    android:layout_marginLeft="15sp"
+    android:gravity="center_vertical"
+    android:text="@string/plan_today"
+    android:textSize="16sp" />
