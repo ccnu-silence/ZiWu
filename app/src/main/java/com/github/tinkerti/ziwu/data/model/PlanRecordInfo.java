@@ -9,11 +9,38 @@ import android.os.Parcelable;
 
 public class PlanRecordInfo extends PlanBaseInfo implements Parcelable{
 
+    public String getRecordId() {
+        return recordId;
+    }
+
+    public void setRecordId(String recordId) {
+        this.recordId = recordId;
+    }
+    private String recordId;
     private long startTime;
     private long endTime;
     private long timeDuration=0;
     private int recordState;
     private Runnable refreshUiRunnable;//用于定时刷新计时的ui
+    private boolean isExpand=false;
+
+    public long getRealRecordTime() {
+        return realRecordTime;
+    }
+
+    public void setRealRecordTime(long realRecordTime) {
+        this.realRecordTime = realRecordTime;
+    }
+
+    private long realRecordTime;
+
+    public boolean isExpand() {
+        return isExpand;
+    }
+
+    public void setExpand(boolean expand) {
+        isExpand = expand;
+    }
 
     public Runnable getRecordTimeRunnable() {
         return recordTimeRunnable;

@@ -14,8 +14,11 @@ import android.widget.RemoteViews;
 
 import com.github.tinkerti.ziwu.R;
 import com.github.tinkerti.ziwu.data.Constants;
+import com.github.tinkerti.ziwu.data.RecordTask;
 import com.github.tinkerti.ziwu.data.model.PlanRecordInfo;
 import com.github.tinkerti.ziwu.ui.activity.MainActivity;
+
+import java.util.UUID;
 
 /**
  * Created by tiankui on 4/30/17.
@@ -49,15 +52,19 @@ public class RecordService extends Service {
                 public void run() {
                     recordInfo.setTimeDuration(recordInfo.getTimeDuration() + 1000);
                     recordInfo.setRecordState(Constants.RECORD_STATE_RECORDING);
-                    handler.postDelayed(this,1000);
+                    handler.postDelayed(this, 1000);
                     recordInfo.setRecordTimeRunnable(this);
                 }
             };
             handler.postDelayed(startRecordRunnable, 1000);
+            recordInfo.setStartTime(System.currentTimeMillis());
+            recordInfo.setRecordId(UUID.randomUUID().toString());
+            recordInfo.setRecordState(Constants.RECORD_STATE_RECORDING);
+            RecordTask.getInstance().addPlanRecord(recordInfo);
         }
 
-        public void stopRecord(PlanRecordInfo recordInfo){
-              handler.removeCallbacks(recordInfo.getRecordTimeRunnable());
+        public void stopRecord(PlanRecordInfo recordInfo) {
+            handler.removeCallbacks(recordInfo.getRecordTimeRunnable());
         }
     }
 

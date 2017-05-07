@@ -40,6 +40,7 @@ public class PlanFragment extends Fragment {
     int[] types;
     private RecordServiceConnection serviceConnection;
     private Map<String, PlanRecordInfo> planRecordInfoMap;
+    private RecyclerView recyclerView;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -54,7 +55,7 @@ public class PlanFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         initBindService();
         View view = inflater.inflate(R.layout.fragment_plan_list, container, false);
-        RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.fr_rv_plan_summary_list);
+        recyclerView = (RecyclerView) view.findViewById(R.id.fr_rv_plan_summary_list);
         types = new int[]{Constants.DAY_TYPE, Constants.WEEK_TYPE, Constants.LONG_TERM_TYPE};
         //从数据库中查询今天的计划清单
         //周计划列表
@@ -96,7 +97,10 @@ public class PlanFragment extends Fragment {
 
             }
         }
+        //setModelList()中没有进行notifyDateSetChanged的原因，是因为着这样做的话计时会有问题
         planAdapter.setModelList(itemModelList);
+        //加上这一句代码，来刷新ui，否则的话，第一次进入app，添加计划，planList界面不刷新；
+        recyclerView.setAdapter(planAdapter);
     }
 
     @Override

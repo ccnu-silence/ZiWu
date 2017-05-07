@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import com.github.tinkerti.ziwu.R;
 import com.github.tinkerti.ziwu.data.Constants;
+import com.github.tinkerti.ziwu.data.RecordTask;
 import com.github.tinkerti.ziwu.data.model.PlanRecordInfo;
 import com.github.tinkerti.ziwu.ui.activity.AddPlanDetailActivity;
 import com.github.tinkerti.ziwu.ui.service.RecordService;
@@ -161,21 +162,29 @@ public class PlanAdapter extends RecyclerView.Adapter {
             final PlanSummaryModel planSummaryModel = (PlanSummaryModel) modelList.get(position);
             planNameTextView.setText(planSummaryModel.getPlanName());
             recordingTimeTextView.setText(FormatTime.calculateTimeString(planSummaryModel.getRecordInfo().getTimeDuration()));
-            //Todo:需要对今日进行的时间进行加总显示；
-            detailRecordedTimeView.setText(context.getString(R.string.ad_item_plan_recorded_time, planSummaryModel.getPlanName(), FormatTime.calculateTimeString(0)));
+            //planRecordInfo对象，用来保存计划进行时间
+            final PlanRecordInfo recordInfo = planSummaryModel.getRecordInfo();
+            recordInfo.setPlanId(planSummaryModel.getPlanId());
+            //设置recordView是否显示；
+            recordContainer.setVisibility(recordInfo.isExpand() ? View.VISIBLE : View.GONE);
+
+            long totalRecordTime = RecordTask.getInstance().getPlanTotalRecordedTime(recordInfo, planSummaryModel.getPlanType());
+
+            detailRecordedTimeView.setText(context.getString(R.string.ad_item_plan_recorded_time, planSummaryModel.getPlanName(), FormatTime.calculateTimeString(totalRecordTime)));
             planSummaryView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     if (!planSummaryModel.isShowRecordView()) {
                         recordContainer.setVisibility(View.VISIBLE);
+                        recordInfo.setExpand(true);
                     } else {
                         recordContainer.setVisibility(View.GONE);
+                        recordInfo.setExpand(false);
                     }
                     planSummaryModel.setShowRecordView(!planSummaryModel.isShowRecordView());
                 }
             });
-            //planRecordInfo对象，用来保存计划进行时间
-            final PlanRecordInfo recordInfo = planSummaryModel.getRecordInfo();
+
             //点击开始计时，如果处于计时进行中的状态，点击暂停计时
             startButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -191,7 +200,18 @@ public class PlanAdapter extends RecyclerView.Adapter {
                 @Override
                 public void onClick(View v) {
                     if (binder != null) {
-                        binder.stopRecord(recordInfo);
+                        //需要判断下记录状态，否则的话，点击stopButton会一致进行增加计时的操作；
+                        if (recordInfo.getRecordState() == Constants.RECORD_STATE_RECORDING) {
+                            binder.stopRecord(recordInfo);
+                            recordInfo.setEndTime(System.currentTimeMillis());
+                            recordInfo.setRealRecordTime(recordInfo.getEndTime() - recordInfo.getStartTime());
+                            recordInfo.setRecordState(Constants.RECORD_STATE_STOP);
+                            RecordTask.getInstance().updatePlanRecord(recordInfo);
+                            long realRecordTime = RecordTask.getInstance().getPlanTotalRecordedTime(recordInfo, planSummaryModel.getPlanType());
+                            detailRecordedTimeView.setText(context.getString(R.string.ad_item_plan_recorded_time,
+                                    planSummaryModel.getPlanName(),
+                                    FormatTime.calculateTimeString(realRecordTime)));
+                        }
                     }
                 }
             });

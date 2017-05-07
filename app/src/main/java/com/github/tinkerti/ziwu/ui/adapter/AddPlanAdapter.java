@@ -229,7 +229,7 @@ public class AddPlanAdapter extends RecyclerView.Adapter {
             deleteButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    AddPlanTask.getInstance().deletePlanDetailInfoById(addSummaryModel.getId());
+                    PlanTask.getInstance().deletePlanDetailInfoById(addSummaryModel.getId());
                     modelList.remove(position);
                     if (addSummaryModel.isShowDetail()) {
                         modelList.remove(position);
