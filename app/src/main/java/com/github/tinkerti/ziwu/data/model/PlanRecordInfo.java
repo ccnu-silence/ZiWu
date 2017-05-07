@@ -13,6 +13,25 @@ public class PlanRecordInfo extends PlanBaseInfo implements Parcelable{
     private long endTime;
     private long timeDuration=0;
     private int recordState;
+    private Runnable refreshUiRunnable;//用于定时刷新计时的ui
+
+    public Runnable getRecordTimeRunnable() {
+        return recordTimeRunnable;
+    }
+
+    public void setRecordTimeRunnable(Runnable recordTimeRunnable) {
+        this.recordTimeRunnable = recordTimeRunnable;
+    }
+
+    private Runnable recordTimeRunnable;//用于计时的runnable；
+
+    public Runnable getRefreshUiRunnable() {
+        return refreshUiRunnable;
+    }
+
+    public void setRefreshUiRunnable(Runnable refreshUiRunnable) {
+        this.refreshUiRunnable = refreshUiRunnable;
+    }
 
     public PlanRecordInfo(){}
     protected PlanRecordInfo(Parcel in) {

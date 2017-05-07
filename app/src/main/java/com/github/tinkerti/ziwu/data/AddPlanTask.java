@@ -123,11 +123,11 @@ public class AddPlanTask implements ITask {
         String sql = "delete from " + Constants.ADD_PLAN_DETAIL_TABLE_NAME;
         TaskManager.getInstance().getDb().execSQL(sql);
     }
-
-    public void savePlanDetailInfo() {
-        String savePlanSql = "insert or replace into " + Constants.PLAN_DETAIL_TABLE_NAME +
-                " select * from " + Constants.ADD_PLAN_DETAIL_TABLE_NAME;
-        TaskManager.getInstance().getDb().execSQL(savePlanSql);
-        deletePlanDetailInfo();
-    }
+    //没有用了
+//    public void savePlanDetailInfo() {
+//        String savePlanSql = "insert or replace into " + Constants.PLAN_DETAIL_TABLE_NAME +
+//                " select * from " + Constants.ADD_PLAN_DETAIL_TABLE_NAME;
+//        TaskManager.getInstance().getDb().execSQL(savePlanSql);
+//        deletePlanDetailInfo();
+//    }
 }

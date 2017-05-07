@@ -14,6 +14,7 @@ import android.widget.Toast;
 
 import com.github.tinkerti.ziwu.R;
 import com.github.tinkerti.ziwu.data.AddPlanTask;
+import com.github.tinkerti.ziwu.data.PlanTask;
 import com.github.tinkerti.ziwu.data.model.AddPlanDetailInfo;
 
 import java.util.ArrayList;
@@ -30,7 +31,7 @@ public class AddPlanAdapter extends RecyclerView.Adapter {
     private static final int MODEL_ADD_SUMMARY_TYPE = 2;
     private static final int MODEL_ADD_DETAIL_TYPE = 3;
 
-    private List<ItemModel> modelList;
+    private ArrayList<ItemModel> modelList;
 
     public AddPlanAdapter() {
         modelList = new ArrayList<>();
@@ -161,6 +162,7 @@ public class AddPlanAdapter extends RecyclerView.Adapter {
                     addPlanDetailInfo.setPlanTime(TextUtils.isEmpty(planTimeEditText.getText().toString()) ? 0 : Integer.valueOf(planTimeEditText.getText().toString()));
                     addPlanDetailInfo.setCreateTime(System.currentTimeMillis());
                     AddPlanTask.getInstance().addPlanToDb(addPlanDetailInfo);
+                    PlanTask.getInstance().addPlanToDb(addPlanDetailInfo);
                     moreItemContainer.setVisibility(View.GONE);
                     moreButton.setVisibility(View.VISIBLE);
                     //重置所有的EditText；
@@ -215,12 +217,6 @@ public class AddPlanAdapter extends RecyclerView.Adapter {
                             addDetailModel.setPlanTag(addPlanDetailInfo.getPlanTag());
                             modelList.add(getAdapterPosition() + 1, addDetailModel);
                             notifyDataSetChanged();
-//                            int position = findPosition(addSummaryModel);
-//                            if (position >= 0) {
-//                                modelList.add(position + 1, addDetailModel);
-//                                notifyDataSetChanged();
-////                                notifyItemRangeInserted(getAdapterPosition() + 1, 1);
-//                            }
                         }
                     } else {
                         modelList.remove(position + 1);
@@ -272,8 +268,6 @@ public class AddPlanAdapter extends RecyclerView.Adapter {
             planTag.setText(addDetailModel.getPlanTag());
             planTime.setText(String.valueOf(addDetailModel.getPlanTime()));
             planJoinParentId.setText(addDetailModel.getPlanJoinParentId());
-//            itemView.setVisibility(addDetailModel.isShow()?View.GONE:View.VISIBLE);
-//            addDetailModel.setShow(!addDetailModel.isShow());
         }
     }
 
@@ -425,22 +419,10 @@ public class AddPlanAdapter extends RecyclerView.Adapter {
         return modelList;
     }
 
-    public void setModelList(List<ItemModel> modelList) {
+    public void setModelList(ArrayList<ItemModel> modelList) {
         this.modelList = modelList;
         notifyDataSetChanged();
     }
-
-//    private int findPosition(ItemModel model) {
-//        int position = 0;
-//        for (ItemModel itemModel : modelList) {
-//            if (itemModel.getId().equals(model.getId())) {
-//                return position;
-//            }
-//            position++;
-//        }
-//        return -1;
-//    }
-
 
     private void editTextGetFocus(final EditText editText) {
         editText.requestFocus();

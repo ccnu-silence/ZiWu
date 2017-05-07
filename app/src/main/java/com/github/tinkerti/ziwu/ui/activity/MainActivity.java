@@ -134,7 +134,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         addPlanPopupWindow.setVisibility(View.GONE);
         Intent intent = new Intent(this, AddPlanDetailActivity.class);
         intent.putExtra("type", type);
-        startActivity(intent);
+        startActivityForResult(intent,Constants.ADD_PLAN_REQUEST);
     }
 
     private class ContentPagerAdapter extends FragmentPagerAdapter {

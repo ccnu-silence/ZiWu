@@ -34,6 +34,8 @@ public class Constants {
     public static final int RECORD_STATE_PAUSE=102;
     public static final int RECORD_STATE_STOP=103;
 
+    public static final int ADD_PLAN_REQUEST=1000;
+
 
     public static final String CREATE_ADD_PLAN_DETAIL_TABLE = "create table " + ADD_PLAN_DETAIL_TABLE_NAME + " ( planId text not null primary key, " +
             "planName text not null, planType integer not null, " +

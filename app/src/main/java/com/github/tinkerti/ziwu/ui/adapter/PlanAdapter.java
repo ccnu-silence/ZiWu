@@ -2,10 +2,12 @@ package com.github.tinkerti.ziwu.ui.adapter;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Handler;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.github.tinkerti.ziwu.R;
@@ -29,6 +31,16 @@ public class PlanAdapter extends RecyclerView.Adapter {
     private static final int PLAN_RECORD_TYPE = 3;
     List<ItemModel> modelList;
     private RecordService.RecordServiceBinder binder;
+
+    public Handler getHandler() {
+        return handler;
+    }
+
+    public void setHandler(Handler handler) {
+        this.handler = handler;
+    }
+
+    private Handler handler;//更新界面用；
 
     public PlanAdapter() {
         modelList = new ArrayList<>();
@@ -120,49 +132,94 @@ public class PlanAdapter extends RecyclerView.Adapter {
         private TextView planNameTextView;
         private TextView recordingTimeTextView;
         private View itemView;
+        private RelativeLayout recordContainer;
+        private RelativeLayout planSummaryView;
+
+        private TextView detailRecordedTimeView;//点击显示记录详情时，展示已经进行的时间；
+        private TextView startButton;
+        private TextView stopButton;
+        private TextView finishButton;
+        private Context context;
 
 
         public PlanSummaryItemViewHolder(View itemView) {
             super(itemView);
             planNameTextView = (TextView) itemView.findViewById(R.id.ad_tv_plan_summary_name);
             recordingTimeTextView = (TextView) itemView.findViewById(R.id.ad_tv_plan_summary_recording_time);
+            recordContainer = (RelativeLayout) itemView.findViewById(R.id.ad_rl_plan_record_container);
+            planSummaryView = (RelativeLayout) itemView.findViewById(R.id.ad_rl_plan_summary_view);
             this.itemView = itemView;
+            detailRecordedTimeView = (TextView) itemView.findViewById(R.id.ad_tv_plan_recorded_time);
+            startButton = (TextView) itemView.findViewById(R.id.ad_tv_plan_record_begin);
+            stopButton = (TextView) itemView.findViewById(R.id.ad_tv_plan_record_stop);
+            finishButton = (TextView) itemView.findViewById(R.id.ad_tv_plan_record_finish);
+            context = itemView.getContext();
         }
 
         @Override
         public void update(final int position) {
             final PlanSummaryModel planSummaryModel = (PlanSummaryModel) modelList.get(position);
             planNameTextView.setText(planSummaryModel.getPlanName());
-            recordingTimeTextView.setText(String.valueOf(planSummaryModel.getRecordingTime()));
-            final PlanRecordModel planRecordModel = new PlanRecordModel();
-            ;
-            itemView.setOnClickListener(new View.OnClickListener() {
+            recordingTimeTextView.setText(FormatTime.calculateTimeString(planSummaryModel.getRecordInfo().getTimeDuration()));
+            //Todo:需要对今日进行的时间进行加总显示；
+            detailRecordedTimeView.setText(context.getString(R.string.ad_item_plan_recorded_time, planSummaryModel.getPlanName(), FormatTime.calculateTimeString(0)));
+            planSummaryView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     if (!planSummaryModel.isShowRecordView()) {
-                        planRecordModel.setPlanType(planSummaryModel.getPlanType());
-                        planRecordModel.setPlanName(planSummaryModel.getPlanName());
-                        modelList.add(getAdapterPosition() + 1, planRecordModel);
-                        notifyDataSetChanged();
+                        recordContainer.setVisibility(View.VISIBLE);
                     } else {
-                        modelList.remove(position + 1);
-                        notifyDataSetChanged();
+                        recordContainer.setVisibility(View.GONE);
                     }
                     planSummaryModel.setShowRecordView(!planSummaryModel.isShowRecordView());
                 }
             });
+            //planRecordInfo对象，用来保存计划进行时间
+            final PlanRecordInfo recordInfo = planSummaryModel.getRecordInfo();
+            //点击开始计时，如果处于计时进行中的状态，点击暂停计时
+            startButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (binder != null) {
+                        binder.startRecord(recordInfo);
+                    }
+                }
+            });
+            planSummaryModel.setRecordInfo(recordInfo);
+            //点击结束计时
+            stopButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (binder != null) {
+                        binder.stopRecord(recordInfo);
+                    }
+                }
+            });
+            //点击完成该计划
+            finishButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                }
+            });
+
             //这个地方有点问题，需要优化下，这样做没有多大必要；
             Runnable recordRunnable = new Runnable() {
                 @Override
                 public void run() {
-                    PlanRecordInfo recordInfo = planRecordModel.getRecordInfo();
+                    PlanRecordInfo recordInfo = planSummaryModel.getRecordInfo();
                     if (recordInfo != null) {
                         recordingTimeTextView.setText(FormatTime.calculateTimeString(recordInfo.getTimeDuration()));
                     }
-                    recordingTimeTextView.postDelayed(this, 1000);
+                    handler.postDelayed(this, 1000);
                 }
             };
-            recordingTimeTextView.postDelayed(recordRunnable, 1000);
+
+
+            handler.removeCallbacks(recordInfo.getRefreshUiRunnable());
+            recordInfo.setRefreshUiRunnable(recordRunnable);
+
+            handler.postDelayed(recordInfo.getRefreshUiRunnable(), 1000);
         }
     }
 
@@ -215,6 +272,10 @@ public class PlanAdapter extends RecyclerView.Adapter {
             });
         }
     }
+
+    /**
+     * 暂时不用这个类了，因为记录详情view添加到了summaryView中，通过隐藏和显示来控制；
+     */
 
     public class PlanRecordItemViewHolder extends ItemViewHolder {
         private TextView recordedTimeView;
@@ -336,6 +397,7 @@ public class PlanAdapter extends RecyclerView.Adapter {
         private long recordingTime;
         private int planType;
         private boolean isShowRecordView = false;
+        private PlanRecordInfo recordInfo;
 
         @Override
         public int getType() {
@@ -383,6 +445,15 @@ public class PlanAdapter extends RecyclerView.Adapter {
         public void setPlanId(String planId) {
             this.planId = planId;
         }
+
+
+        public PlanRecordInfo getRecordInfo() {
+            return recordInfo;
+        }
+
+        public void setRecordInfo(PlanRecordInfo recordInfo) {
+            this.recordInfo = recordInfo;
+        }
     }
 
     public static class PlanRecordModel extends ItemModel {
@@ -427,7 +498,6 @@ public class PlanAdapter extends RecyclerView.Adapter {
 
     public void setModelList(List<ItemModel> modelList) {
         this.modelList = modelList;
-        notifyDataSetChanged();
     }
 
     public RecordService.RecordServiceBinder getBinder() {

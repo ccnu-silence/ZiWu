@@ -1,16 +1,70 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="45dp">
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/ad_tv_plan_summary_name"
-        style="@style/adapter_item_plan_summary_left_text_view"
-        tools:text="产品文档" />
+    <RelativeLayout
+        android:id="@+id/ad_rl_plan_summary_view"
+        android:layout_width="match_parent"
+        android:layout_height="45dp">
 
-    <TextView
-        android:id="@+id/ad_tv_plan_summary_recording_time"
-        style="@style/adapter_item_plan_summary_right_text_view"
-        tools:text="00:00:00" />
-</RelativeLayout>
+        <TextView
+            android:id="@+id/ad_tv_plan_summary_name"
+            style="@style/adapter_item_plan_summary_left_text_view"
+            tools:text="产品文档" />
+
+        <TextView
+            android:id="@+id/ad_tv_plan_summary_recording_time"
+            style="@style/adapter_item_plan_summary_right_text_view"
+            tools:text="00:00:00" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/ad_rl_plan_record_container"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/ad_tv_plan_recorded_time"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="25dp"
+            android:gravity="center_vertical"
+            tools:text="今天已经进行了3个小时" />
+
+        <TextView
+            android:id="@+id/ad_tv_plan_record_finish"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="25dp"
+            android:gravity="center_vertical"
+            android:text="@string/ad_item_plan_record_finish"
+            tools:text="完成" />
+
+        <TextView
+            android:id="@+id/ad_tv_plan_record_stop"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginRight="25dp"
+            android:layout_toLeftOf="@id/ad_tv_plan_record_finish"
+            android:gravity="center_vertical"
+            android:text="@string/ad_item_plan_record_stop"
+            tools:text="停止" />
+
+        <TextView
+            android:id="@+id/ad_tv_plan_record_begin"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginRight="25dp"
+            android:layout_toLeftOf="@id/ad_tv_plan_record_stop"
+            android:gravity="center_vertical"
+            android:text="@string/ad_item_plan_record_start"
+            tools:text="开始" />
+
+
+    </RelativeLayout>
+</LinearLayout>

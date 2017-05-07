@@ -21,6 +21,7 @@
         android:gravity="center_vertical"
         android:text="@string/ad_item_plan_record_finish"
         tools:text="完成" />
+
     <TextView
         android:id="@+id/ad_tv_plan_record_stop"
         android:layout_width="wrap_content"
@@ -30,17 +31,16 @@
         android:gravity="center_vertical"
         android:text="@string/ad_item_plan_record_stop"
         tools:text="停止" />
+
     <TextView
         android:id="@+id/ad_tv_plan_record_begin"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_marginRight="25dp"
         android:layout_toLeftOf="@id/ad_tv_plan_record_stop"
-        android:text="@string/ad_item_plan_record_start"
         android:gravity="center_vertical"
+        android:text="@string/ad_item_plan_record_start"
         tools:text="开始" />
-
-
 
 
 </RelativeLayout>

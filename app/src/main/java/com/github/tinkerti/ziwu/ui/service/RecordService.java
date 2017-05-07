@@ -50,9 +50,14 @@ public class RecordService extends Service {
                     recordInfo.setTimeDuration(recordInfo.getTimeDuration() + 1000);
                     recordInfo.setRecordState(Constants.RECORD_STATE_RECORDING);
                     handler.postDelayed(this,1000);
+                    recordInfo.setRecordTimeRunnable(this);
                 }
             };
             handler.postDelayed(startRecordRunnable, 1000);
+        }
+
+        public void stopRecord(PlanRecordInfo recordInfo){
+              handler.removeCallbacks(recordInfo.getRecordTimeRunnable());
         }
     }
 

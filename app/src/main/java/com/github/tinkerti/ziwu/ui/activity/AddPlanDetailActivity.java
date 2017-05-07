@@ -25,9 +25,9 @@ import java.util.List;
 
 public class AddPlanDetailActivity extends BaseActivity {
 
-    //Todo:点击查看和收起计划详情；2、根据计划制定类型来显示计划列表；3、需要在planDetail表中添加计划类型column；
     RecyclerView addPlanRecyclerView;
     private int type;
+    private AddPlanAdapter addPlanAdapter;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -36,8 +36,8 @@ public class AddPlanDetailActivity extends BaseActivity {
         setContentView(R.layout.activity_add_plan_detail);
         addPlanRecyclerView = (RecyclerView) findViewById(R.id.ac_rv_add_plan_detail);
         addPlanRecyclerView.setLayoutManager(new LinearLayoutManager(getBaseContext()));
-        AddPlanAdapter addPlanAdapter = new AddPlanAdapter();
-        List<AddPlanAdapter.ItemModel> modelList = new ArrayList<>();
+        addPlanAdapter = new AddPlanAdapter();
+        ArrayList<AddPlanAdapter.ItemModel> modelList = new ArrayList<>();
         List<AddPlanDetailInfo> addPlanDetailInfoList = AddPlanTask.getInstance().getPlanDetailInfoByType(type);
         for (AddPlanDetailInfo addPlanDetailInfo : addPlanDetailInfoList) {
             AddPlanAdapter.AddSummaryModel addSummaryModel = new AddPlanAdapter.AddSummaryModel();
@@ -78,7 +78,7 @@ public class AddPlanDetailActivity extends BaseActivity {
         view.findViewById(R.id.tv_ok_add_plan_detail).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AddPlanTask.getInstance().savePlanDetailInfo();
+                AddPlanTask.getInstance().deletePlanDetailInfo();
                 finish();
             }
         });
