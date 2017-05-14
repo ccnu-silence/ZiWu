@@ -51,7 +51,7 @@ public class PlanAdapter extends RecyclerView.Adapter {
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         RecyclerView.ViewHolder holder = null;
         LayoutInflater inflater = (LayoutInflater) parent.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View view = null;
+        View view;
         switch (viewType) {
             case PLAN_SUMMARY_TYPE:
                 view = inflater.inflate(R.layout.adapter_item_plan_summary, parent, false);
@@ -65,12 +65,7 @@ public class PlanAdapter extends RecyclerView.Adapter {
                 view = inflater.inflate(R.layout.adapter_item_plan_no_plan, parent, false);
                 holder = new NoPlanItemViewHolder(view);
                 break;
-            case PLAN_RECORD_TYPE:
-                view = inflater.inflate(R.layout.adapter_item_plan_record, parent, false);
-                holder = new PlanRecordItemViewHolder(view);
-                break;
         }
-
         return holder;
     }
 
@@ -84,9 +79,6 @@ public class PlanAdapter extends RecyclerView.Adapter {
             ((PlanCategoryItemViewHolder) holder).update(position);
         }
 
-        if (itemModel instanceof PlanRecordModel) {
-            ((PlanRecordItemViewHolder) holder).update(position);
-        }
         if (itemModel instanceof NoPlanModel) {
             ((NoPlanItemViewHolder) holder).update(position);
         }
@@ -108,9 +100,6 @@ public class PlanAdapter extends RecyclerView.Adapter {
         }
         if (itemModel instanceof PlanCategoryModel) {
             return PLAN_CATEGORY_TYPE;
-        }
-        if (itemModel instanceof PlanRecordModel) {
-            return PLAN_RECORD_TYPE;
         }
         if (itemModel instanceof NoPlanModel) {
             return NO_PLAN_TYPE;
@@ -184,13 +173,17 @@ public class PlanAdapter extends RecyclerView.Adapter {
                     planSummaryModel.setShowRecordView(!planSummaryModel.isShowRecordView());
                 }
             });
-
+            //TODO:double click 的时候可能就会有问题；
             //点击开始计时，如果处于计时进行中的状态，点击暂停计时
             startButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     if (binder != null) {
-                        binder.startRecord(recordInfo);
+                        if (recordInfo.getRecordState() == Constants.RECORD_STATE_IDLE
+                                || recordInfo.getRecordState() == Constants.RECORD_STATE_STOP) {
+                            binder.startRecord(recordInfo);
+                        }
+
                     }
                 }
             });
@@ -293,69 +286,6 @@ public class PlanAdapter extends RecyclerView.Adapter {
         }
     }
 
-    /**
-     * 暂时不用这个类了，因为记录详情view添加到了summaryView中，通过隐藏和显示来控制；
-     */
-
-    public class PlanRecordItemViewHolder extends ItemViewHolder {
-        private TextView recordedTimeView;
-        private TextView startButton;
-        private TextView stopButton;
-        private TextView finishButton;
-        private Context context;
-
-        public PlanRecordItemViewHolder(View itemView) {
-            super(itemView);
-            recordedTimeView = (TextView) itemView.findViewById(R.id.ad_tv_plan_recorded_time);
-            startButton = (TextView) itemView.findViewById(R.id.ad_tv_plan_record_begin);
-            stopButton = (TextView) itemView.findViewById(R.id.ad_tv_plan_record_stop);
-            finishButton = (TextView) itemView.findViewById(R.id.ad_tv_plan_record_finish);
-            context = itemView.getContext();
-
-        }
-
-        @Override
-        public void update(int position) {
-            PlanRecordModel planRecordModel = (PlanRecordModel) modelList.get(position);
-            String planTypeString = null;
-            switch (planRecordModel.getPlanType()) {
-                case Constants.DAY_TYPE:
-                    planTypeString = context.getString(R.string.plan_today);
-                    break;
-                case Constants.WEEK_TYPE:
-                    planTypeString = context.getString(R.string.plan_this_week);
-                    break;
-                case Constants.LONG_TERM_TYPE:
-                    planTypeString = context.getString(R.string.plan_long_time);
-                    break;
-            }
-            recordedTimeView.setText(context.getString(R.string.ad_item_plan_recorded_time, planRecordModel.getPlanName(), String.valueOf(0)));
-            //planRecordInfo对象，用来保存计划进行时间
-            final PlanRecordInfo recordInfo = new PlanRecordInfo();
-            //点击开始计时，如果处于计时进行中的状态，点击暂停计时
-            startButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    binder.startRecord(recordInfo);
-                }
-            });
-            planRecordModel.setRecordInfo(recordInfo);
-            //点击结束计时
-            stopButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-
-                }
-            });
-            //点击完成该计划
-            finishButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-
-                }
-            });
-        }
-    }
 
     public static abstract class ItemModel {
         private int Type;
@@ -476,41 +406,6 @@ public class PlanAdapter extends RecyclerView.Adapter {
         }
     }
 
-    public static class PlanRecordModel extends ItemModel {
-        private int planType;
-        private String planName;
-        private PlanRecordInfo recordInfo;
-
-        @Override
-        public int getType() {
-            return PLAN_RECORD_TYPE;
-        }
-
-        public int getPlanType() {
-            return planType;
-        }
-
-        public void setPlanType(int planType) {
-            this.planType = planType;
-        }
-
-        public String getPlanName() {
-            return planName;
-        }
-
-        public void setPlanName(String planName) {
-            this.planName = planName;
-        }
-
-
-        public PlanRecordInfo getRecordInfo() {
-            return recordInfo;
-        }
-
-        public void setRecordInfo(PlanRecordInfo recordInfo) {
-            this.recordInfo = recordInfo;
-        }
-    }
 
     public List<ItemModel> getModelList() {
         return modelList;

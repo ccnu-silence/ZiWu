@@ -36,6 +36,9 @@ public class Constants {
 
     public static final int ADD_PLAN_REQUEST=1000;
 
+    public static final float ONE_DAY_TOTAL_MILLI_SECS=1*24*60*60*1000.0f;
+    public static final float SEVEN_DAY_TOTAL_MILLIS_SECS=7*ONE_DAY_TOTAL_MILLI_SECS;
+
 
     public static final String CREATE_ADD_PLAN_DETAIL_TABLE = "create table " + ADD_PLAN_DETAIL_TABLE_NAME + " ( planId text not null primary key, " +
             "planName text not null, planType integer not null, " +

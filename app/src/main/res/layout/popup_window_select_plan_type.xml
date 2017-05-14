@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#FDFEFE">
+
+    <TextView
+        android:id="@+id/tv_show_today"
+        style="@style/popup_window_content"
+        android:text="@string/plan_today" />
+    <View
+        style="@style/popup_window_content_divider"/>
+    <TextView
+        android:id="@+id/tv_show_seven_days"
+        style="@style/popup_window_content"
+        android:text="@string/plan_this_week"/>
+    <View
+        style="@style/popup_window_content_divider"/>
+    <TextView
+        android:id="@+id/tv_show_long_term"
+        style="@style/popup_window_content"
+        android:text="@string/plan_long_time"/>
+
+</LinearLayout>
