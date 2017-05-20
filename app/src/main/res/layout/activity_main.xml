@@ -6,14 +6,47 @@
     android:layout_height="match_parent"
     tools:context="com.github.tinkerti.ziwu.ui.activity.MainActivity">
 
-    <FrameLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-        <android.support.v4.view.ViewPager
-            android:id="@+id/ac_view_pager"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
-    </FrameLayout>
+            android:layout_height="0dp"
+            android:layout_weight="1">
+            <android.support.v4.view.ViewPager
+                android:id="@+id/ac_view_pager"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+        </FrameLayout>
+        <LinearLayout
+            android:id="@+id/ac_ll_bottom_indicator"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:orientation="horizontal"
+            android:layout_alignParentBottom="true"
+            android:gravity="center_vertical"
+            android:background="@color/baseColor">
+            <com.github.tinkerti.ziwu.ui.widget.TabIndicatorItemView
+                android:id="@+id/bottom_indicator_plan"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                app:IndicatorText="@string/bottom_indicator_plan"/>
+            <com.github.tinkerti.ziwu.ui.widget.TabIndicatorItemView
+                android:id="@+id/bottom_indicator_record"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                app:IndicatorText="@string/bottom_indicator_record"/>
+            <com.github.tinkerti.ziwu.ui.widget.TabIndicatorItemView
+                android:id="@+id/bottom_indicator_me"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                app:IndicatorText="@string/bottom_indicator_me"/>
+        </LinearLayout>
+    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/ac_ll_add_plan_popup_window"
@@ -54,31 +87,5 @@
         app:AddButtonBackground="@drawable/wi_add_plan_button_background"
         app:AddButtonImageSrc="@drawable/wi_add_plan_button_vector" />
 
-    <LinearLayout
-        android:id="@+id/ac_ll_bottom_indicator"
-        android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:orientation="horizontal"
-        android:layout_alignParentBottom="true"
-        android:gravity="center_vertical"
-        android:background="@color/baseColor">
-        <com.github.tinkerti.ziwu.ui.widget.TabIndicatorItemView
-            android:id="@+id/bottom_indicator_plan"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            app:IndicatorText="@string/bottom_indicator_plan"/>
-        <com.github.tinkerti.ziwu.ui.widget.TabIndicatorItemView
-            android:id="@+id/bottom_indicator_record"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            app:IndicatorText="@string/bottom_indicator_record"/>
-        <com.github.tinkerti.ziwu.ui.widget.TabIndicatorItemView
-            android:id="@+id/bottom_indicator_me"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            app:IndicatorText="@string/bottom_indicator_me"/>
-    </LinearLayout>
+
 </RelativeLayout>

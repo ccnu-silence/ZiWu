@@ -48,12 +48,12 @@ public class PlanFragment extends Fragment {
         planRecordInfoMap = new HashMap<>();
         planAdapter = new PlanAdapter();
         planAdapter.setHandler(new Handler(Looper.getMainLooper()));
+        initBindService();
     }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        initBindService();
         View view = inflater.inflate(R.layout.fragment_plan_list, container, false);
         recyclerView = (RecyclerView) view.findViewById(R.id.fr_rv_plan_summary_list);
         types = new int[]{Constants.DAY_TYPE, Constants.WEEK_TYPE, Constants.LONG_TERM_TYPE};
@@ -114,6 +114,7 @@ public class PlanFragment extends Fragment {
     private void initBindService() {
         Intent intent = new Intent(getContext(), RecordService.class);
         serviceConnection = new RecordServiceConnection();
+        getContext().startService(intent);
         getContext().bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
     }
 
@@ -123,6 +124,8 @@ public class PlanFragment extends Fragment {
         public void onServiceConnected(ComponentName name, IBinder service) {
             RecordService.RecordServiceBinder binder = (RecordService.RecordServiceBinder) service;
             planAdapter.setBinder(binder);
+            planRecordInfoMap=binder.getRecordInfoHashMap();
+            getPlanListByType(types);
         }
 
         @Override
@@ -136,5 +139,11 @@ public class PlanFragment extends Fragment {
         if (requestCode == Constants.ADD_PLAN_REQUEST) {
 
         }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        getContext().unbindService(serviceConnection);
     }
 }

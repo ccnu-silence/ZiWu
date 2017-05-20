@@ -18,6 +18,7 @@ import com.github.tinkerti.ziwu.data.RecordTask;
 import com.github.tinkerti.ziwu.data.model.PlanRecordInfo;
 import com.github.tinkerti.ziwu.ui.activity.MainActivity;
 
+import java.util.HashMap;
 import java.util.UUID;
 
 /**
@@ -27,6 +28,7 @@ import java.util.UUID;
 public class RecordService extends Service {
 
     private Handler handler;
+    private HashMap<String,PlanRecordInfo> recordInfoHashMap;
 
     @Override
     public void onCreate() {
@@ -35,6 +37,7 @@ public class RecordService extends Service {
         //不要忘了调用start();
         handlerThread.start();
         handler = new Handler(handlerThread.getLooper());
+        recordInfoHashMap=new HashMap<>();
     }
 
     @Nullable
@@ -44,8 +47,12 @@ public class RecordService extends Service {
     }
 
     public class RecordServiceBinder extends Binder {
+        public HashMap<String, PlanRecordInfo> getRecordInfoHashMap(){
+            return recordInfoHashMap;
+        }
 
         public void startRecord(final PlanRecordInfo recordInfo) {
+            recordInfoHashMap.put(recordInfo.getPlanId(),recordInfo);
             showNotification();
             final Runnable startRecordRunnable = new Runnable() {
                 @Override

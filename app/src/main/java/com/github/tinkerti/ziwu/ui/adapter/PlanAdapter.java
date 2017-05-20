@@ -4,6 +4,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
 import android.support.v7.widget.RecyclerView;
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
+import android.text.style.ForegroundColorSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,7 +32,6 @@ public class PlanAdapter extends RecyclerView.Adapter {
     private static final int PLAN_CATEGORY_TYPE = 1;
     private static final int PLAN_SUMMARY_TYPE = 2;
     private static final int NO_PLAN_TYPE = 4;
-    private static final int PLAN_RECORD_TYPE = 3;
     List<ItemModel> modelList;
     private RecordService.RecordServiceBinder binder;
 
@@ -153,13 +155,15 @@ public class PlanAdapter extends RecyclerView.Adapter {
             recordingTimeTextView.setText(FormatTime.calculateTimeString(planSummaryModel.getRecordInfo().getTimeDuration()));
             //planRecordInfo对象，用来保存计划进行时间
             final PlanRecordInfo recordInfo = planSummaryModel.getRecordInfo();
+            if (recordInfo.getRecordState() == Constants.RECORD_STATE_RECORDING) {
+                recordingTimeTextView.setVisibility(View.VISIBLE);
+            }
             recordInfo.setPlanId(planSummaryModel.getPlanId());
             //设置recordView是否显示；
             recordContainer.setVisibility(recordInfo.isExpand() ? View.VISIBLE : View.GONE);
 
-            long totalRecordTime = RecordTask.getInstance().getPlanTotalRecordedTime(recordInfo, planSummaryModel.getPlanType());
-
-            detailRecordedTimeView.setText(context.getString(R.string.ad_item_plan_recorded_time, planSummaryModel.getPlanName(), FormatTime.calculateTimeString(totalRecordTime)));
+            final long totalRecordTime = RecordTask.getInstance().getPlanTotalRecordedTime(recordInfo, planSummaryModel.getPlanType());
+            detailRecordedTimeView.setText(getColoredString(context, planSummaryModel.getPlanName(), totalRecordTime));
             planSummaryView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -173,7 +177,6 @@ public class PlanAdapter extends RecyclerView.Adapter {
                     planSummaryModel.setShowRecordView(!planSummaryModel.isShowRecordView());
                 }
             });
-            //TODO:double click 的时候可能就会有问题；
             //点击开始计时，如果处于计时进行中的状态，点击暂停计时
             startButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -183,7 +186,7 @@ public class PlanAdapter extends RecyclerView.Adapter {
                                 || recordInfo.getRecordState() == Constants.RECORD_STATE_STOP) {
                             binder.startRecord(recordInfo);
                         }
-
+                        recordingTimeTextView.setVisibility(View.VISIBLE);
                     }
                 }
             });
@@ -201,10 +204,9 @@ public class PlanAdapter extends RecyclerView.Adapter {
                             recordInfo.setRecordState(Constants.RECORD_STATE_STOP);
                             RecordTask.getInstance().updatePlanRecord(recordInfo);
                             long realRecordTime = RecordTask.getInstance().getPlanTotalRecordedTime(recordInfo, planSummaryModel.getPlanType());
-                            detailRecordedTimeView.setText(context.getString(R.string.ad_item_plan_recorded_time,
-                                    planSummaryModel.getPlanName(),
-                                    FormatTime.calculateTimeString(realRecordTime)));
+                            detailRecordedTimeView.setText(getColoredString(context, planSummaryModel.getPlanName(), realRecordTime));
                         }
+                        recordingTimeTextView.setVisibility(View.GONE);
                     }
                 }
             });
@@ -223,6 +225,7 @@ public class PlanAdapter extends RecyclerView.Adapter {
                     PlanRecordInfo recordInfo = planSummaryModel.getRecordInfo();
                     if (recordInfo != null) {
                         recordingTimeTextView.setText(FormatTime.calculateTimeString(recordInfo.getTimeDuration()));
+                        detailRecordedTimeView.setText(getColoredString(context, planSummaryModel.getPlanName(), totalRecordTime + recordInfo.getTimeDuration()));
                     }
                     handler.postDelayed(this, 1000);
                 }
@@ -421,6 +424,21 @@ public class PlanAdapter extends RecyclerView.Adapter {
 
     public void setBinder(RecordService.RecordServiceBinder binder) {
         this.binder = binder;
+    }
+
+    private SpannableStringBuilder getColoredString(Context context, String name, long totalRecordTime) {
+        SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder(context.getString(R.string.ad_item_plan_recorded_time,
+                name,
+                FormatTime.calculateTimeString(totalRecordTime)));
+        spannableStringBuilder.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.baseColor)),
+                0,
+                name.length(),
+                Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+        spannableStringBuilder.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.greenColor)),
+                spannableStringBuilder.length() - FormatTime.calculateTimeString(totalRecordTime).length(),
+                spannableStringBuilder.length(),
+                Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+        return spannableStringBuilder;
     }
 
 }

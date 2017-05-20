@@ -20,7 +20,6 @@ import com.github.tinkerti.ziwu.ui.fragment.RecordFragment;
 
 public class SelectPlanTypePopupWindow extends PopupWindow {
 
-
     private RecordFragment recordFragment;
 
     public SelectPlanTypePopupWindow(Context context, final android.support.v4.app.Fragment fragment) {

@@ -30,16 +30,13 @@ public class RecordFragment extends Fragment {
 
     private PieChart pieChart;
     private TextView planTypeTextView;
-    private List<PlanRecordInfo> planRecordInfoList;
-    private int recordType;
-    private float totalRecordTime = 1;
+    private TextView planNoRecord;
+    public int type;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        recordType = Constants.WEEK_TYPE;
-        planRecordInfoList = RecordTask.getInstance().getPlanHistoryTime(recordType);
-        totalRecordTime = RecordTask.getInstance().getPlanTotalRecordedTimeByType(recordType);
+        type = Constants.DAY_TYPE;
     }
 
     @Nullable
@@ -48,8 +45,8 @@ public class RecordFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_record, container, false);
         planTypeTextView = (TextView) view.findViewById(R.id.fr_tv_plan_type_view);
         pieChart = (PieChart) view.findViewById(R.id.fr_pc_plan_record_summary);
-        selectPlanType(recordType);
-        drawRecordPieChart(recordType);
+        planNoRecord = (TextView) view.findViewById(R.id.fr_tv_plan_no_record);
+        selectPlanType(type);
         planTypeTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -63,25 +60,41 @@ public class RecordFragment extends Fragment {
     public void selectPlanType(int recordType) {
         switch (recordType) {
             case Constants.DAY_TYPE:
+                type=Constants.DAY_TYPE;
                 planTypeTextView.setText(getString(R.string.plan_today));
-                drawRecordPieChart(recordType);
+                drawRecordPieChart(type);
                 break;
             case Constants.WEEK_TYPE:
+                type=Constants.WEEK_TYPE;
                 planTypeTextView.setText(getString(R.string.plan_this_week));
-                drawRecordPieChart(recordType);
+                drawRecordPieChart(type);
                 break;
             case Constants.LONG_TERM_TYPE:
+                type=Constants.LONG_TERM_TYPE;
                 planTypeTextView.setText(getString(R.string.plan_long_time));
-                drawRecordPieChart(recordType);
+                drawRecordPieChart(type);
                 break;
         }
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        selectPlanType(type);
+    }
+
     private void drawRecordPieChart(int recordType) {
-        //test
+        List<PlanRecordInfo> planRecordInfoList = RecordTask.getInstance().getPlanHistoryTime(recordType);
+        float totalRecordTime = RecordTask.getInstance().getPlanTotalRecordedTimeByType(recordType);
+        if (totalRecordTime - 0.0 < 0.0000000001) {
+            planNoRecord.setVisibility(View.VISIBLE);
+            pieChart.setVisibility(View.GONE);
+            return;
+        }
+        planNoRecord.setVisibility(View.GONE);
+        pieChart.setVisibility(View.VISIBLE);
         int count = 0;
         List<PieEntry> entries = new ArrayList<>();
-        ArrayList<String> labels = new ArrayList<String>();
         for (PlanRecordInfo recordInfo : planRecordInfoList) {
             float percent = recordInfo.getTimeDuration() / totalRecordTime;
             if (percent - 0 > 0.01) {

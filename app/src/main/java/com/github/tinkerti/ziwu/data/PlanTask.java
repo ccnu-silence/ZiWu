@@ -4,6 +4,7 @@ import android.database.Cursor;
 
 import com.github.tinkerti.ziwu.data.model.AddPlanDetailInfo;
 import com.github.tinkerti.ziwu.data.model.PlanDetailInfo;
+import com.github.tinkerti.ziwu.ui.utils.DateUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,10 +35,26 @@ public class PlanTask implements ITask {
 
     public List<PlanDetailInfo> getPlanDetailInfoByType(int type) {
         List<PlanDetailInfo> planDetailInfoList = new ArrayList<>();
+        long beginTime = 0;
+        long endTime = System.currentTimeMillis();
+        switch (type) {
+            case Constants.DAY_TYPE:
+                beginTime = DateUtils.getTodayMorning();
+                endTime = DateUtils.getTodayNight();
+                break;
+            case Constants.MONTH_TYPE:
+                beginTime = DateUtils.getCurrentWeekMorning();
+                endTime = DateUtils.getCurrentWeekNight();
+                break;
+            case Constants.LONG_TERM_TYPE:
+                beginTime = 0;
+                endTime = System.currentTimeMillis();
+                break;
+        }
         String sql = "select * from " +
                 Constants.PLAN_DETAIL_TABLE_NAME
                 + " where " + Constants.PLAN_DETAIL_TABLE_COLUMN_PLAN_TYPE
-                + " = " + type;
+                + " = " + type+" and createTime>"+beginTime;
         Cursor cursor = TaskManager.getInstance().getDb().rawQuery(sql, null);
         while (cursor.moveToNext()) {
             PlanDetailInfo planDetailInfo = new PlanDetailInfo();

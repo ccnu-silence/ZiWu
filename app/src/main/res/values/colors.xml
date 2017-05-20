@@ -7,4 +7,5 @@
     <color name="baseColor">#AF7AC5</color>
     <color name="blackColor">#000000</color>
     <color name="whiteColor">#ffffff</color>
+    <color name="greenColor">#2ECC71</color>
 </resources>

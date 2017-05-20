@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends BaseActivity implements View.OnClickListener {
+    //TOdo:一是退出之后正在进行的计划记录没有了 ；
 
     private AddPlanButton addPlanButton;
     private LinearLayout addPlanPopupWindow;
@@ -49,7 +50,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         bottomIndicator = (LinearLayout) findViewById(R.id.ac_ll_bottom_indicator);
 
         contentViewPager = (ViewPager) findViewById(R.id.ac_view_pager);
-        List<Fragment> fragmentList = new ArrayList<>();
+        final List<Fragment> fragmentList = new ArrayList<>();
         fragmentList.add(new PlanFragment());
         fragmentList.add(new RecordFragment());
         fragmentList.add(new MeFragment());
@@ -68,6 +69,12 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             public void onPageSelected(int position) {
                 for (int i = 0; i < bottomIndicator.getChildCount(); i++) {
                     bottomIndicator.getChildAt(i).setSelected(i == position);
+                    if(position==1){
+                        if(fragmentList.get(position) instanceof RecordFragment){
+                            RecordFragment fragment=(RecordFragment)fragmentList.get(position);
+                            fragment.selectPlanType(fragment.type);
+                        }
+                    }
                 }
             }
 

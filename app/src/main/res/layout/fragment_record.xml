@@ -16,6 +16,15 @@
         android:id="@+id/fr_pc_plan_record_summary"
         android:layout_width="200dp"
         android:layout_height="200dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="20dp" />
+
+    <TextView
+        android:id="@+id/fr_tv_plan_no_record"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:layout_gravity="center_horizontal"
         android:layout_marginTop="20dp"
-        android:layout_gravity="center_horizontal"/>
+        android:text="暂无记录"
+        android:visibility="gone" />
 </LinearLayout>
