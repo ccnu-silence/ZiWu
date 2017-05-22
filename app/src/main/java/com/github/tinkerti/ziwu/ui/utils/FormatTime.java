@@ -1,5 +1,8 @@
 package com.github.tinkerti.ziwu.ui.utils;
 
+import com.github.tinkerti.ziwu.data.Constants;
+import com.github.tinkerti.ziwu.data.model.PlanRecordInfo;
+
 public class FormatTime {
 
     public static String calculateTimeString(long timeMillis) {
@@ -43,6 +46,41 @@ public class FormatTime {
         return builder.toString();
     }
 
+    public static String formatTimeToString(long timeMillis) {
+        long timeSeconds = timeMillis / 1000;
+        StringBuilder builder = new StringBuilder();
+        if (timeSeconds < 60) {
+            builder.append(timeSeconds)
+                    .append("s");
+        } else if (timeSeconds < 60 * 60) {
+            long minutes = timeSeconds / 60;
+            long seconds = timeSeconds % 60;
+            builder.append(minutes)
+                    .append("min");
+        } else if (timeSeconds < 99 * 3600) {
+            long hours = timeSeconds / 3600;
+            long rest = timeSeconds % 3600;
+            long minutes = rest / 60;
+            long seconds = rest % 60;
+            builder.append(hours)
+                    .append("h")
+                    .append(minutes)
+                    .append("min");
+        } else {
+            long days = timeSeconds / (24 * 3600);
+            long restTime = timeSeconds % (24 * 3600);
+            long hours = restTime / 3600;
+            long rest = restTime % 3600;
+            long minutes = rest / 60;
+            long seconds = rest % 60;
+            builder.append(days)
+                    .append("天")
+                    .append(hours)
+                    .append("h");
+        }
+        return builder.toString();
+    }
+
     private static String formatTime(long time) {
         StringBuilder builder = new StringBuilder();
         if (time < 10) {
@@ -52,5 +90,20 @@ public class FormatTime {
             builder.append(String.valueOf(time));
         }
         return builder.toString();
+    }
+
+    private float getTimePercent(PlanRecordInfo recordInfo, int type) {
+        float timePercent = 0f;
+        switch (type) {
+            case Constants.DAY_TYPE:
+                timePercent = recordInfo.getTimeDuration() / Constants.ONE_DAY_TOTAL_MILLI_SECS;
+                break;
+            case Constants.WEEK_TYPE:
+                timePercent = recordInfo.getTimeDuration() / Constants.SEVEN_DAY_TOTAL_MILLIS_SECS;
+                break;
+            case Constants.LONG_TERM_TYPE:
+                break;
+        }
+        return timePercent;
     }
 }

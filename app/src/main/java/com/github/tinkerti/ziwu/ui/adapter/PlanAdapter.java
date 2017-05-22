@@ -158,12 +158,13 @@ public class PlanAdapter extends RecyclerView.Adapter {
             if (recordInfo.getRecordState() == Constants.RECORD_STATE_RECORDING) {
                 recordingTimeTextView.setVisibility(View.VISIBLE);
             }
-            recordInfo.setPlanId(planSummaryModel.getPlanId());
+            recordInfo.setPlanId(planSummaryModel.getPlanId());//这里为什么要设置planId?
             //设置recordView是否显示；
             recordContainer.setVisibility(recordInfo.isExpand() ? View.VISIBLE : View.GONE);
 
             final long totalRecordTime = RecordTask.getInstance().getPlanTotalRecordedTime(recordInfo, planSummaryModel.getPlanType());
-            detailRecordedTimeView.setText(getColoredString(context, planSummaryModel.getPlanName(), totalRecordTime));
+            //之所以要加上timeDuration是因为，退出界面在现实的时候会出现时间跳动，因为部分正在计时着的时间实际上没有计入到数据库中；
+            detailRecordedTimeView.setText(getColoredString(context, planSummaryModel.getPlanName(), totalRecordTime+recordInfo.getTimeDuration()));
             planSummaryView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -175,46 +176,6 @@ public class PlanAdapter extends RecyclerView.Adapter {
                         recordInfo.setExpand(false);
                     }
                     planSummaryModel.setShowRecordView(!planSummaryModel.isShowRecordView());
-                }
-            });
-            //点击开始计时，如果处于计时进行中的状态，点击暂停计时
-            startButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (binder != null) {
-                        if (recordInfo.getRecordState() == Constants.RECORD_STATE_IDLE
-                                || recordInfo.getRecordState() == Constants.RECORD_STATE_STOP) {
-                            binder.startRecord(recordInfo);
-                        }
-                        recordingTimeTextView.setVisibility(View.VISIBLE);
-                    }
-                }
-            });
-            planSummaryModel.setRecordInfo(recordInfo);
-            //点击结束计时
-            stopButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (binder != null) {
-                        //需要判断下记录状态，否则的话，点击stopButton会一致进行增加计时的操作；
-                        if (recordInfo.getRecordState() == Constants.RECORD_STATE_RECORDING) {
-                            binder.stopRecord(recordInfo);
-                            recordInfo.setEndTime(System.currentTimeMillis());
-                            recordInfo.setRealRecordTime(recordInfo.getEndTime() - recordInfo.getStartTime());
-                            recordInfo.setRecordState(Constants.RECORD_STATE_STOP);
-                            RecordTask.getInstance().updatePlanRecord(recordInfo);
-                            long realRecordTime = RecordTask.getInstance().getPlanTotalRecordedTime(recordInfo, planSummaryModel.getPlanType());
-                            detailRecordedTimeView.setText(getColoredString(context, planSummaryModel.getPlanName(), realRecordTime));
-                        }
-                        recordingTimeTextView.setVisibility(View.GONE);
-                    }
-                }
-            });
-            //点击完成该计划
-            finishButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-
                 }
             });
 
@@ -235,7 +196,59 @@ public class PlanAdapter extends RecyclerView.Adapter {
             handler.removeCallbacks(recordInfo.getRefreshUiRunnable());
             recordInfo.setRefreshUiRunnable(recordRunnable);
 
-            handler.postDelayed(recordInfo.getRefreshUiRunnable(), 1000);
+            //点击开始计时，如果处于计时进行中的状态，点击暂停计时
+            startButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (binder != null) {
+                        if (recordInfo.getRecordState() == Constants.RECORD_STATE_IDLE
+                                || recordInfo.getRecordState() == Constants.RECORD_STATE_STOP) {
+                            binder.startRecord(recordInfo);
+                            handler.postDelayed(recordInfo.getRefreshUiRunnable(), 1000);//点击开始更新计时view；
+                        }
+                        recordingTimeTextView.setVisibility(View.VISIBLE);
+                    }
+                }
+            });
+            planSummaryModel.setRecordInfo(recordInfo);
+            //点击结束计时
+            stopButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (binder != null) {
+                        //需要判断下记录状态，否则的话，点击stopButton会一致进行增加计时的操作；
+                        if (recordInfo.getRecordState() == Constants.RECORD_STATE_RECORDING) {
+                            binder.stopRecord(recordInfo);
+                            recordInfo.setEndTime(System.currentTimeMillis());
+                            recordInfo.setRealRecordTime(recordInfo.getEndTime() - recordInfo.getStartTime());
+                            recordInfo.setRecordState(Constants.RECORD_STATE_STOP);
+                            RecordTask.getInstance().updatePlanRecord(recordInfo);
+                            long realRecordTime = RecordTask.getInstance().getPlanTotalRecordedTime(recordInfo, planSummaryModel.getPlanType());
+                            detailRecordedTimeView.setText(getColoredString(context, planSummaryModel.getPlanName(), realRecordTime));
+                            handler.removeCallbacks(recordInfo.getRefreshUiRunnable());
+                        }
+                        recordingTimeTextView.setVisibility(View.GONE);
+                    }
+                }
+            });
+            //点击完成该计划
+            finishButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                }
+            });
+
+
+
+            //如果是正在记录则需要去更新界面，而处于idle或者stop的状态，则不去更新
+            if(recordInfo.getRecordState()==Constants.RECORD_STATE_RECORDING){
+                handler.postDelayed(recordInfo.getRefreshUiRunnable(), 1000);
+            }else if(recordInfo.getRecordState()==Constants.RECORD_STATE_IDLE
+                    ||recordInfo.getRecordState()==Constants.RECORD_STATE_STOP){
+                handler.removeCallbacks(recordInfo.getRefreshUiRunnable());
+            }
+
         }
     }
 

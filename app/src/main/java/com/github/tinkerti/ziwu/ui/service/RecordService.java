@@ -72,6 +72,7 @@ public class RecordService extends Service {
 
         public void stopRecord(PlanRecordInfo recordInfo) {
             handler.removeCallbacks(recordInfo.getRecordTimeRunnable());
+            recordInfo.setTimeDuration(0l);
         }
     }
 

@@ -69,11 +69,16 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             public void onPageSelected(int position) {
                 for (int i = 0; i < bottomIndicator.getChildCount(); i++) {
                     bottomIndicator.getChildAt(i).setSelected(i == position);
-                    if(position==1){
-                        if(fragmentList.get(position) instanceof RecordFragment){
-                            RecordFragment fragment=(RecordFragment)fragmentList.get(position);
+                    if (position == 1) {
+                        if (fragmentList.get(position) instanceof RecordFragment) {
+                            RecordFragment fragment = (RecordFragment) fragmentList.get(position);
                             fragment.selectPlanType(fragment.type);
                         }
+                    }
+                    if (position == 0) {
+                        addPlanButton.setVisibility(View.VISIBLE);
+                    } else {
+                        addPlanButton.setVisibility(View.GONE);
                     }
                 }
             }
@@ -141,7 +146,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         addPlanPopupWindow.setVisibility(View.GONE);
         Intent intent = new Intent(this, AddPlanDetailActivity.class);
         intent.putExtra("type", type);
-        startActivityForResult(intent,Constants.ADD_PLAN_REQUEST);
+        startActivityForResult(intent, Constants.ADD_PLAN_REQUEST);
     }
 
     private class ContentPagerAdapter extends FragmentPagerAdapter {
