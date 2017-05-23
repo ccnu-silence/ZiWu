@@ -89,7 +89,7 @@ public class PlanTask implements ITask {
     }
 
     public void deletePlanDetailInfoById(String planId) {
-        String sql = "delete from " + Constants.ADD_PLAN_DETAIL_TABLE_NAME + " where " + Constants.PLAN_DETAIL_TABLE_COLUMN_PLAN_ID + " = '" + planId + "'";
+        String sql = "delete from " + Constants.PLAN_DETAIL_TABLE_NAME + " where " + Constants.PLAN_DETAIL_TABLE_COLUMN_PLAN_ID + " = '" + planId + "'";
         TaskManager.getInstance().getDb().execSQL(sql);
     }
 

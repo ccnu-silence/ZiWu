@@ -22,6 +22,7 @@ import com.github.tinkerti.ziwu.ui.service.RecordService;
 import com.github.tinkerti.ziwu.ui.utils.FormatTime;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -45,8 +46,15 @@ public class PlanAdapter extends RecyclerView.Adapter {
 
     private Handler handler;//更新界面用；
 
+    public HashMap<String, PlanRecordInfo> getRecordInfoHashMap() {
+        return recordInfoHashMap;
+    }
+
+    private HashMap<String, PlanRecordInfo> recordInfoHashMap;//记录正在进行的计时任务；这里的 id是recordId；
+
     public PlanAdapter() {
         modelList = new ArrayList<>();
+        recordInfoHashMap = new HashMap<>();
     }
 
     @Override
@@ -164,7 +172,7 @@ public class PlanAdapter extends RecyclerView.Adapter {
 
             final long totalRecordTime = RecordTask.getInstance().getPlanTotalRecordedTime(recordInfo, planSummaryModel.getPlanType());
             //之所以要加上timeDuration是因为，退出界面在现实的时候会出现时间跳动，因为部分正在计时着的时间实际上没有计入到数据库中；
-            detailRecordedTimeView.setText(getColoredString(context, planSummaryModel.getPlanName(), totalRecordTime+recordInfo.getTimeDuration()));
+            detailRecordedTimeView.setText(getColoredString(context, planSummaryModel.getPlanName(), totalRecordTime + recordInfo.getTimeDuration()));
             planSummaryView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -179,11 +187,18 @@ public class PlanAdapter extends RecyclerView.Adapter {
                 }
             });
 
+            //计划item长按点击事件，可以对计划进行修改、删除操作和查看详情操作；
+            planSummaryView.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    return false;
+                }
+            });
+
             //这个地方有点问题，需要优化下，这样做没有多大必要；
             Runnable recordRunnable = new Runnable() {
                 @Override
                 public void run() {
-                    PlanRecordInfo recordInfo = planSummaryModel.getRecordInfo();
                     if (recordInfo != null) {
                         recordingTimeTextView.setText(FormatTime.calculateTimeString(recordInfo.getTimeDuration()));
                         detailRecordedTimeView.setText(getColoredString(context, planSummaryModel.getPlanName(), totalRecordTime + recordInfo.getTimeDuration()));
@@ -191,11 +206,8 @@ public class PlanAdapter extends RecyclerView.Adapter {
                     handler.postDelayed(this, 1000);
                 }
             };
-
-
             handler.removeCallbacks(recordInfo.getRefreshUiRunnable());
             recordInfo.setRefreshUiRunnable(recordRunnable);
-
             //点击开始计时，如果处于计时进行中的状态，点击暂停计时
             startButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -205,8 +217,11 @@ public class PlanAdapter extends RecyclerView.Adapter {
                                 || recordInfo.getRecordState() == Constants.RECORD_STATE_STOP) {
                             binder.startRecord(recordInfo);
                             handler.postDelayed(recordInfo.getRefreshUiRunnable(), 1000);//点击开始更新计时view；
+                            recordInfoHashMap.put(recordInfo.getRecordId(), recordInfo);
                         }
                         recordingTimeTextView.setVisibility(View.VISIBLE);
+                        recordingTimeTextView.setText(FormatTime.calculateTimeString(recordInfo.getTimeDuration()));
+
                     }
                 }
             });
@@ -228,6 +243,7 @@ public class PlanAdapter extends RecyclerView.Adapter {
                             handler.removeCallbacks(recordInfo.getRefreshUiRunnable());
                         }
                         recordingTimeTextView.setVisibility(View.GONE);
+                        recordInfo.setTimeDuration(0);
                     }
                 }
             });
@@ -240,12 +256,11 @@ public class PlanAdapter extends RecyclerView.Adapter {
             });
 
 
-
             //如果是正在记录则需要去更新界面，而处于idle或者stop的状态，则不去更新
-            if(recordInfo.getRecordState()==Constants.RECORD_STATE_RECORDING){
+            if (recordInfo.getRecordState() == Constants.RECORD_STATE_RECORDING) {
                 handler.postDelayed(recordInfo.getRefreshUiRunnable(), 1000);
-            }else if(recordInfo.getRecordState()==Constants.RECORD_STATE_IDLE
-                    ||recordInfo.getRecordState()==Constants.RECORD_STATE_STOP){
+            } else if (recordInfo.getRecordState() == Constants.RECORD_STATE_IDLE
+                    || recordInfo.getRecordState() == Constants.RECORD_STATE_STOP) {
                 handler.removeCallbacks(recordInfo.getRefreshUiRunnable());
             }
 

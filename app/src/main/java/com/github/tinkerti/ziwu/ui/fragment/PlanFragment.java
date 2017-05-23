@@ -25,7 +25,9 @@ import com.github.tinkerti.ziwu.ui.adapter.PlanAdapter;
 import com.github.tinkerti.ziwu.ui.service.RecordService;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -41,13 +43,15 @@ public class PlanFragment extends Fragment {
     private RecordServiceConnection serviceConnection;
     private Map<String, PlanRecordInfo> planRecordInfoMap;
     private RecyclerView recyclerView;
+    private Handler handler;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         planRecordInfoMap = new HashMap<>();
         planAdapter = new PlanAdapter();
-        planAdapter.setHandler(new Handler(Looper.getMainLooper()));
+        handler=new Handler(Looper.getMainLooper());
+        planAdapter.setHandler(handler);
         initBindService();
     }
 
@@ -145,5 +149,13 @@ public class PlanFragment extends Fragment {
     public void onDestroy() {
         super.onDestroy();
         getContext().unbindService(serviceConnection);
+        //销毁fragment的时候需要，移除handler中正在进行的任务；
+        if(handler!=null){
+            Collection<PlanRecordInfo> recordInfoCollection=planAdapter.getRecordInfoHashMap().values();
+            Iterator<PlanRecordInfo> infoIterator=recordInfoCollection.iterator();
+            while (infoIterator.hasNext()){
+                handler.removeCallbacks(infoIterator.next().getRefreshUiRunnable());
+            }
+        }
     }
 }

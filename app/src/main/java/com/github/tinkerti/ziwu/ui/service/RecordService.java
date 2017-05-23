@@ -81,6 +81,7 @@ public class RecordService extends Service {
         Intent intent = new Intent(getApplicationContext(), MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), Constants.NOTIFICATION_START_ACTIVITY, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         Notification notification = new Notification.Builder(getApplicationContext())
+                .setSmallIcon(R.mipmap.ic_launcher)
                 .setContent(notificationView)
                 .setContentIntent(pendingIntent)
                 .build();
