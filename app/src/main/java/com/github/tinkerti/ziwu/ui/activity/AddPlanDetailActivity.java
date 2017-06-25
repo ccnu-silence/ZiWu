@@ -13,6 +13,7 @@ import android.widget.TextView;
 import com.github.tinkerti.ziwu.R;
 import com.github.tinkerti.ziwu.data.AddPlanTask;
 import com.github.tinkerti.ziwu.data.Constants;
+import com.github.tinkerti.ziwu.data.PlanTask;
 import com.github.tinkerti.ziwu.data.model.AddPlanDetailInfo;
 import com.github.tinkerti.ziwu.ui.adapter.AddPlanAdapter;
 
@@ -71,6 +72,7 @@ public class AddPlanDetailActivity extends BaseActivity {
         view.findViewById(R.id.tv_cancel_add_plan_detail).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                PlanTask.getInstance().deletePlanDetailInfo();
                 AddPlanTask.getInstance().deletePlanDetailInfo();
                 finish();
             }

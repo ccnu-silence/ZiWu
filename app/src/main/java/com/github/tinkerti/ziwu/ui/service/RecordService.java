@@ -17,9 +17,14 @@ import com.github.tinkerti.ziwu.data.Constants;
 import com.github.tinkerti.ziwu.data.RecordTask;
 import com.github.tinkerti.ziwu.data.model.PlanRecordInfo;
 import com.github.tinkerti.ziwu.ui.activity.MainActivity;
+import com.github.tinkerti.ziwu.ui.utils.ZLog;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
+
+import static com.github.tinkerti.ziwu.data.Constants.SERVICE_RECORDING_PLAN_INFO_LIST;
 
 /**
  * Created by tiankui on 4/30/17.
@@ -27,17 +32,34 @@ import java.util.UUID;
 
 public class RecordService extends Service {
 
+    private static final String TAG = "RecordService";
     private Handler handler;
-    private HashMap<String,PlanRecordInfo> recordInfoHashMap;
+    private HashMap<String, PlanRecordInfo> recordInfoHashMap;
+    private ArrayList<PlanRecordInfo> recordInfoArrayList;
 
     @Override
     public void onCreate() {
         super.onCreate();
+        ZLog.d(TAG, "onCreate");
         HandlerThread handlerThread = new HandlerThread("ServiceWorkThread");
         //不要忘了调用start();
         handlerThread.start();
         handler = new Handler(handlerThread.getLooper());
-        recordInfoHashMap=new HashMap<>();
+        recordInfoHashMap = new HashMap<>();
+        recordInfoArrayList = new ArrayList<>();
+
+
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        List<PlanRecordInfo> recordInfoList = intent.getParcelableArrayListExtra(Constants.SERVICE_RECORDING_PLAN_INFO_LIST);
+        if (recordInfoList != null) {
+            for (PlanRecordInfo info : recordInfoList) {
+                recordInfoHashMap.put(info.getPlanId(), info);
+            }
+        }
+        return Service.START_STICKY;
     }
 
     @Nullable
@@ -47,17 +69,20 @@ public class RecordService extends Service {
     }
 
     public class RecordServiceBinder extends Binder {
-        public HashMap<String, PlanRecordInfo> getRecordInfoHashMap(){
+        public HashMap<String, PlanRecordInfo> getRecordInfoHashMap() {
             return recordInfoHashMap;
         }
 
         public void startRecord(final PlanRecordInfo recordInfo) {
-            recordInfoHashMap.put(recordInfo.getPlanId(),recordInfo);
+            ZLog.d(TAG, "start record");
+            recordInfoHashMap.put(recordInfo.getPlanId(), recordInfo);
+            recordInfoArrayList.add(recordInfo);
             showNotification();
             final Runnable startRecordRunnable = new Runnable() {
                 @Override
                 public void run() {
                     recordInfo.setTimeDuration(recordInfo.getTimeDuration() + 1000);
+                    ZLog.d(TAG, "(runnable)" + this + " time duration:" + recordInfo.getTimeDuration());
                     recordInfo.setRecordState(Constants.RECORD_STATE_RECORDING);
                     handler.postDelayed(this, 1000);
                     recordInfo.setRecordTimeRunnable(this);
@@ -71,12 +96,15 @@ public class RecordService extends Service {
         }
 
         public void stopRecord(PlanRecordInfo recordInfo) {
+            ZLog.d(TAG, "stop record");
             handler.removeCallbacks(recordInfo.getRecordTimeRunnable());
+            ZLog.d(TAG, "remove runnable " + recordInfo.getRecordTimeRunnable());
             recordInfo.setTimeDuration(0l);
         }
     }
 
     private void showNotification() {
+        ZLog.d(TAG, "show notification");
         RemoteViews notificationView = new RemoteViews(getPackageName(), R.layout.notification_content_view);
         Intent intent = new Intent(getApplicationContext(), MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), Constants.NOTIFICATION_START_ACTIVITY, intent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -88,5 +116,14 @@ public class RecordService extends Service {
         NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         notificationManager.notify(101, notification);
         startForeground(1, notification);
+    }
+
+    @Override
+    public void onDestroy() {
+        ZLog.e(TAG, "onDestroy");
+        Intent intent = new Intent(this, RecordService.class);
+        intent.putParcelableArrayListExtra(SERVICE_RECORDING_PLAN_INFO_LIST, recordInfoArrayList);
+        startService(intent);
+
     }
 }

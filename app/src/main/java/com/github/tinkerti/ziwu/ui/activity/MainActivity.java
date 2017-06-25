@@ -14,6 +14,7 @@ import com.github.tinkerti.ziwu.data.Constants;
 import com.github.tinkerti.ziwu.ui.fragment.MeFragment;
 import com.github.tinkerti.ziwu.ui.fragment.PlanFragment;
 import com.github.tinkerti.ziwu.ui.fragment.RecordFragment;
+import com.github.tinkerti.ziwu.ui.utils.ZLog;
 import com.github.tinkerti.ziwu.ui.widget.AddPlanButton;
 import com.github.tinkerti.ziwu.ui.widget.TabIndicatorItemView;
 
@@ -22,7 +23,7 @@ import java.util.List;
 
 public class MainActivity extends BaseActivity implements View.OnClickListener {
     //TOdo:一是退出之后正在进行的计划记录没有了 ；
-
+    private static final String TAG = "MainActivity";
     private AddPlanButton addPlanButton;
     private LinearLayout addPlanPopupWindow;
 
@@ -36,6 +37,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        ZLog.d(TAG, "onCreate");
         setContentView(R.layout.activity_main);
         initView();
     }
@@ -101,6 +103,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
     @Override
     public void onCreateTitleBar(TitleBar titleBar) {
+        ZLog.d(TAG, "onCreateTitleBar");
         View view = titleBar.onCreateTitle(R.layout.bar_plan_content_title);
     }
 
@@ -174,12 +177,14 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             return 0;
         }
 
-        public List<Fragment> getFragmentList() {
-            return fragmentList;
-        }
-
         public void setFragmentList(List<Fragment> fragmentList) {
             this.fragmentList = fragmentList;
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        ZLog.e(TAG, "onDestroy");
     }
 }

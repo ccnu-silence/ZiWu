@@ -23,11 +23,10 @@ import com.github.tinkerti.ziwu.data.model.PlanDetailInfo;
 import com.github.tinkerti.ziwu.data.model.PlanRecordInfo;
 import com.github.tinkerti.ziwu.ui.adapter.PlanAdapter;
 import com.github.tinkerti.ziwu.ui.service.RecordService;
+import com.github.tinkerti.ziwu.ui.utils.ZLog;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -37,7 +36,9 @@ import java.util.Map;
  */
 
 public class PlanFragment extends Fragment {
-    //Todo:有个问题，有一定概率你添加计划清单之后没有及时的在计划列表中进行展示；可能跟数据库的异步操作有关？
+    //TODO:锁屏之后会有问题，解锁的时候界面不会刷新到最新的时间；二是：锁屏之后，停止计时，然后再开始，时间统计会有问题
+    //TODO:功能完善，比如长按事件处理重命名和删除逻辑；
+    private static final String TAG = "PlanFragment";
     PlanAdapter planAdapter;
     int[] types;
     private RecordServiceConnection serviceConnection;
@@ -48,9 +49,10 @@ public class PlanFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        ZLog.d(TAG, "onCreate");
         planRecordInfoMap = new HashMap<>();
         planAdapter = new PlanAdapter();
-        handler=new Handler(Looper.getMainLooper());
+        handler = new Handler(Looper.getMainLooper());
         planAdapter.setHandler(handler);
         initBindService();
     }
@@ -58,6 +60,7 @@ public class PlanFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        ZLog.d(TAG, "onCreateView");
         View view = inflater.inflate(R.layout.fragment_plan_list, container, false);
         recyclerView = (RecyclerView) view.findViewById(R.id.fr_rv_plan_summary_list);
         types = new int[]{Constants.DAY_TYPE, Constants.WEEK_TYPE, Constants.LONG_TERM_TYPE};
@@ -98,7 +101,6 @@ public class PlanFragment extends Fragment {
                 PlanAdapter.NoPlanModel noPlanModel = new PlanAdapter.NoPlanModel();
                 noPlanModel.setNoPlanType(type);
                 itemModelList.add(noPlanModel);
-
             }
         }
         //setModelList()中没有进行notifyDateSetChanged的原因，是因为着这样做的话计时会有问题
@@ -110,12 +112,14 @@ public class PlanFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        ZLog.d(TAG, "onResume");
         //在这调用这个方法的目的是当添加新的plan之后，会回到主界面，
         // 当前fragment的生命周期不会走onCreate()和onCreateView（）,实时更新planList就需要在这添加这个方法
         getPlanListByType(types);
     }
 
     private void initBindService() {
+        ZLog.d(TAG, "initBindService");
         Intent intent = new Intent(getContext(), RecordService.class);
         serviceConnection = new RecordServiceConnection();
         getContext().startService(intent);
@@ -126,15 +130,16 @@ public class PlanFragment extends Fragment {
 
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
+            ZLog.d(TAG, "onServiceConnected: record service connected");
             RecordService.RecordServiceBinder binder = (RecordService.RecordServiceBinder) service;
             planAdapter.setBinder(binder);
-            planRecordInfoMap=binder.getRecordInfoHashMap();
+            planRecordInfoMap = binder.getRecordInfoHashMap();
             getPlanListByType(types);
         }
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
-
+            ZLog.d(TAG, "onServiceDisconnected: record service disconnected");
         }
     }
 
@@ -148,14 +153,15 @@ public class PlanFragment extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        getContext().unbindService(serviceConnection);
+        ZLog.e(TAG, "onDestroy");
+//        getContext().unbindService(serviceConnection);
         //销毁fragment的时候需要，移除handler中正在进行的任务；
-        if(handler!=null){
-            Collection<PlanRecordInfo> recordInfoCollection=planAdapter.getRecordInfoHashMap().values();
-            Iterator<PlanRecordInfo> infoIterator=recordInfoCollection.iterator();
-            while (infoIterator.hasNext()){
-                handler.removeCallbacks(infoIterator.next().getRefreshUiRunnable());
-            }
-        }
+//        if(handler!=null){
+//            Collection<PlanRecordInfo> recordInfoCollection=planAdapter.getRecordInfoHashMap().values();
+//            Iterator<PlanRecordInfo> infoIterator=recordInfoCollection.iterator();
+//            while (infoIterator.hasNext()){
+//                handler.removeCallbacks(infoIterator.next().getRefreshUiRunnable());
+//            }
+//        }
     }
 }

@@ -20,41 +20,31 @@ import com.github.tinkerti.ziwu.data.model.PlanRecordInfo;
 import com.github.tinkerti.ziwu.ui.activity.AddPlanDetailActivity;
 import com.github.tinkerti.ziwu.ui.service.RecordService;
 import com.github.tinkerti.ziwu.ui.utils.FormatTime;
+import com.github.tinkerti.ziwu.ui.utils.ZLog;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-/**
- * Created by tiankui on 4/23/17.
- */
-
 public class PlanAdapter extends RecyclerView.Adapter {
+    //TODO:需要把planType和recordState都写成枚举类型，日志内容跟易读些；
+    private static final String TAG = "PlanAdapter";
     private static final int PLAN_CATEGORY_TYPE = 1;
     private static final int PLAN_SUMMARY_TYPE = 2;
     private static final int NO_PLAN_TYPE = 4;
     List<ItemModel> modelList;
     private RecordService.RecordServiceBinder binder;
+    private Handler handler;//更新界面用；
+    private HashMap<String, PlanRecordInfo> recordInfoHashMap;//记录正在进行的计时任务；这里的 id是recordId；
 
-    public Handler getHandler() {
-        return handler;
+    public PlanAdapter() {
+        ZLog.d(TAG, "new PlanAdapter");
+        modelList = new ArrayList<>();
+        recordInfoHashMap = new HashMap<>();
     }
 
     public void setHandler(Handler handler) {
         this.handler = handler;
-    }
-
-    private Handler handler;//更新界面用；
-
-    public HashMap<String, PlanRecordInfo> getRecordInfoHashMap() {
-        return recordInfoHashMap;
-    }
-
-    private HashMap<String, PlanRecordInfo> recordInfoHashMap;//记录正在进行的计时任务；这里的 id是recordId；
-
-    public PlanAdapter() {
-        modelList = new ArrayList<>();
-        recordInfoHashMap = new HashMap<>();
     }
 
     @Override
@@ -158,9 +148,14 @@ public class PlanAdapter extends RecyclerView.Adapter {
 
         @Override
         public void update(final int position) {
+            ZLog.d(TAG, "PlanSummaryItemView update");
             final PlanSummaryModel planSummaryModel = (PlanSummaryModel) modelList.get(position);
             planNameTextView.setText(planSummaryModel.getPlanName());
-            recordingTimeTextView.setText(FormatTime.calculateTimeString(planSummaryModel.getRecordInfo().getTimeDuration()));
+            ZLog.d(TAG, "planSummary name:" + planSummaryModel.getPlanName());
+            String recordingTime = FormatTime.calculateTimeString(planSummaryModel.getRecordInfo().getTimeDuration());
+            recordingTimeTextView.setText(recordingTime);
+            ZLog.d(TAG, "recording time:" + recordingTime);
+
             //planRecordInfo对象，用来保存计划进行时间
             final PlanRecordInfo recordInfo = planSummaryModel.getRecordInfo();
             if (recordInfo.getRecordState() == Constants.RECORD_STATE_RECORDING) {
@@ -169,10 +164,12 @@ public class PlanAdapter extends RecyclerView.Adapter {
             recordInfo.setPlanId(planSummaryModel.getPlanId());//这里为什么要设置planId?
             //设置recordView是否显示；
             recordContainer.setVisibility(recordInfo.isExpand() ? View.VISIBLE : View.GONE);
-
-            final long totalRecordTime = RecordTask.getInstance().getPlanTotalRecordedTime(recordInfo, planSummaryModel.getPlanType());
+            long totalTime = RecordTask.getInstance().getPlanTotalRecordedTime(recordInfo, planSummaryModel.getPlanType());
+            recordInfo.setTotalRecordTime(totalTime);
+            ZLog.d(TAG, "totalTime:" + totalTime);
             //之所以要加上timeDuration是因为，退出界面在现实的时候会出现时间跳动，因为部分正在计时着的时间实际上没有计入到数据库中；
-            detailRecordedTimeView.setText(getColoredString(context, planSummaryModel.getPlanName(), totalRecordTime + recordInfo.getTimeDuration()));
+            detailRecordedTimeView.setText(getColoredString(context, planSummaryModel.getPlanName(), recordInfo.getTotalRecordTime() + recordInfo.getTimeDuration()));
+            ZLog.d(TAG, "detail record time:" + (recordInfo.getTotalRecordTime() + recordInfo.getTimeDuration()) + "| time duration this time:" + recordInfo.getTimeDuration());
             planSummaryView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -201,13 +198,17 @@ public class PlanAdapter extends RecyclerView.Adapter {
                 public void run() {
                     if (recordInfo != null) {
                         recordingTimeTextView.setText(FormatTime.calculateTimeString(recordInfo.getTimeDuration()));
-                        detailRecordedTimeView.setText(getColoredString(context, planSummaryModel.getPlanName(), totalRecordTime + recordInfo.getTimeDuration()));
+                        ZLog.d(TAG, "(runnable)" + this + " recording time:" + FormatTime.calculateTimeString(recordInfo.getTimeDuration()));
+                        detailRecordedTimeView.setText(getColoredString(context, planSummaryModel.getPlanName(), recordInfo.getTotalRecordTime() + recordInfo.getTimeDuration()));
+                        ZLog.d(TAG, "(runnable)" + this + " detail record time:" + (recordInfo.getTotalRecordTime() + recordInfo.getTimeDuration()));
                     }
                     handler.postDelayed(this, 1000);
                 }
             };
             handler.removeCallbacks(recordInfo.getRefreshUiRunnable());
+            ZLog.d(TAG, "remove runnable " + recordInfo.getRefreshUiRunnable());
             recordInfo.setRefreshUiRunnable(recordRunnable);
+            ZLog.d(TAG, "set runnable " + recordInfo.getRefreshUiRunnable());
             //点击开始计时，如果处于计时进行中的状态，点击暂停计时
             startButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -215,6 +216,7 @@ public class PlanAdapter extends RecyclerView.Adapter {
                     if (binder != null) {
                         if (recordInfo.getRecordState() == Constants.RECORD_STATE_IDLE
                                 || recordInfo.getRecordState() == Constants.RECORD_STATE_STOP) {
+                            recordInfo.setTimeDuration(0);//为了解决，锁屏之后，结束计时，然后再开始计时，记录详情时间记录问题；
                             binder.startRecord(recordInfo);
                             handler.postDelayed(recordInfo.getRefreshUiRunnable(), 1000);//点击开始更新计时view；
                             recordInfoHashMap.put(recordInfo.getRecordId(), recordInfo);
@@ -241,6 +243,7 @@ public class PlanAdapter extends RecyclerView.Adapter {
                             long realRecordTime = RecordTask.getInstance().getPlanTotalRecordedTime(recordInfo, planSummaryModel.getPlanType());
                             detailRecordedTimeView.setText(getColoredString(context, planSummaryModel.getPlanName(), realRecordTime));
                             handler.removeCallbacks(recordInfo.getRefreshUiRunnable());
+                            recordInfo.setTotalRecordTime(RecordTask.getInstance().getPlanTotalRecordedTime(recordInfo, planSummaryModel.getPlanType()));
                         }
                         recordingTimeTextView.setVisibility(View.GONE);
                         recordInfo.setTimeDuration(0);
@@ -319,15 +322,14 @@ public class PlanAdapter extends RecyclerView.Adapter {
 
 
     public static abstract class ItemModel {
-        private int Type;
-
-        private String planId;
-
-        public abstract int getType();
 
         public String getPlanId() {
             return planId;
         }
+
+        private String planId;
+
+        public abstract int getType();
 
         public void setPlanId(String planId) {
             this.planId = planId;
@@ -375,7 +377,6 @@ public class PlanAdapter extends RecyclerView.Adapter {
 
         private String planId;
         private String planName;
-        private long recordingTime;
         private int planType;
         private boolean isShowRecordView = false;
         private PlanRecordInfo recordInfo;
@@ -391,14 +392,6 @@ public class PlanAdapter extends RecyclerView.Adapter {
 
         public void setPlanName(String planName) {
             this.planName = planName;
-        }
-
-        public long getRecordingTime() {
-            return recordingTime;
-        }
-
-        public void setRecordingTime(long recordingTime) {
-            this.recordingTime = recordingTime;
         }
 
         public int getPlanType() {
@@ -437,17 +430,8 @@ public class PlanAdapter extends RecyclerView.Adapter {
         }
     }
 
-
-    public List<ItemModel> getModelList() {
-        return modelList;
-    }
-
     public void setModelList(List<ItemModel> modelList) {
         this.modelList = modelList;
-    }
-
-    public RecordService.RecordServiceBinder getBinder() {
-        return binder;
     }
 
     public void setBinder(RecordService.RecordServiceBinder binder) {

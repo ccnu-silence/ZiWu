@@ -26,6 +26,8 @@ public class Constants {
     public static final String PLAN_DETAIL_TABLE_COLUMN_PLAN_JOIN_PARENT_ID = "planJoinParentId";
     public static final String PLAN_DETAIL_TABLE_COLUMN_PLAN_TAG = "planTag";
 
+    public static final String SERVICE_RECORDING_PLAN_INFO_LIST="planRecordingList";
+
 
     public static final int NOTIFICATION_START_ACTIVITY=11;
 

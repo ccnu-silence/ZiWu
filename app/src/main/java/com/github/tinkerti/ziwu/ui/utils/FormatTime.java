@@ -1,8 +1,5 @@
 package com.github.tinkerti.ziwu.ui.utils;
 
-import com.github.tinkerti.ziwu.data.Constants;
-import com.github.tinkerti.ziwu.data.model.PlanRecordInfo;
-
 public class FormatTime {
 
     public static String calculateTimeString(long timeMillis) {
@@ -90,20 +87,5 @@ public class FormatTime {
             builder.append(String.valueOf(time));
         }
         return builder.toString();
-    }
-
-    private float getTimePercent(PlanRecordInfo recordInfo, int type) {
-        float timePercent = 0f;
-        switch (type) {
-            case Constants.DAY_TYPE:
-                timePercent = recordInfo.getTimeDuration() / Constants.ONE_DAY_TOTAL_MILLI_SECS;
-                break;
-            case Constants.WEEK_TYPE:
-                timePercent = recordInfo.getTimeDuration() / Constants.SEVEN_DAY_TOTAL_MILLIS_SECS;
-                break;
-            case Constants.LONG_TERM_TYPE:
-                break;
-        }
-        return timePercent;
     }
 }

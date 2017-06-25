@@ -9,7 +9,7 @@ import com.github.tinkerti.ziwu.data.Constants;
  * Created by tiankui on 4/30/17.
  */
 
-public class PlanRecordInfo extends PlanBaseInfo implements Parcelable{
+public class PlanRecordInfo extends PlanBaseInfo implements Parcelable {
 
     public String getRecordId() {
         return recordId;
@@ -18,13 +18,24 @@ public class PlanRecordInfo extends PlanBaseInfo implements Parcelable{
     public void setRecordId(String recordId) {
         this.recordId = recordId;
     }
+
     private String recordId;
     private long startTime;
     private long endTime;
-    private long timeDuration=0;
-    private int recordState= Constants.RECORD_STATE_IDLE;
+    private long timeDuration = 0;
+    private int recordState = Constants.RECORD_STATE_IDLE;
     private Runnable refreshUiRunnable;//用于定时刷新计时的ui
-    private boolean isExpand=false;
+    private boolean isExpand = false;
+
+    public long getTotalRecordTime() {
+        return totalRecordTime;
+    }
+
+    public void setTotalRecordTime(long totalRecordTime) {
+        this.totalRecordTime = totalRecordTime;
+    }
+
+    private long totalRecordTime = 0;
 
     public long getRealRecordTime() {
         return realRecordTime;
@@ -62,12 +73,16 @@ public class PlanRecordInfo extends PlanBaseInfo implements Parcelable{
         this.refreshUiRunnable = refreshUiRunnable;
     }
 
-    public PlanRecordInfo(){}
+    public PlanRecordInfo() {
+    }
+
     protected PlanRecordInfo(Parcel in) {
         startTime = in.readLong();
         endTime = in.readLong();
         timeDuration = in.readLong();
         recordState = in.readInt();
+        recordId = in.readString();
+        totalRecordTime = in.readLong();
     }
 
     public static final Creator<PlanRecordInfo> CREATOR = new Creator<PlanRecordInfo>() {
@@ -125,5 +140,7 @@ public class PlanRecordInfo extends PlanBaseInfo implements Parcelable{
         dest.writeLong(endTime);
         dest.writeLong(timeDuration);
         dest.writeInt(recordState);
+        dest.writeString(recordId);
+        dest.writeLong(totalRecordTime);
     }
 }
