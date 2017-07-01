@@ -148,13 +148,11 @@ public class PlanAdapter extends RecyclerView.Adapter {
 
         @Override
         public void update(final int position) {
-            ZLog.d(TAG, "PlanSummaryItemView update");
             final PlanSummaryModel planSummaryModel = (PlanSummaryModel) modelList.get(position);
             planNameTextView.setText(planSummaryModel.getPlanName());
-            ZLog.d(TAG, "planSummary name:" + planSummaryModel.getPlanName());
             String recordingTime = FormatTime.calculateTimeString(planSummaryModel.getRecordInfo().getTimeDuration());
             recordingTimeTextView.setText(recordingTime);
-            ZLog.d(TAG, "recording time:" + recordingTime);
+            ZLog.d(TAG, planSummaryModel.getPlanName()+" recording time:" + recordingTime);
 
             //planRecordInfo对象，用来保存计划进行时间
             final PlanRecordInfo recordInfo = planSummaryModel.getRecordInfo();
@@ -166,10 +164,10 @@ public class PlanAdapter extends RecyclerView.Adapter {
             recordContainer.setVisibility(recordInfo.isExpand() ? View.VISIBLE : View.GONE);
             long totalTime = RecordTask.getInstance().getPlanTotalRecordedTime(recordInfo, planSummaryModel.getPlanType());
             recordInfo.setTotalRecordTime(totalTime);
-            ZLog.d(TAG, "totalTime:" + totalTime);
+            ZLog.d(TAG, planSummaryModel.getPlanName()+" totalTime:" + totalTime);
             //之所以要加上timeDuration是因为，退出界面在现实的时候会出现时间跳动，因为部分正在计时着的时间实际上没有计入到数据库中；
             detailRecordedTimeView.setText(getColoredString(context, planSummaryModel.getPlanName(), recordInfo.getTotalRecordTime() + recordInfo.getTimeDuration()));
-            ZLog.d(TAG, "detail record time:" + (recordInfo.getTotalRecordTime() + recordInfo.getTimeDuration()) + "| time duration this time:" + recordInfo.getTimeDuration());
+            ZLog.d(TAG, planSummaryModel.getPlanName()+" detail record time:" + (recordInfo.getTotalRecordTime() + recordInfo.getTimeDuration()) + "| time duration this time:" + recordInfo.getTimeDuration());
             planSummaryView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -198,9 +196,9 @@ public class PlanAdapter extends RecyclerView.Adapter {
                 public void run() {
                     if (recordInfo != null) {
                         recordingTimeTextView.setText(FormatTime.calculateTimeString(recordInfo.getTimeDuration()));
-                        ZLog.d(TAG, "(runnable)" + this + " recording time:" + FormatTime.calculateTimeString(recordInfo.getTimeDuration()));
+                        ZLog.d(TAG, planSummaryModel.getPlanName()+" (runnable)" + this + " recording time:" + FormatTime.calculateTimeString(recordInfo.getTimeDuration()));
                         detailRecordedTimeView.setText(getColoredString(context, planSummaryModel.getPlanName(), recordInfo.getTotalRecordTime() + recordInfo.getTimeDuration()));
-                        ZLog.d(TAG, "(runnable)" + this + " detail record time:" + (recordInfo.getTotalRecordTime() + recordInfo.getTimeDuration()));
+                        ZLog.d(TAG, planSummaryModel.getPlanName()+" (runnable)" + this + " detail record time:" + (recordInfo.getTotalRecordTime() + recordInfo.getTimeDuration()));
                     }
                     handler.postDelayed(this, 1000);
                 }
@@ -246,7 +244,6 @@ public class PlanAdapter extends RecyclerView.Adapter {
                             recordInfo.setTotalRecordTime(RecordTask.getInstance().getPlanTotalRecordedTime(recordInfo, planSummaryModel.getPlanType()));
                         }
                         recordingTimeTextView.setVisibility(View.GONE);
-                        recordInfo.setTimeDuration(0);
                     }
                 }
             });

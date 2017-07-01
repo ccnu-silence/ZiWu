@@ -47,8 +47,6 @@ public class RecordService extends Service {
         handler = new Handler(handlerThread.getLooper());
         recordInfoHashMap = new HashMap<>();
         recordInfoArrayList = new ArrayList<>();
-
-
     }
 
     @Override
@@ -74,15 +72,19 @@ public class RecordService extends Service {
         }
 
         public void startRecord(final PlanRecordInfo recordInfo) {
-            ZLog.d(TAG, "start record");
+            ZLog.d(TAG, "start record:" + recordInfo.getPlanName());
             recordInfoHashMap.put(recordInfo.getPlanId(), recordInfo);
             recordInfoArrayList.add(recordInfo);
             showNotification();
             final Runnable startRecordRunnable = new Runnable() {
                 @Override
                 public void run() {
+                    long timeDuration=System.currentTimeMillis()-recordInfo.getStartTime();
+                    if(timeDuration>recordInfo.getTimeDuration()){
+                        recordInfo.setTimeDuration(timeDuration);
+                    }
                     recordInfo.setTimeDuration(recordInfo.getTimeDuration() + 1000);
-                    ZLog.d(TAG, "(runnable)" + this + " time duration:" + recordInfo.getTimeDuration());
+                    ZLog.d(TAG, recordInfo.getPlanName() + "(runnable)" + this + " time duration:" + recordInfo.getTimeDuration());
                     recordInfo.setRecordState(Constants.RECORD_STATE_RECORDING);
                     handler.postDelayed(this, 1000);
                     recordInfo.setRecordTimeRunnable(this);
@@ -92,11 +94,13 @@ public class RecordService extends Service {
             recordInfo.setStartTime(System.currentTimeMillis());
             recordInfo.setRecordId(UUID.randomUUID().toString());
             recordInfo.setRecordState(Constants.RECORD_STATE_RECORDING);
+            recordInfo.setEndTime(System.currentTimeMillis());
+            recordInfo.setRealRecordTime(0);
             RecordTask.getInstance().addPlanRecord(recordInfo);
         }
 
         public void stopRecord(PlanRecordInfo recordInfo) {
-            ZLog.d(TAG, "stop record");
+            ZLog.d(TAG, "stop record:" + recordInfo.getPlanName());
             handler.removeCallbacks(recordInfo.getRecordTimeRunnable());
             ZLog.d(TAG, "remove runnable " + recordInfo.getRecordTimeRunnable());
             recordInfo.setTimeDuration(0l);

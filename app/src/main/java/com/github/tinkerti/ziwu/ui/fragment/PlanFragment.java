@@ -19,6 +19,7 @@ import android.view.ViewGroup;
 import com.github.tinkerti.ziwu.R;
 import com.github.tinkerti.ziwu.data.Constants;
 import com.github.tinkerti.ziwu.data.PlanTask;
+import com.github.tinkerti.ziwu.data.RecordTask;
 import com.github.tinkerti.ziwu.data.model.PlanDetailInfo;
 import com.github.tinkerti.ziwu.data.model.PlanRecordInfo;
 import com.github.tinkerti.ziwu.ui.adapter.PlanAdapter;
@@ -80,6 +81,7 @@ public class PlanFragment extends Fragment {
             PlanAdapter.PlanCategoryModel planCategoryModel = new PlanAdapter.PlanCategoryModel();
             planCategoryModel.setPlanType(type);  //根据类型来显示；
             itemModelList.add(planCategoryModel);
+            //todo:需要查询recordInfo的状态，查询出record_state 为recording的计划，再次启动界面之后需要恢复计时状态
             List<PlanDetailInfo> planList = PlanTask.getInstance().getPlanDetailInfoByType(type);
             if (planList.size() > 0) {
                 for (PlanDetailInfo planDetailInfo : planList) {
@@ -151,17 +153,20 @@ public class PlanFragment extends Fragment {
     }
 
     @Override
+    public void onStop() {
+        for(PlanRecordInfo planRecordInfo:planRecordInfoMap.values()){
+           if(planRecordInfo.getRecordState()==Constants.RECORD_STATE_RECORDING){
+               planRecordInfo.setEndTime(System.currentTimeMillis());
+               planRecordInfo.setRealRecordTime(planRecordInfo.getEndTime() - planRecordInfo.getStartTime());
+               RecordTask.getInstance().updatePlanRecord(planRecordInfo);
+           }
+        }
+        super.onStop();
+    }
+
+    @Override
     public void onDestroy() {
         super.onDestroy();
         ZLog.e(TAG, "onDestroy");
-//        getContext().unbindService(serviceConnection);
-        //销毁fragment的时候需要，移除handler中正在进行的任务；
-//        if(handler!=null){
-//            Collection<PlanRecordInfo> recordInfoCollection=planAdapter.getRecordInfoHashMap().values();
-//            Iterator<PlanRecordInfo> infoIterator=recordInfoCollection.iterator();
-//            while (infoIterator.hasNext()){
-//                handler.removeCallbacks(infoIterator.next().getRefreshUiRunnable());
-//            }
-//        }
     }
 }
