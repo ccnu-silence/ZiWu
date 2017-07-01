@@ -4,6 +4,7 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.Handler;
@@ -15,8 +16,11 @@ import android.widget.RemoteViews;
 import com.github.tinkerti.ziwu.R;
 import com.github.tinkerti.ziwu.data.Constants;
 import com.github.tinkerti.ziwu.data.RecordTask;
+import com.github.tinkerti.ziwu.data.model.NotificationInfo;
 import com.github.tinkerti.ziwu.data.model.PlanRecordInfo;
 import com.github.tinkerti.ziwu.ui.activity.MainActivity;
+import com.github.tinkerti.ziwu.ui.utils.CommonUtils;
+import com.github.tinkerti.ziwu.ui.utils.FormatTime;
 import com.github.tinkerti.ziwu.ui.utils.ZLog;
 
 import java.util.ArrayList;
@@ -36,6 +40,7 @@ public class RecordService extends Service {
     private Handler handler;
     private HashMap<String, PlanRecordInfo> recordInfoHashMap;
     private ArrayList<PlanRecordInfo> recordInfoArrayList;
+
 
     @Override
     public void onCreate() {
@@ -57,7 +62,7 @@ public class RecordService extends Service {
                 recordInfoHashMap.put(info.getPlanId(), info);
             }
         }
-        return Service.START_STICKY;
+        return Service.START_STICKY; //返回这个
     }
 
     @Nullable
@@ -75,15 +80,24 @@ public class RecordService extends Service {
             ZLog.d(TAG, "start record:" + recordInfo.getPlanName());
             recordInfoHashMap.put(recordInfo.getPlanId(), recordInfo);
             recordInfoArrayList.add(recordInfo);
-            showNotification();
+            showNotification(recordInfo);
             final Runnable startRecordRunnable = new Runnable() {
                 @Override
                 public void run() {
-                    long timeDuration=System.currentTimeMillis()-recordInfo.getStartTime();
-                    if(timeDuration>recordInfo.getTimeDuration()){
+                    long timeDuration = System.currentTimeMillis() - recordInfo.getStartTime();
+                    if (timeDuration > recordInfo.getTimeDuration()) {
                         recordInfo.setTimeDuration(timeDuration);
                     }
                     recordInfo.setTimeDuration(recordInfo.getTimeDuration() + 1000);
+
+                    //用于更新通知栏的计时状态
+                    if (recordInfo.getNotificationInfo() != null) {
+                        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                        notificationManager.notify(recordInfo.getNotificationInfo().getId(), recordInfo.getNotificationInfo().getNotification());
+                        if (recordInfo.getNotificationInfo().getRemoteViews() != null) {
+                            recordInfo.getNotificationInfo().getRemoteViews().setTextViewText(R.id.tv_notification_record_time, FormatTime.calculateTimeString(recordInfo.getTimeDuration()));
+                        }
+                    }
                     ZLog.d(TAG, recordInfo.getPlanName() + "(runnable)" + this + " time duration:" + recordInfo.getTimeDuration());
                     recordInfo.setRecordState(Constants.RECORD_STATE_RECORDING);
                     handler.postDelayed(this, 1000);
@@ -104,22 +118,33 @@ public class RecordService extends Service {
             handler.removeCallbacks(recordInfo.getRecordTimeRunnable());
             ZLog.d(TAG, "remove runnable " + recordInfo.getRecordTimeRunnable());
             recordInfo.setTimeDuration(0l);
+            NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            if (recordInfo.getNotificationInfo() != null) {
+                notificationManager.cancel(recordInfo.getNotificationInfo().getId());
+                stopForeground(true);
+            }
         }
     }
 
-    private void showNotification() {
+    private void showNotification(PlanRecordInfo recordInfo) {
         ZLog.d(TAG, "show notification");
         RemoteViews notificationView = new RemoteViews(getPackageName(), R.layout.notification_content_view);
         Intent intent = new Intent(getApplicationContext(), MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), Constants.NOTIFICATION_START_ACTIVITY, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         Notification notification = new Notification.Builder(getApplicationContext())
-                .setSmallIcon(R.mipmap.ic_launcher)
+                .setSmallIcon(R.mipmap.notification_icon)
                 .setContent(notificationView)
                 .setContentIntent(pendingIntent)
                 .build();
+        NotificationInfo notificationInfo = new NotificationInfo();
+        notificationInfo.setId(CommonUtils.getID());
+        notificationInfo.setNotification(notification);
+        notificationInfo.setRemoteViews(notificationView);
+        recordInfo.setNotificationInfo(notificationInfo);
+
         NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        notificationManager.notify(101, notification);
-        startForeground(1, notification);
+        notificationManager.notify(notificationInfo.getId(), notification);
+        startForeground(notificationInfo.getId(), notification);
     }
 
     @Override

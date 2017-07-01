@@ -26,6 +26,7 @@ public class PlanRecordInfo extends PlanBaseInfo implements Parcelable {
     private int recordState = Constants.RECORD_STATE_IDLE;
     private Runnable refreshUiRunnable;//用于定时刷新计时的ui
     private boolean isExpand = false;
+    private NotificationInfo notificationInfo;
 
     public long getTotalRecordTime() {
         return totalRecordTime;
@@ -73,6 +74,13 @@ public class PlanRecordInfo extends PlanBaseInfo implements Parcelable {
         this.refreshUiRunnable = refreshUiRunnable;
     }
 
+    public NotificationInfo getNotificationInfo() {
+        return notificationInfo;
+    }
+
+    public void setNotificationInfo(NotificationInfo notificationInfo) {
+        this.notificationInfo = notificationInfo;
+    }
     public PlanRecordInfo() {
     }
 
@@ -83,6 +91,7 @@ public class PlanRecordInfo extends PlanBaseInfo implements Parcelable {
         recordState = in.readInt();
         recordId = in.readString();
         totalRecordTime = in.readLong();
+        notificationInfo=in.readParcelable(Thread.currentThread().getContextClassLoader()) ;
     }
 
     public static final Creator<PlanRecordInfo> CREATOR = new Creator<PlanRecordInfo>() {
@@ -142,5 +151,6 @@ public class PlanRecordInfo extends PlanBaseInfo implements Parcelable {
         dest.writeInt(recordState);
         dest.writeString(recordId);
         dest.writeLong(totalRecordTime);
+        dest.writeParcelable(notificationInfo,0);
     }
 }

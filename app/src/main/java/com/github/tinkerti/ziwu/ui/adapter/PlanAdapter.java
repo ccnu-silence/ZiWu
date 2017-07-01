@@ -168,27 +168,6 @@ public class PlanAdapter extends RecyclerView.Adapter {
             //之所以要加上timeDuration是因为，退出界面在现实的时候会出现时间跳动，因为部分正在计时着的时间实际上没有计入到数据库中；
             detailRecordedTimeView.setText(getColoredString(context, planSummaryModel.getPlanName(), recordInfo.getTotalRecordTime() + recordInfo.getTimeDuration()));
             ZLog.d(TAG, planSummaryModel.getPlanName()+" detail record time:" + (recordInfo.getTotalRecordTime() + recordInfo.getTimeDuration()) + "| time duration this time:" + recordInfo.getTimeDuration());
-            planSummaryView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (!planSummaryModel.isShowRecordView()) {
-                        recordContainer.setVisibility(View.VISIBLE);
-                        recordInfo.setExpand(true);
-                    } else {
-                        recordContainer.setVisibility(View.GONE);
-                        recordInfo.setExpand(false);
-                    }
-                    planSummaryModel.setShowRecordView(!planSummaryModel.isShowRecordView());
-                }
-            });
-
-            //计划item长按点击事件，可以对计划进行修改、删除操作和查看详情操作；
-            planSummaryView.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View v) {
-                    return false;
-                }
-            });
 
             //这个地方有点问题，需要优化下，这样做没有多大必要；
             Runnable recordRunnable = new Runnable() {
@@ -207,6 +186,45 @@ public class PlanAdapter extends RecyclerView.Adapter {
             ZLog.d(TAG, "remove runnable " + recordInfo.getRefreshUiRunnable());
             recordInfo.setRefreshUiRunnable(recordRunnable);
             ZLog.d(TAG, "set runnable " + recordInfo.getRefreshUiRunnable());
+            setListener(position);
+
+            planSummaryModel.setRecordInfo(recordInfo);
+
+            //点击完成该计划
+            finishButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                }
+            });
+
+
+            //如果是正在记录则需要去更新界面，而处于idle或者stop的状态，则不去更新
+            if (recordInfo.getRecordState() == Constants.RECORD_STATE_RECORDING) {
+                handler.postDelayed(recordInfo.getRefreshUiRunnable(), 1000);
+            } else if (recordInfo.getRecordState() == Constants.RECORD_STATE_IDLE
+                    || recordInfo.getRecordState() == Constants.RECORD_STATE_STOP) {
+                handler.removeCallbacks(recordInfo.getRefreshUiRunnable());
+            }
+
+        }
+        private void setListener(int position){
+            final PlanSummaryModel planSummaryModel = (PlanSummaryModel) modelList.get(position);
+            final PlanRecordInfo recordInfo=planSummaryModel.getRecordInfo();
+            planSummaryView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (!planSummaryModel.isShowRecordView()) {
+                        recordContainer.setVisibility(View.VISIBLE);
+                        recordInfo.setExpand(true);
+                    } else {
+                        recordContainer.setVisibility(View.GONE);
+                        recordInfo.setExpand(false);
+                    }
+                    planSummaryModel.setShowRecordView(!planSummaryModel.isShowRecordView());
+                }
+            });
+
             //点击开始计时，如果处于计时进行中的状态，点击暂停计时
             startButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -225,7 +243,7 @@ public class PlanAdapter extends RecyclerView.Adapter {
                     }
                 }
             });
-            planSummaryModel.setRecordInfo(recordInfo);
+
             //点击结束计时
             stopButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -247,23 +265,14 @@ public class PlanAdapter extends RecyclerView.Adapter {
                     }
                 }
             });
-            //点击完成该计划
-            finishButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
 
+            //计划item长按点击事件，可以对计划进行修改、删除操作和查看详情操作；
+            planSummaryView.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    return false;
                 }
             });
-
-
-            //如果是正在记录则需要去更新界面，而处于idle或者stop的状态，则不去更新
-            if (recordInfo.getRecordState() == Constants.RECORD_STATE_RECORDING) {
-                handler.postDelayed(recordInfo.getRefreshUiRunnable(), 1000);
-            } else if (recordInfo.getRecordState() == Constants.RECORD_STATE_IDLE
-                    || recordInfo.getRecordState() == Constants.RECORD_STATE_STOP) {
-                handler.removeCallbacks(recordInfo.getRefreshUiRunnable());
-            }
-
         }
     }
 

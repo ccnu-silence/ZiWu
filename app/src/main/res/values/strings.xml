@@ -37,4 +37,5 @@
     <string name="add_plan_detail_edit_text_name_no_string">计划名称不能为空</string>
 
     <string name="fr_record_today_plan">今日计划</string>
+    <string name="notification_start_time">00:00:00</string>
 </resources>

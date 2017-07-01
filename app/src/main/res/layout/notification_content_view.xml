@@ -1,6 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
     android:layout_height="match_parent">
-
+    <TextView
+        android:id="@+id/tv_notification_record_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/greenColor"
+        android:textSize="@dimen/text_size_sp_16"
+        android:text="@string/notification_start_time"
+        android:layout_marginLeft="@dimen/dimen_dp_20"
+        android:layout_gravity="center_vertical"/>
 </LinearLayout>
