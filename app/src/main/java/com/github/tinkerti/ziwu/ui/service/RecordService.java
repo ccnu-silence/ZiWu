@@ -84,7 +84,7 @@ public class RecordService extends Service {
             final Runnable startRecordRunnable = new Runnable() {
                 @Override
                 public void run() {
-                    long timeDuration = System.currentTimeMillis() - recordInfo.getStartTime();
+                    long timeDuration = System.currentTimeMillis() - recordInfo.getStartTime();//矫正锁屏时计时不准确的问题
                     if (timeDuration > recordInfo.getTimeDuration()) {
                         recordInfo.setTimeDuration(timeDuration);
                     }
@@ -123,6 +123,7 @@ public class RecordService extends Service {
                 notificationManager.cancel(recordInfo.getNotificationInfo().getId());
                 stopForeground(true);
             }
+            recordInfoArrayList.remove(recordInfo);
         }
     }
 
@@ -153,6 +154,11 @@ public class RecordService extends Service {
         Intent intent = new Intent(this, RecordService.class);
         intent.putParcelableArrayListExtra(SERVICE_RECORDING_PLAN_INFO_LIST, recordInfoArrayList);
         startService(intent);
-
+//        for(PlanRecordInfo recordInfo:recordInfoArrayList){
+//            recordInfo.setEndTime(System.currentTimeMillis());
+//            recordInfo.setRealRecordTime(recordInfo.getEndTime() - recordInfo.getStartTime());
+//            recordInfo.setRecordState(Constants.RECORD_STATE_STOP);
+//            RecordTask.getInstance().updatePlanRecord(recordInfo);
+//        }
     }
 }

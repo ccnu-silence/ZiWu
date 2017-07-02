@@ -6,6 +6,7 @@ import android.os.Handler;
 import android.support.v7.widget.RecyclerView;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
+import android.text.TextUtils;
 import android.text.style.ForegroundColorSpan;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,15 +16,18 @@ import android.widget.TextView;
 
 import com.github.tinkerti.ziwu.R;
 import com.github.tinkerti.ziwu.data.Constants;
+import com.github.tinkerti.ziwu.data.PlanTask;
 import com.github.tinkerti.ziwu.data.RecordTask;
+import com.github.tinkerti.ziwu.data.model.PlanDetailInfo;
 import com.github.tinkerti.ziwu.data.model.PlanRecordInfo;
 import com.github.tinkerti.ziwu.ui.activity.AddPlanDetailActivity;
 import com.github.tinkerti.ziwu.ui.service.RecordService;
 import com.github.tinkerti.ziwu.ui.utils.FormatTime;
 import com.github.tinkerti.ziwu.ui.utils.ZLog;
+import com.github.tinkerti.ziwu.ui.widget.OptionsPopupDialog;
+import com.github.tinkerti.ziwu.ui.widget.RenameDialog;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 public class PlanAdapter extends RecyclerView.Adapter {
@@ -35,12 +39,10 @@ public class PlanAdapter extends RecyclerView.Adapter {
     List<ItemModel> modelList;
     private RecordService.RecordServiceBinder binder;
     private Handler handler;//更新界面用；
-    private HashMap<String, PlanRecordInfo> recordInfoHashMap;//记录正在进行的计时任务；这里的 id是recordId；
 
     public PlanAdapter() {
         ZLog.d(TAG, "new PlanAdapter");
         modelList = new ArrayList<>();
-        recordInfoHashMap = new HashMap<>();
     }
 
     public void setHandler(Handler handler) {
@@ -152,7 +154,7 @@ public class PlanAdapter extends RecyclerView.Adapter {
             planNameTextView.setText(planSummaryModel.getPlanName());
             String recordingTime = FormatTime.calculateTimeString(planSummaryModel.getRecordInfo().getTimeDuration());
             recordingTimeTextView.setText(recordingTime);
-            ZLog.d(TAG, planSummaryModel.getPlanName()+" recording time:" + recordingTime);
+            ZLog.d(TAG, planSummaryModel.getPlanName() + " recording time:" + recordingTime);
 
             //planRecordInfo对象，用来保存计划进行时间
             final PlanRecordInfo recordInfo = planSummaryModel.getRecordInfo();
@@ -164,10 +166,10 @@ public class PlanAdapter extends RecyclerView.Adapter {
             recordContainer.setVisibility(recordInfo.isExpand() ? View.VISIBLE : View.GONE);
             long totalTime = RecordTask.getInstance().getPlanTotalRecordedTime(recordInfo, planSummaryModel.getPlanType());
             recordInfo.setTotalRecordTime(totalTime);
-            ZLog.d(TAG, planSummaryModel.getPlanName()+" totalTime:" + totalTime);
+            ZLog.d(TAG, planSummaryModel.getPlanName() + " totalTime:" + totalTime);
             //之所以要加上timeDuration是因为，退出界面在现实的时候会出现时间跳动，因为部分正在计时着的时间实际上没有计入到数据库中；
             detailRecordedTimeView.setText(getColoredString(context, planSummaryModel.getPlanName(), recordInfo.getTotalRecordTime() + recordInfo.getTimeDuration()));
-            ZLog.d(TAG, planSummaryModel.getPlanName()+" detail record time:" + (recordInfo.getTotalRecordTime() + recordInfo.getTimeDuration()) + "| time duration this time:" + recordInfo.getTimeDuration());
+            ZLog.d(TAG, planSummaryModel.getPlanName() + " detail record time:" + (recordInfo.getTotalRecordTime() + recordInfo.getTimeDuration()) + "| time duration this time:" + recordInfo.getTimeDuration());
 
             //这个地方有点问题，需要优化下，这样做没有多大必要；
             Runnable recordRunnable = new Runnable() {
@@ -175,9 +177,9 @@ public class PlanAdapter extends RecyclerView.Adapter {
                 public void run() {
                     if (recordInfo != null) {
                         recordingTimeTextView.setText(FormatTime.calculateTimeString(recordInfo.getTimeDuration()));
-                        ZLog.d(TAG, planSummaryModel.getPlanName()+" (runnable)" + this + " recording time:" + FormatTime.calculateTimeString(recordInfo.getTimeDuration()));
+                        ZLog.d(TAG, planSummaryModel.getPlanName() + " (runnable)" + this + " recording time:" + FormatTime.calculateTimeString(recordInfo.getTimeDuration()));
                         detailRecordedTimeView.setText(getColoredString(context, planSummaryModel.getPlanName(), recordInfo.getTotalRecordTime() + recordInfo.getTimeDuration()));
-                        ZLog.d(TAG, planSummaryModel.getPlanName()+" (runnable)" + this + " detail record time:" + (recordInfo.getTotalRecordTime() + recordInfo.getTimeDuration()));
+                        ZLog.d(TAG, planSummaryModel.getPlanName() + " (runnable)" + this + " detail record time:" + (recordInfo.getTotalRecordTime() + recordInfo.getTimeDuration()));
                     }
                     handler.postDelayed(this, 1000);
                 }
@@ -188,29 +190,29 @@ public class PlanAdapter extends RecyclerView.Adapter {
             ZLog.d(TAG, "set runnable " + recordInfo.getRefreshUiRunnable());
             setListener(position);
 
-            planSummaryModel.setRecordInfo(recordInfo);
-
-            //点击完成该计划
-            finishButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-
-                }
-            });
-
-
             //如果是正在记录则需要去更新界面，而处于idle或者stop的状态，则不去更新
             if (recordInfo.getRecordState() == Constants.RECORD_STATE_RECORDING) {
                 handler.postDelayed(recordInfo.getRefreshUiRunnable(), 1000);
+//                RecordTask.getInstance().addBinderServiceObserver(new RecordTask.BinderServiceObserver() {
+//                    @Override
+//                    public void onServiceConnected() {
+//                        if (binder != null) {
+//                            binder.startRecord(recordInfo);
+//
+//                        }
+//                    }
+//                });
+
             } else if (recordInfo.getRecordState() == Constants.RECORD_STATE_IDLE
                     || recordInfo.getRecordState() == Constants.RECORD_STATE_STOP) {
                 handler.removeCallbacks(recordInfo.getRefreshUiRunnable());
             }
 
         }
-        private void setListener(int position){
-            final PlanSummaryModel planSummaryModel = (PlanSummaryModel) modelList.get(position);
-            final PlanRecordInfo recordInfo=planSummaryModel.getRecordInfo();
+
+        private void setListener(final int pos) {
+            final PlanSummaryModel planSummaryModel = (PlanSummaryModel) modelList.get(pos);
+            final PlanRecordInfo recordInfo = planSummaryModel.getRecordInfo();
             planSummaryView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -235,7 +237,6 @@ public class PlanAdapter extends RecyclerView.Adapter {
                             recordInfo.setTimeDuration(0);//为了解决，锁屏之后，结束计时，然后再开始计时，记录详情时间记录问题；
                             binder.startRecord(recordInfo);
                             handler.postDelayed(recordInfo.getRefreshUiRunnable(), 1000);//点击开始更新计时view；
-                            recordInfoHashMap.put(recordInfo.getRecordId(), recordInfo);
                         }
                         recordingTimeTextView.setVisibility(View.VISIBLE);
                         recordingTimeTextView.setText(FormatTime.calculateTimeString(recordInfo.getTimeDuration()));
@@ -266,11 +267,54 @@ public class PlanAdapter extends RecyclerView.Adapter {
                 }
             });
 
+            //点击完成该计划
+            finishButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                }
+            });
+
             //计划item长按点击事件，可以对计划进行修改、删除操作和查看详情操作；
             planSummaryView.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
-                    return false;
+                    OptionsPopupDialog optionsPopupDialog = new OptionsPopupDialog(context);
+                    optionsPopupDialog.setListener(new OptionsPopupDialog.OptionPopupWindowClickListener() {
+                        @Override
+                        public void onClick(int position) {
+                            switch (position) {
+                                case Constants.RENAME_PLAN:
+                                    RenameDialog renameDialog = new RenameDialog(context);
+                                    renameDialog.setListener(new RenameDialog.DialogClickListener() {
+                                        @Override
+                                        public void onOKClick(String planName) {
+                                            if (!TextUtils.isEmpty(planName)) {
+                                                PlanDetailInfo info = new PlanDetailInfo();
+                                                info.setPlanId(planSummaryModel.getPlanId());
+                                                info.setPlanName(planName);
+                                                PlanTask.getInstance().renamePlan(info);
+                                                ((PlanSummaryModel) modelList.get(pos)).setPlanName(planName);
+                                                //注意需要更新adapter中的pos位置的数据，这样调用notifyItemChange才会刷新
+                                                //之前不刷新是因为更改的不是modelList中的数据；
+                                                notifyItemChanged(pos);
+//                                                 notifyDataSetChanged();
+                                            }
+                                        }
+                                    });
+                                    renameDialog.show();
+                                    break;
+                                case Constants.DELETE_PLAN:
+                                    break;
+                                case Constants.TRANSFER_PLAN:
+                                    break;
+                                case Constants.CHECK_DETAIL:
+                                    break;
+                            }
+                        }
+                    });
+                    optionsPopupDialog.show();
+                    return true;
                 }
             });
         }
@@ -448,7 +492,7 @@ public class PlanAdapter extends RecyclerView.Adapter {
         SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder(context.getString(R.string.ad_item_plan_recorded_time,
                 name,
                 FormatTime.calculateTimeString(totalRecordTime)));
-        spannableStringBuilder.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.baseColor)),
+        spannableStringBuilder.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.plan_list_name_color)),
                 0,
                 name.length(),
                 Spanned.SPAN_INCLUSIVE_EXCLUSIVE);

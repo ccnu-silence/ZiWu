@@ -2,6 +2,7 @@ package com.github.tinkerti.ziwu.data;
 
 import android.database.Cursor;
 
+import com.github.tinkerti.ziwu.data.model.PlanDetailInfo;
 import com.github.tinkerti.ziwu.data.model.PlanRecordInfo;
 import com.github.tinkerti.ziwu.ui.utils.DateUtils;
 
@@ -13,6 +14,11 @@ import java.util.List;
  */
 
 public class RecordTask implements ITask {
+    List<BinderServiceObserver> observerList;
+
+    public RecordTask() {
+        observerList = new ArrayList<>();
+    }
 
     private static class SingletonHolder {
         private static RecordTask sIns = new RecordTask();
@@ -53,6 +59,26 @@ public class RecordTask implements ITask {
                 " where recordId='" + recordInfo.getRecordId() +
                 "'";
         TaskManager.getDbHelper().getWritableDatabase().execSQL(sql);
+    }
+
+    public List<PlanRecordInfo> getPlanInRecordingState(PlanDetailInfo planDetailInfo) {
+        List<PlanRecordInfo> recordInfoList = new ArrayList<>();
+        String sql = "select * from " + Constants.RECORD_DETAIL_TABLE_NAME +
+                " where planId= '" + planDetailInfo.getPlanId() +
+                "' and recordState=" + Constants.RECORD_STATE_RECORDING +
+                " order by beginTime desc";
+        Cursor cursor = TaskManager.getDbHelper().getWritableDatabase().rawQuery(sql, null);
+        while (cursor.moveToNext()) {
+            PlanRecordInfo recordInfo = new PlanRecordInfo();
+            recordInfo.setRecordId(cursor.getString(cursor.getColumnIndex("recordId")));
+            recordInfo.setPlanId(cursor.getString(cursor.getColumnIndex("planId")));
+            recordInfo.setStartTime(cursor.getLong(cursor.getColumnIndex("beginTime")));
+            recordInfo.setEndTime(cursor.getLong(cursor.getColumnIndex("endTime")));
+            recordInfo.setTimeDuration(cursor.getLong(cursor.getColumnIndex("timeDuration")));
+            recordInfo.setRecordState(cursor.getInt(cursor.getColumnIndex("recordState")));
+            recordInfoList.add(recordInfo);
+        }
+        return recordInfoList;
     }
 
     /**
@@ -132,7 +158,7 @@ public class RecordTask implements ITask {
         return planRecordInfoList;
     }
 
-    public long getPlanTotalRecordedTimeByType( int type) {
+    public long getPlanTotalRecordedTimeByType(int type) {
         long beginTime = 0;
         long endTime = System.currentTimeMillis();
         switch (type) {
@@ -159,5 +185,22 @@ public class RecordTask implements ITask {
         return 0l;
     }
 
+    public void addBinderServiceObserver(BinderServiceObserver observer) {
+        observerList.add(observer);
+    }
+
+    public void removeBinderServiceObserver(BinderServiceObserver observer) {
+        observerList.remove(observer);
+    }
+
+    public void notifyServiceConnected() {
+        for (BinderServiceObserver observer : observerList) {
+            observer.onServiceConnected();
+        }
+    }
+
+    public interface BinderServiceObserver {
+        public void onServiceConnected();
+    }
 
 }

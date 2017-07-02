@@ -5,6 +5,12 @@ package com.github.tinkerti.ziwu.data;
  */
 
 public class Constants {
+
+    public static final int RENAME_PLAN=0;
+    public static final int DELETE_PLAN=1;
+    public static final int TRANSFER_PLAN=2;
+    public static final int CHECK_DETAIL=3;
+
     public static final int DAY_TYPE = 0;
     public static final int WEEK_TYPE = 1;
     public static final int MONTH_TYPE = 2;

@@ -38,4 +38,14 @@
 
     <string name="fr_record_today_plan">今日计划</string>
     <string name="notification_start_time">00:00:00</string>
+
+    <string name="dialog_rename_plan">重命名</string>
+    <string name="dialog_delete_plan">删除</string>
+    <string name="dialog_transfer_plan">移动至</string>
+    <string name="dialog_check_plan_detail">查看详情</string>
+
+    <string name="text_ok">确定</string>
+    <string name="text_cancel">取消</string>
+    <string name="text_input_prompt">请输入名称：</string>
+    <string name="text_rename">重命名</string>
 </resources>

@@ -52,7 +52,7 @@
         <item name="android:gravity">center_vertical</item>
         <item name="android:layout_marginLeft">25dp</item>
         <item name="android:textSize">16sp</item>
-        <item name="android:textColor">@color/baseColor</item>
+        <item name="android:textColor">@color/plan_list_name_color</item>
     </style>
 
     <style name="adapter_item_plan_summary_right_text_view">
@@ -77,6 +77,23 @@
         <item name="android:background">#D5DBDB</item>
         <item name="android:paddingLeft">8dp</item>
         <item name="android:paddingRight">8dp</item>
+    </style>
+
+     <style name="long_click_option_dialog_content_text_view">
+         <item name="android:layout_width">wrap_content</item>
+         <item name="android:layout_height">wrap_content</item>
+         <item name="android:textSize">18sp</item>
+         <item name="android:textColor">#000000</item>
+         <item name="android:layout_gravity">center</item>
+         <item name="android:layout_marginLeft">@dimen/dimen_dp_15</item>
+         <item name="android:layout_marginTop">@dimen/dimen_dp_15</item>
+         <item name="android:layout_marginRight">@dimen/dimen_dp_15</item>
+         <item name="android:layout_marginBottom">@dimen/dimen_dp_15</item>
+     </style>
+    <style name="rce_vertical_light_thin_divider">
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:layout_width">0.5dp</item>
+        <item name="android:background">@color/color_divider_line</item>
     </style>
 
     <declare-styleable name="AddImageButton">

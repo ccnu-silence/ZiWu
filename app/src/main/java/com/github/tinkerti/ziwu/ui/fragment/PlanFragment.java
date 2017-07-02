@@ -89,8 +89,15 @@ public class PlanFragment extends Fragment {
                     PlanRecordInfo planRecordInfo = planRecordInfoMap.get(planDetailInfo.getPlanId());
                     if (planRecordInfo == null) {
                         planRecordInfo = new PlanRecordInfo();
+                        //检查数据库中的状态为recording的record，继续自动开始计时；
+//                        List<PlanRecordInfo> recordInfoList=RecordTask.getInstance().getPlanInRecordingState(planDetailInfo);
+//                        if(recordInfoList.size()>0){
+//                            planRecordInfo=recordInfoList.get(0);
+//                            planRecordInfo.setTimeDuration(System.currentTimeMillis()-planRecordInfo.getStartTime());
+//                        }
                         planRecordInfoMap.put(planDetailInfo.getPlanId(), planRecordInfo);
                     }
+
                     //展示今日计划清单
                     planSummaryModel.setPlanName(planDetailInfo.getPlanName());
                     planSummaryModel.setPlanId(planDetailInfo.getPlanId());
@@ -137,6 +144,7 @@ public class PlanFragment extends Fragment {
             planAdapter.setBinder(binder);
             planRecordInfoMap = binder.getRecordInfoHashMap();
             getPlanListByType(types);
+            RecordTask.getInstance().notifyServiceConnected();//通知观察者service已经连接上了；
         }
 
         @Override
@@ -156,9 +164,9 @@ public class PlanFragment extends Fragment {
     public void onStop() {
         for(PlanRecordInfo planRecordInfo:planRecordInfoMap.values()){
            if(planRecordInfo.getRecordState()==Constants.RECORD_STATE_RECORDING){
-               planRecordInfo.setEndTime(System.currentTimeMillis());
-               planRecordInfo.setRealRecordTime(planRecordInfo.getEndTime() - planRecordInfo.getStartTime());
-               RecordTask.getInstance().updatePlanRecord(planRecordInfo);
+//               planRecordInfo.setEndTime(System.currentTimeMillis());
+//               planRecordInfo.setRealRecordTime(planRecordInfo.getEndTime() - planRecordInfo.getStartTime());
+//               RecordTask.getInstance().updatePlanRecord(planRecordInfo);
            }
         }
         super.onStop();
@@ -168,5 +176,6 @@ public class PlanFragment extends Fragment {
     public void onDestroy() {
         super.onDestroy();
         ZLog.e(TAG, "onDestroy");
+        getContext().unbindService(serviceConnection);
     }
 }

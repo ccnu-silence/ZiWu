@@ -54,7 +54,7 @@ public class PlanTask implements ITask {
         String sql = "select * from " +
                 Constants.PLAN_DETAIL_TABLE_NAME
                 + " where " + Constants.PLAN_DETAIL_TABLE_COLUMN_PLAN_TYPE
-                + " = " + type+" and createTime>"+beginTime;
+                + " = " + type + " and createTime>" + beginTime;
         Cursor cursor = TaskManager.getInstance().getDb().rawQuery(sql, null);
         while (cursor.moveToNext()) {
             PlanDetailInfo planDetailInfo = new PlanDetailInfo();
@@ -97,7 +97,15 @@ public class PlanTask implements ITask {
      * where column_name in (select column_name from table_name)这里需要加上括号，否则会报错
      */
     public void deletePlanDetailInfo() {
-        String sql = "delete from " + Constants.PLAN_DETAIL_TABLE_NAME+" where planId in (select planId from "+Constants.ADD_PLAN_DETAIL_TABLE_NAME+")";
+        String sql = "delete from " + Constants.PLAN_DETAIL_TABLE_NAME + " where planId in (select planId from " + Constants.ADD_PLAN_DETAIL_TABLE_NAME + ")";
+        TaskManager.getInstance().getDb().execSQL(sql);
+    }
+
+    public void renamePlan(PlanDetailInfo info) {
+        String sql = "update " + Constants.PLAN_DETAIL_TABLE_NAME +
+                " set planName= '" + info.getPlanName() +
+                "' where planId='" + info.getPlanId() +
+                "'";
         TaskManager.getInstance().getDb().execSQL(sql);
     }
 

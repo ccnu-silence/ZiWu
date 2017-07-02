@@ -26,7 +26,7 @@
             android:orientation="horizontal"
             android:layout_alignParentBottom="true"
             android:gravity="center_vertical"
-            android:background="@color/baseColor">
+            android:background="@color/bottom_tab_back_ground_color">
             <com.github.tinkerti.ziwu.ui.widget.TabIndicatorItemView
                 android:id="@+id/bottom_indicator_plan"
                 android:layout_width="0dp"

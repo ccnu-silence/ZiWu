@@ -3,9 +3,17 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
-
     <color name="baseColor">#AF7AC5</color>
+    <color name="textBaseColor">#AF7AC5</color>
+
+    <color name="activity_title_bar_color">#AF7AC5</color>
+    <color name="bottom_tab_back_ground_color">#AF7AC5</color>
+    <color name="plan_list_name_color">#AF7AC5</color>
+    <color name="add_button_back_ground">#2ECC71</color>
+    <!--AF7AC5-->
     <color name="blackColor">#000000</color>
     <color name="whiteColor">#ffffff</color>
     <color name="greenColor">#2ECC71</color>
+
+    <color name="color_divider_line">#E5E5E5</color>
 </resources>
