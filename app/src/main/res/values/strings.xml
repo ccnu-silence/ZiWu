@@ -48,4 +48,8 @@
     <string name="text_cancel">取消</string>
     <string name="text_input_prompt">请输入名称：</string>
     <string name="text_rename">重命名</string>
+
+    <string name="text_delete_confirm">删除%s</string>
+    <string name="text_delete">删除</string>
+    <string name="text_delete_description">此操作会删除所有的数据，删除后数据不可恢复，确定删除吗？</string>
 </resources>

@@ -185,6 +185,11 @@ public class RecordTask implements ITask {
         return 0l;
     }
 
+    public void deleteRecordInfoByPlanId(String planId) {
+        String deleteSql = "delete from " + Constants.RECORD_DETAIL_TABLE_NAME + " where " + Constants.PLAN_DETAIL_TABLE_COLUMN_PLAN_ID + "= '" + planId + "'";
+        TaskManager.getDbHelper().getWritableDatabase().execSQL(deleteSql);
+    }
+
     public void addBinderServiceObserver(BinderServiceObserver observer) {
         observerList.add(observer);
     }

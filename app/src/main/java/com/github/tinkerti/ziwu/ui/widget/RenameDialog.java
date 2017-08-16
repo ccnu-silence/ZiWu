@@ -22,6 +22,7 @@ import com.github.tinkerti.ziwu.ui.utils.CommonUtils;
 public class RenameDialog extends AlertDialog {
     Context context;
     private String planName;
+    private EditText planNameEditText;
 
     public void setListener(DialogClickListener listener) {
         this.listener = listener;
@@ -40,10 +41,9 @@ public class RenameDialog extends AlertDialog {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View view = inflater.inflate(R.layout.dialog_rename_plan, null);
         setContentView(view);
-
         TextView cancelTextView = (TextView) view.findViewById(R.id.tv_cancel);
         TextView okTextView = (TextView) view.findViewById(R.id.tv_ok);
-        EditText planNameEditText = (EditText) view.findViewById(R.id.dialog_name_edit_text);
+        planNameEditText = (EditText) view.findViewById(R.id.dialog_name_edit_text);
 
         //设置监听
         planNameEditText.addTextChangedListener(new TextWatcher() {
@@ -92,6 +92,9 @@ public class RenameDialog extends AlertDialog {
 
     }
 
+    public void setTextContent(String content){
+        planNameEditText.setText(content);
+    }
 
     public interface DialogClickListener {
         void onOKClick(String planName);

@@ -24,6 +24,7 @@ import com.github.tinkerti.ziwu.ui.activity.AddPlanDetailActivity;
 import com.github.tinkerti.ziwu.ui.service.RecordService;
 import com.github.tinkerti.ziwu.ui.utils.FormatTime;
 import com.github.tinkerti.ziwu.ui.utils.ZLog;
+import com.github.tinkerti.ziwu.ui.widget.DeleteConfirmDialog;
 import com.github.tinkerti.ziwu.ui.widget.OptionsPopupDialog;
 import com.github.tinkerti.ziwu.ui.widget.RenameDialog;
 
@@ -282,7 +283,7 @@ public class PlanAdapter extends RecyclerView.Adapter {
                     OptionsPopupDialog optionsPopupDialog = new OptionsPopupDialog(context);
                     optionsPopupDialog.setListener(new OptionsPopupDialog.OptionPopupWindowClickListener() {
                         @Override
-                        public void onClick(int position) {
+                        public void onClick(final int position) {
                             switch (position) {
                                 case Constants.RENAME_PLAN:
                                     RenameDialog renameDialog = new RenameDialog(context);
@@ -303,8 +304,21 @@ public class PlanAdapter extends RecyclerView.Adapter {
                                         }
                                     });
                                     renameDialog.show();
+                                    renameDialog.setTextContent(planSummaryModel.getPlanName());
                                     break;
                                 case Constants.DELETE_PLAN:
+                                    DeleteConfirmDialog deleteConfirmDialog = new DeleteConfirmDialog(context);
+                                    deleteConfirmDialog.setListener(new DeleteConfirmDialog.DialogClickListener() {
+                                        @Override
+                                        public void onDeleteClick() {
+                                            PlanTask.getInstance().deletePlanDetailInfoById(planSummaryModel.getPlanId());
+                                            RecordTask.getInstance().deleteRecordInfoByPlanId(planSummaryModel.getPlanId());
+                                            modelList.remove(pos);
+                                            notifyDataSetChanged();
+                                        }
+                                    });
+                                    deleteConfirmDialog.show();
+                                    deleteConfirmDialog.setTitleView(planSummaryModel.getPlanName());
                                     break;
                                 case Constants.TRANSFER_PLAN:
                                     break;
