@@ -15,9 +15,15 @@
     <com.github.mikephil.charting.charts.PieChart
         android:id="@+id/fr_pc_plan_record_summary"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="0dp" />
+        android:layout_height="130dp"
+        android:layout_gravity="center_horizontal" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/rv_recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:visibility="gone" />
 
     <TextView
         android:id="@+id/fr_tv_plan_no_record"

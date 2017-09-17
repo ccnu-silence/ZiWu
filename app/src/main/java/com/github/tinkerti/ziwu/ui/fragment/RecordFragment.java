@@ -4,6 +4,8 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +21,7 @@ import com.github.tinkerti.ziwu.R;
 import com.github.tinkerti.ziwu.data.Constants;
 import com.github.tinkerti.ziwu.data.RecordTask;
 import com.github.tinkerti.ziwu.data.model.PlanRecordInfo;
+import com.github.tinkerti.ziwu.ui.adapter.RecordListAdapter;
 import com.github.tinkerti.ziwu.ui.widget.SelectPlanTypePopupWindow;
 
 import java.util.ArrayList;
@@ -34,6 +37,8 @@ public class RecordFragment extends Fragment {
     private TextView planTypeTextView;
     private TextView planNoRecord;
     public int type;
+    private RecyclerView recordList;
+    private RecordListAdapter recordListAdapter;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -48,6 +53,12 @@ public class RecordFragment extends Fragment {
         planTypeTextView = (TextView) view.findViewById(R.id.fr_tv_plan_type_view);
         pieChart = (PieChart) view.findViewById(R.id.fr_pc_plan_record_summary);
         planNoRecord = (TextView) view.findViewById(R.id.fr_tv_plan_no_record);
+        recordList = (RecyclerView) view.findViewById(R.id.rv_recycler_view);
+        recordList.setVisibility(View.VISIBLE);
+        recordListAdapter = new RecordListAdapter();
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
+        recordList.setLayoutManager(layoutManager);
+        recordList.setAdapter(recordListAdapter);
         selectPlanType(type);
         planTypeTextView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -65,6 +76,7 @@ public class RecordFragment extends Fragment {
                 type = Constants.DAY_TYPE;
                 planTypeTextView.setText(getString(R.string.plan_today));
                 drawRecordPieChart(type);
+                getPlanRecordDetailList(recordType);
                 break;
             case Constants.WEEK_TYPE:
                 type = Constants.WEEK_TYPE;
@@ -85,6 +97,39 @@ public class RecordFragment extends Fragment {
         selectPlanType(type);
     }
 
+    private void setListViewHeightBasedOnChildren(RecyclerView listView) {
+        RecyclerView.Adapter listAdapter = listView.getAdapter();
+        RecyclerView.LayoutManager layoutManager = listView.getLayoutManager();
+        if (listAdapter == null) {
+            return;
+        }
+        int totalHeight = 0;
+        for (int i = 0, len = listAdapter.getItemCount(); i < len; i++) {
+            View listItem = layoutManager.getChildAt(i);
+            if (listItem != null) {
+                listItem.measure(0, 0);
+                totalHeight += listItem.getMeasuredHeight();
+            }
+        }
+        ViewGroup.LayoutParams params = listView.getLayoutParams();
+        params.height = totalHeight;
+        listView.setLayoutParams(params);
+    }
+
+    private void getPlanRecordDetailList(int recordType) {
+        List<PlanRecordInfo> planRecordInfoList = RecordTask.getInstance().getPlanRecordListByType(recordType);
+        List<RecordListAdapter.ItemModel> itemModelList = new ArrayList<>();
+        for (PlanRecordInfo planRecordInfo : planRecordInfoList) {
+            RecordListAdapter.RecordListItemModel itemModel = new RecordListAdapter.RecordListItemModel();
+            itemModel.setPlanName(planRecordInfo.getPlanName());
+            itemModel.setBeginTime(planRecordInfo.getStartTime());
+            itemModel.setEndTime(planRecordInfo.getEndTime());
+            itemModelList.add(itemModel);
+        }
+        recordListAdapter.setModelList(itemModelList);
+//        setListViewHeightBasedOnChildren(recordList);
+    }
+
     private void drawRecordPieChart(int recordType) {
         List<PlanRecordInfo> planRecordInfoList = RecordTask.getInstance().getPlanHistoryTime(recordType);
         float totalRecordTime = RecordTask.getInstance().getPlanTotalRecordedTimeByType(recordType);
@@ -99,7 +144,7 @@ public class RecordFragment extends Fragment {
         pieChart.setUsePercentValues(false);
         pieChart.setRotationEnabled(false);//控制是否旋转
         pieChart.getDescription().setEnabled(false);//不显示description；
-        pieChart.setExtraOffsets(35, 35, 35, 35);//控制pieChart与屏幕边框的举例？；
+//        pieChart.setExtraOffsets(35, 35, 35, 35);//控制pieChart与屏幕边框的举例？；
 
         pieChart.setTransparentCircleColor(Color.WHITE);
         pieChart.setTransparentCircleAlpha(110);
