@@ -2,6 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.github.tinkerti.ziwu">
 
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <application
         android:name=".App"
         android:allowBackup="true"
@@ -20,6 +21,7 @@
         <activity android:name=".ui.activity.BaseActivity"/>
         <activity android:name=".ui.activity.AddPlanDetailActivity"/>
         <service android:name=".ui.service.RecordService"/>
+        <activity android:name=".ui.activity.ModifyRecordDetailActivity"/>
     </application>
 
 </manifest>

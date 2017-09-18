@@ -9,6 +9,7 @@ import android.widget.TextView;
 
 import com.github.tinkerti.ziwu.R;
 import com.github.tinkerti.ziwu.data.Constants;
+import com.github.tinkerti.ziwu.ui.utils.DateUtils;
 
 import java.util.List;
 
@@ -18,7 +19,8 @@ import java.util.List;
 
 public class RecordListAdapter extends RecyclerView.Adapter {
 
-    List<ItemModel> modelList;
+    private List<ItemModel> modelList;
+    private RecordListItemClickListener listItemClickListener;
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -71,6 +73,7 @@ public class RecordListAdapter extends RecyclerView.Adapter {
 
     public abstract class ItemViewHolder extends RecyclerView.ViewHolder {
 
+
         public ItemViewHolder(View itemView) {
             super(itemView);
         }
@@ -79,14 +82,17 @@ public class RecordListAdapter extends RecyclerView.Adapter {
     }
 
     public class RecordDateItemViewHolder extends ItemViewHolder {
+        private TextView dateNameView;
 
         public RecordDateItemViewHolder(View itemView) {
             super(itemView);
+            dateNameView = (TextView) itemView.findViewById(R.id.tv_record_list_item_title);
         }
 
         @Override
         public void update(int position) {
-
+            RecordDateItemModel recordDateItemModel = (RecordDateItemModel) modelList.get(position);
+            dateNameView.setText(recordDateItemModel.getDateName());
         }
     }
 
@@ -104,9 +110,18 @@ public class RecordListAdapter extends RecyclerView.Adapter {
 
         @Override
         public void update(int position) {
-            RecordListItemModel recordListItemModel = (RecordListItemModel) modelList.get(position);
+            final RecordListItemModel recordListItemModel = (RecordListItemModel) modelList.get(position);
             nameView.setText(recordListItemModel.getPlanName());
-            timeView.setText(String.valueOf(recordListItemModel.getBeginTime()));
+            timeView.setText(DateUtils.getFormatTime(recordListItemModel.getBeginTime(), recordListItemModel.getEndTime()));
+
+            mainView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (listItemClickListener != null) {
+                        listItemClickListener.onClick(recordListItemModel);
+                    }
+                }
+            });
         }
     }
 
@@ -116,6 +131,15 @@ public class RecordListAdapter extends RecyclerView.Adapter {
     }
 
     public static class RecordDateItemModel extends ItemModel {
+        public String getDateName() {
+            return dateName;
+        }
+
+        public void setDateName(String dateName) {
+            this.dateName = dateName;
+        }
+
+        private String dateName;
 
         @Override
         public int getType() {
@@ -175,5 +199,17 @@ public class RecordListAdapter extends RecyclerView.Adapter {
     public void setModelList(List<ItemModel> modelList) {
         this.modelList = modelList;
         notifyDataSetChanged();
+    }
+
+    public RecordListItemClickListener getListItemClickListener() {
+        return listItemClickListener;
+    }
+
+    public void setListItemClickListener(RecordListItemClickListener listItemClickListener) {
+        this.listItemClickListener = listItemClickListener;
+    }
+
+    public interface RecordListItemClickListener {
+        void onClick(RecordListItemModel recordListItemModel);
     }
 }

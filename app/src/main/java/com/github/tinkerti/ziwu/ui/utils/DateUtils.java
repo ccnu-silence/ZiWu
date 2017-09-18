@@ -181,6 +181,7 @@ public class DateUtils {
         }
         return time;
     }
+
     public static long getEndTimeByType(int type, int count) {
         long time = 0;
         switch (type) {
@@ -265,5 +266,70 @@ public class DateUtils {
         cal.setTime(new Date(getCurrentQuarterStartTime()));
         cal.add(Calendar.MONTH, 3);
         return cal.getTime();
+    }
+
+    public static String getFormatTime(long beginTime, long endTime) {
+        String beginTimeString = getFormatTime(beginTime, false);
+        String endTimeString = getFormatTime(endTime, true);
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(beginTimeString)
+                .append("-")
+                .append(endTimeString);
+        return stringBuilder.toString();
+    }
+
+    public static String getFormatTime(long time, boolean isEnd) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(time);
+        int Year = calendar.get(Calendar.YEAR);
+        int MonthOfYear = calendar.get(Calendar.MONTH);
+        int dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
+        int hour = calendar.get(Calendar.HOUR_OF_DAY);
+        int minute = calendar.get(Calendar.MINUTE);
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder
+                .append(getFormatTime(hour)).append(":")
+                .append(getFormatTime(minute));
+        if ((time > getTodayMorning() && time < getTodayNight())
+                || isEnd) {
+            return stringBuilder.toString();
+        }
+
+        return getFormatTime(Year, MonthOfYear + 1, dayOfMonth, hour, minute);
+    }
+
+    private static String getFormatTime(int time) {
+        StringBuilder stringBuilder = new StringBuilder();
+        if (time < 10) {
+            stringBuilder.append("0").append(time);
+        } else {
+            stringBuilder.append(time);
+        }
+        return stringBuilder.toString();
+    }
+
+    public static String getFormatTime(int year, int monthOfYear, int dayOfMonth, int hour, int minute) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder
+                .append(getFormatTime(hour)).append(":")
+                .append(getFormatTime(minute));
+        return stringBuilder.toString();
+    }
+
+    public static String getDateFormat(long time) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(time);
+        int year = calendar.get(Calendar.YEAR);
+        int monthOfYear = calendar.get(Calendar.MONTH);
+        int dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
+        int hour = calendar.get(Calendar.HOUR_OF_DAY);
+        int minute = calendar.get(Calendar.MINUTE);
+
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder
+                .append(getFormatTime(monthOfYear + 1)).append(".")
+                .append(getFormatTime(dayOfMonth)).append(" ");
+
+        return stringBuilder.toString();
     }
 }
