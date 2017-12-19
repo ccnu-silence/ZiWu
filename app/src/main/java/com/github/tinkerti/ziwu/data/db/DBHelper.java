@@ -29,16 +29,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
     private static boolean mainTmpDirSet = false;
 
-    @Override
-    public SQLiteDatabase getWritableDatabase() {
-        if (!mainTmpDirSet) {
-            boolean rs = new File(DBPath+"main").mkdir();
-            super.getWritableDatabase().execSQL("PRAGMA temp_store_directory = '/data/user/0/com.github.tinkerti.ziwu/files/userId/zw_db/main'");
-            mainTmpDirSet = true;
-            return super.getWritableDatabase();
-        }
-        return super.getWritableDatabase();
-    }
+    
 
     @Override
     public void onCreate(SQLiteDatabase db) {

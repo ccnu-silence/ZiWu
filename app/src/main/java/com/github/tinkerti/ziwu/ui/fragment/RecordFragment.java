@@ -118,34 +118,29 @@ public class RecordFragment extends Fragment {
         long currentDateTime = DateUtils.getTodayMorning();
         boolean once = false;
         boolean onceBeforeToday = false;
-        while (true) {
-            List<PlanRecordInfo> planRecordInfoList = RecordTask.getInstance().getPlanRecordListByType(
-                    currentDateTime,
-                    currentDateTime + (long) Constants.ONE_DAY_TOTAL_MILLI_SECS);
-            for (PlanRecordInfo planRecordInfo : planRecordInfoList) {
-                if (planRecordInfo.getStartTime() > DateUtils.getTodayMorning() && !once) {
-                    RecordListAdapter.RecordDateItemModel recordDateItemModel = new RecordListAdapter.RecordDateItemModel();
-                    recordDateItemModel.setDateName(getString(R.string.plan_today));
-                    once = true;
-                    itemModelList.add(recordDateItemModel);
-                }
-                if (planRecordInfo.getStartTime() < DateUtils.getTodayMorning() && !onceBeforeToday) {
-                    RecordListAdapter.RecordDateItemModel recordDateItemModel = new RecordListAdapter.RecordDateItemModel();
-                    recordDateItemModel.setDateName(DateUtils.getDateFormat(planRecordInfo.getStartTime()));
-                    onceBeforeToday = true;
-                    itemModelList.add(recordDateItemModel);
-                }
-                RecordListAdapter.RecordListItemModel itemModel = new RecordListAdapter.RecordListItemModel();
-                itemModel.setPlanName(planRecordInfo.getPlanName());
-                itemModel.setBeginTime(planRecordInfo.getStartTime());
-                itemModel.setEndTime(planRecordInfo.getEndTime());
-                itemModelList.add(itemModel);
+        List<PlanRecordInfo> planRecordInfoList = RecordTask.getInstance().getPlanRecordListByType(
+                currentDateTime,
+                currentDateTime + (long) Constants.ONE_DAY_TOTAL_MILLI_SECS);
+        for (PlanRecordInfo planRecordInfo : planRecordInfoList) {
+            if (planRecordInfo.getStartTime() > DateUtils.getTodayMorning() && !once) {
+                RecordListAdapter.RecordDateItemModel recordDateItemModel = new RecordListAdapter.RecordDateItemModel();
+                recordDateItemModel.setDateName(getString(R.string.plan_today));
+                once = true;
+                itemModelList.add(recordDateItemModel);
             }
-            if (recordFirstTime > currentDateTime) {
-                break;
+            if (planRecordInfo.getStartTime() < DateUtils.getTodayMorning() && !onceBeforeToday) {
+                RecordListAdapter.RecordDateItemModel recordDateItemModel = new RecordListAdapter.RecordDateItemModel();
+                recordDateItemModel.setDateName(DateUtils.getDateFormat(planRecordInfo.getStartTime()));
+                onceBeforeToday = true;
+                itemModelList.add(recordDateItemModel);
             }
-            currentDateTime = currentDateTime - (long) Constants.ONE_DAY_TOTAL_MILLI_SECS;
+            RecordListAdapter.RecordListItemModel itemModel = new RecordListAdapter.RecordListItemModel();
+            itemModel.setPlanName(planRecordInfo.getPlanName());
+            itemModel.setBeginTime(planRecordInfo.getStartTime());
+            itemModel.setEndTime(planRecordInfo.getEndTime());
+            itemModelList.add(itemModel);
         }
+        currentDateTime = currentDateTime - (long) Constants.ONE_DAY_TOTAL_MILLI_SECS;
         recordListAdapter.setModelList(itemModelList);
     }
 

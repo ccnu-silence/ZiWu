@@ -110,8 +110,12 @@ public class RecordTask implements ITask {
                 "' and beginTime>" + beginTime +
                 " and endTime<" + endTime;
         Cursor cursor = TaskManager.getDbHelper().getWritableDatabase().rawQuery(sql, null);
-        while (cursor.moveToNext()) {
-            return cursor.getLong(0);
+        try {
+            while (cursor.moveToNext()) {
+                return cursor.getLong(0);
+            }
+        } finally {
+            cursor.close();
         }
         return 0l;
     }
@@ -146,7 +150,7 @@ public class RecordTask implements ITask {
         return startTime;
     }
 
-    public List<PlanRecordInfo> getPlanRecordListByType(long beginTime,long endTime) {
+    public List<PlanRecordInfo> getPlanRecordListByType(long beginTime, long endTime) {
         List<PlanRecordInfo> planRecordInfoList = new ArrayList<>();
         String sql = "select " +
                 "RecordDetail.planId," +
@@ -167,23 +171,28 @@ public class RecordTask implements ITask {
                 " and endTime< " + endTime +
                 " order by beginTime desc";
         Cursor cursor = TaskManager.getDbHelper().getWritableDatabase().rawQuery(sql, null);
-        while (cursor.moveToNext()) {
-            PlanRecordInfo recordInfo = new PlanRecordInfo();
-            recordInfo.setPlanId(cursor.getString(cursor.getColumnIndex("planId")));
-            recordInfo.setPlanName(cursor.getString(cursor.getColumnIndex("planName")));
-            recordInfo.setPlanType(cursor.getInt(cursor.getColumnIndex("planType")));
-            recordInfo.setCreateTime(cursor.getLong(cursor.getColumnIndex("createTime")));
-            recordInfo.setPlanPriority(cursor.getInt(cursor.getColumnIndex("planPriority")));
-            recordInfo.setPlanTime(cursor.getLong(cursor.getColumnIndex("planTime")));
-            recordInfo.setPlanJoinParentId(cursor.getString(cursor.getColumnIndex("planJoinParentId")));
-            recordInfo.setPlanTag(cursor.getString(cursor.getColumnIndex("planTag")));
-            recordInfo.setTimeDuration(cursor.getLong(cursor.getColumnIndex("timeDuration")));
-            recordInfo.setStartTime(cursor.getLong(cursor.getColumnIndex("beginTime")));
-            recordInfo.setEndTime(cursor.getLong(cursor.getColumnIndex("endTime")));
-            recordInfo.setRecordState(cursor.getInt(cursor.getColumnIndex("recordState")));
+        try {
+            while (cursor.moveToNext()) {
+                PlanRecordInfo recordInfo = new PlanRecordInfo();
+                recordInfo.setPlanId(cursor.getString(cursor.getColumnIndex("planId")));
+                recordInfo.setPlanName(cursor.getString(cursor.getColumnIndex("planName")));
+                recordInfo.setPlanType(cursor.getInt(cursor.getColumnIndex("planType")));
+                recordInfo.setCreateTime(cursor.getLong(cursor.getColumnIndex("createTime")));
+                recordInfo.setPlanPriority(cursor.getInt(cursor.getColumnIndex("planPriority")));
+                recordInfo.setPlanTime(cursor.getLong(cursor.getColumnIndex("planTime")));
+                recordInfo.setPlanJoinParentId(cursor.getString(cursor.getColumnIndex("planJoinParentId")));
+                recordInfo.setPlanTag(cursor.getString(cursor.getColumnIndex("planTag")));
+                recordInfo.setTimeDuration(cursor.getLong(cursor.getColumnIndex("timeDuration")));
+                recordInfo.setStartTime(cursor.getLong(cursor.getColumnIndex("beginTime")));
+                recordInfo.setEndTime(cursor.getLong(cursor.getColumnIndex("endTime")));
+                recordInfo.setRecordState(cursor.getInt(cursor.getColumnIndex("recordState")));
 
-            planRecordInfoList.add(recordInfo);
+                planRecordInfoList.add(recordInfo);
+            }
+        } finally {
+            cursor.close();
         }
+
         return planRecordInfoList;
     }
 

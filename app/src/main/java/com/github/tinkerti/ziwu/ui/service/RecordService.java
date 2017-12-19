@@ -56,10 +56,12 @@ public class RecordService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        List<PlanRecordInfo> recordInfoList = intent.getParcelableArrayListExtra(Constants.SERVICE_RECORDING_PLAN_INFO_LIST);
-        if (recordInfoList != null) {
-            for (PlanRecordInfo info : recordInfoList) {
-                recordInfoHashMap.put(info.getPlanId(), info);
+        if (intent != null) {
+            List<PlanRecordInfo> recordInfoList = intent.getParcelableArrayListExtra(Constants.SERVICE_RECORDING_PLAN_INFO_LIST);
+            if (recordInfoList != null) {
+                for (PlanRecordInfo info : recordInfoList) {
+                    recordInfoHashMap.put(info.getPlanId(), info);
+                }
             }
         }
         return Service.START_STICKY; //返回这个
