@@ -23,12 +23,12 @@ public class TaskManager {
     private List<ITask> taskList;
 
     private TaskManager() {
-        taskList=new ArrayList<>();
-         taskList.add(AddPlanTask.getInstance());
+        taskList = new ArrayList<>();
+        taskList.add(AddPlanTask.getInstance());
     }
 
     public static void init(Context context) {
-         sInstance=new TaskManager();
+        sInstance = new TaskManager();
     }
 
     public static TaskManager getInstance() {

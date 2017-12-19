@@ -42,6 +42,7 @@ public class RecordFragment extends Fragment {
     public int type;
     private RecyclerView recordList;
     private RecordListAdapter recordListAdapter;
+    private boolean isFirstTime = true;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -89,21 +90,19 @@ public class RecordFragment extends Fragment {
                 type = Constants.DAY_TYPE;
                 planTypeTextView.setText(getString(R.string.plan_today));
                 drawRecordPieChart(type);
-                getPlanRecordDetailList(recordType);
                 break;
             case Constants.WEEK_TYPE:
                 type = Constants.WEEK_TYPE;
                 planTypeTextView.setText(getString(R.string.plan_this_week));
                 drawRecordPieChart(type);
-                getPlanRecordDetailList(recordType);
                 break;
             case Constants.LONG_TERM_TYPE:
                 type = Constants.LONG_TERM_TYPE;
                 planTypeTextView.setText(getString(R.string.plan_long_time));
                 drawRecordPieChart(type);
-                getPlanRecordDetailList(recordType);
                 break;
         }
+        getPlanRecordDetailList(type);
     }
 
     @Override

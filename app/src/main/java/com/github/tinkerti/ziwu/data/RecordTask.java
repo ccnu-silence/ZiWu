@@ -148,7 +148,8 @@ public class RecordTask implements ITask {
 
     public List<PlanRecordInfo> getPlanRecordListByType(long beginTime,long endTime) {
         List<PlanRecordInfo> planRecordInfoList = new ArrayList<>();
-        String sql = "select RecordDetail.planId," +
+        String sql = "select " +
+                "RecordDetail.planId," +
                 "planName," +
                 "planType," +
                 "createTime," +
