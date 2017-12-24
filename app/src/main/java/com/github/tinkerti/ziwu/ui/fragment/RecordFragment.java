@@ -54,10 +54,10 @@ public class RecordFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_record, container, false);
-        planTypeTextView = (TextView) view.findViewById(R.id.fr_tv_plan_type_view);
-        pieChart = (PieChart) view.findViewById(R.id.fr_pc_plan_record_summary);
-        planNoRecord = (TextView) view.findViewById(R.id.fr_tv_plan_no_record);
-        recordList = (RecyclerView) view.findViewById(R.id.rv_recycler_view);
+        planTypeTextView = view.findViewById(R.id.fr_tv_plan_type_view);
+        pieChart = view.findViewById(R.id.fr_pc_plan_record_summary);
+        planNoRecord = view.findViewById(R.id.fr_tv_plan_no_record);
+        recordList = view.findViewById(R.id.rv_recycler_view);
         recordList.setVisibility(View.VISIBLE);
         recordListAdapter = new RecordListAdapter();
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
@@ -116,11 +116,24 @@ public class RecordFragment extends Fragment {
         List<RecordListAdapter.ItemModel> itemModelList = new ArrayList<>();
         long recordFirstTime = RecordTask.getInstance().getPlanRecordStartTimeByType(recordType);
         long currentDateTime = DateUtils.getTodayMorning();
+        long recordEndTime = RecordTask.getInstance().getPlanRecordEndTimeByType(recordType);
         boolean once = false;
         boolean onceBeforeToday = false;
         List<PlanRecordInfo> planRecordInfoList = RecordTask.getInstance().getPlanRecordListByType(
-                currentDateTime,
-                currentDateTime + (long) Constants.ONE_DAY_TOTAL_MILLI_SECS);
+                recordFirstTime,
+                recordEndTime);
+//        String typeName="";
+//        switch (recordType){
+//            case Constants.DAY_TYPE:
+//                typeName= getString(R.string.plan_today);
+//                break;
+//            case Constants.WEEK_TYPE:
+//                typeName= getString(R.string.plan_this_week);
+//                break;
+//            case Constants.LONG_TERM_TYPE:
+//                typeName= getString(R.string.plan_long_time);
+//                break;
+//        }
         for (PlanRecordInfo planRecordInfo : planRecordInfoList) {
             if (planRecordInfo.getStartTime() > DateUtils.getTodayMorning() && !once) {
                 RecordListAdapter.RecordDateItemModel recordDateItemModel = new RecordListAdapter.RecordDateItemModel();

@@ -37,8 +37,6 @@ import java.util.Map;
  */
 
 public class PlanFragment extends Fragment {
-    //TODO:锁屏之后会有问题，解锁的时候界面不会刷新到最新的时间；二是：锁屏之后，停止计时，然后再开始，时间统计会有问题
-    //TODO:功能完善，比如长按事件处理重命名和删除逻辑；
     private static final String TAG = "PlanFragment";
     PlanAdapter planAdapter;
     int[] types;
@@ -64,7 +62,7 @@ public class PlanFragment extends Fragment {
         ZLog.d(TAG, "onCreateView");
         View view = inflater.inflate(R.layout.fragment_plan_list, container, false);
         recyclerView = (RecyclerView) view.findViewById(R.id.fr_rv_plan_summary_list);
-        types = new int[]{Constants.DAY_TYPE, Constants.WEEK_TYPE, Constants.LONG_TERM_TYPE};
+        types = new int[]{Constants.LONG_TERM_TYPE};
         //从数据库中查询今天的计划清单
         //周计划列表
         //从数据库中查询本周的计划清单
@@ -89,16 +87,8 @@ public class PlanFragment extends Fragment {
                     PlanRecordInfo planRecordInfo = planRecordInfoMap.get(planDetailInfo.getPlanId());
                     if (planRecordInfo == null) {
                         planRecordInfo = new PlanRecordInfo();
-                        //检查数据库中的状态为recording的record，继续自动开始计时；
-//                        List<PlanRecordInfo> recordInfoList=RecordTask.getInstance().getPlanInRecordingState(planDetailInfo);
-//                        if(recordInfoList.size()>0){
-//                            planRecordInfo=recordInfoList.get(0);
-//                            planRecordInfo.setTimeDuration(System.currentTimeMillis()-planRecordInfo.getStartTime());
-//                        }
                         planRecordInfoMap.put(planDetailInfo.getPlanId(), planRecordInfo);
                     }
-
-                    //展示今日计划清单
                     planSummaryModel.setPlanName(planDetailInfo.getPlanName());
                     planSummaryModel.setPlanId(planDetailInfo.getPlanId());
                     planSummaryModel.setRecordInfo(planRecordInfo);
@@ -162,13 +152,6 @@ public class PlanFragment extends Fragment {
 
     @Override
     public void onStop() {
-        for(PlanRecordInfo planRecordInfo:planRecordInfoMap.values()){
-           if(planRecordInfo.getRecordState()==Constants.RECORD_STATE_RECORDING){
-//               planRecordInfo.setEndTime(System.currentTimeMillis());
-//               planRecordInfo.setRealRecordTime(planRecordInfo.getEndTime() - planRecordInfo.getStartTime());
-//               RecordTask.getInstance().updatePlanRecord(planRecordInfo);
-           }
-        }
         super.onStop();
     }
 

@@ -121,33 +121,35 @@ public class RecordTask implements ITask {
     }
 
     public long getPlanRecordStartTimeByType(int type) {
-        long startTime = 0;
         long beginTime = 0;
-        long endTime = System.currentTimeMillis();
         switch (type) {
             case Constants.DAY_TYPE:
                 beginTime = DateUtils.getTodayMorning();
-                endTime = DateUtils.getTodayNight();
                 break;
-            case Constants.MONTH_TYPE:
+            case Constants.WEEK_TYPE:
                 beginTime = DateUtils.getCurrentWeekMorning();
-                endTime = DateUtils.getCurrentWeekNight();
                 break;
             case Constants.LONG_TERM_TYPE:
                 beginTime = 0;
+                break;
+        }
+        return beginTime;
+    }
+
+    public long getPlanRecordEndTimeByType(int type) {
+        long endTime = System.currentTimeMillis();
+        switch (type) {
+            case Constants.DAY_TYPE:
+                endTime = DateUtils.getTodayNight();
+                break;
+            case Constants.WEEK_TYPE:
+                endTime = DateUtils.getCurrentWeekNight();
+                break;
+            case Constants.LONG_TERM_TYPE:
                 endTime = System.currentTimeMillis();
                 break;
         }
-        String sql = "select " +
-                "min(beginTime)" +
-                " from " + Constants.RECORD_DETAIL_TABLE_NAME +
-                " where beginTime> " + beginTime +
-                " and endTime< " + endTime;
-        Cursor cursor = TaskManager.getDbHelper().getWritableDatabase().rawQuery(sql, null);
-        while (cursor.moveToNext()) {
-            startTime = cursor.getLong(0);
-        }
-        return startTime;
+        return endTime;
     }
 
     public List<PlanRecordInfo> getPlanRecordListByType(long beginTime, long endTime) {

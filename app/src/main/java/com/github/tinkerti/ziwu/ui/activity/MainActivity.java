@@ -43,15 +43,15 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     }
 
     private void initView() {
-        addPlanButton = (AddPlanButton) findViewById(R.id.ac_bt_add_plan);
-        addPlanPopupWindow = (LinearLayout) findViewById(R.id.ac_ll_add_plan_popup_window);
+        addPlanButton = findViewById(R.id.ac_bt_add_plan);
+        addPlanPopupWindow = findViewById(R.id.ac_ll_add_plan_popup_window);
 
-        planIndicator = (TabIndicatorItemView) findViewById(R.id.bottom_indicator_plan);
-        recordIndicator = (TabIndicatorItemView) findViewById(R.id.bottom_indicator_record);
-        meIndicator = (TabIndicatorItemView) findViewById(R.id.bottom_indicator_me);
-        bottomIndicator = (LinearLayout) findViewById(R.id.ac_ll_bottom_indicator);
+        planIndicator = findViewById(R.id.bottom_indicator_plan);
+        recordIndicator = findViewById(R.id.bottom_indicator_record);
+        meIndicator = findViewById(R.id.bottom_indicator_me);
+        bottomIndicator = findViewById(R.id.ac_ll_bottom_indicator);
 
-        contentViewPager = (ViewPager) findViewById(R.id.ac_view_pager);
+        contentViewPager = findViewById(R.id.ac_view_pager);
         final List<Fragment> fragmentList = new ArrayList<>();
         fragmentList.add(new PlanFragment());
         fragmentList.add(new RecordFragment());
@@ -104,7 +104,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     @Override
     public void onCreateTitleBar(TitleBar titleBar) {
         ZLog.d(TAG, "onCreateTitleBar");
-        View view = titleBar.onCreateTitle(R.layout.bar_plan_content_title);
+        titleBar.onCreateTitle(R.layout.bar_plan_content_title);
     }
 
     @Override
