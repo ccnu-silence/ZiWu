@@ -8,6 +8,8 @@
         android:id="@+id/tv_cancel_modify"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
+        android:gravity="center_vertical"
+        android:layout_marginStart="@dimen/dimen_dp_15"
         android:text="@string/cancel_modify" />
 
     <TextView
@@ -20,5 +22,7 @@
         android:id="@+id/tv_save_modify"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:text="@string/save_modify" />
+        android:text="@string/save_modify"
+        android:gravity="center_vertical"
+        android:layout_marginEnd="@dimen/dimen_dp_15"/>
 </LinearLayout>

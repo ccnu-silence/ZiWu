@@ -68,9 +68,7 @@ public class RecordFragment extends Fragment {
             @Override
             public void onClick(RecordListAdapter.RecordListItemModel itemModel) {
                 Intent intent = new Intent(getActivity(), ModifyRecordDetailActivity.class);
-                intent.putExtra("planName", itemModel.getPlanName());
-                intent.putExtra("planBeginTime", itemModel.getBeginTime());
-                intent.putExtra("planEndTime", itemModel.getEndTime());
+                intent.putExtra("recordId", itemModel.getRecordId());
                 startActivity(intent);
             }
         });
@@ -122,18 +120,6 @@ public class RecordFragment extends Fragment {
         List<PlanRecordInfo> planRecordInfoList = RecordTask.getInstance().getPlanRecordListByType(
                 recordFirstTime,
                 recordEndTime);
-//        String typeName="";
-//        switch (recordType){
-//            case Constants.DAY_TYPE:
-//                typeName= getString(R.string.plan_today);
-//                break;
-//            case Constants.WEEK_TYPE:
-//                typeName= getString(R.string.plan_this_week);
-//                break;
-//            case Constants.LONG_TERM_TYPE:
-//                typeName= getString(R.string.plan_long_time);
-//                break;
-//        }
         for (PlanRecordInfo planRecordInfo : planRecordInfoList) {
             if (planRecordInfo.getStartTime() > DateUtils.getTodayMorning() && !once) {
                 RecordListAdapter.RecordDateItemModel recordDateItemModel = new RecordListAdapter.RecordDateItemModel();
@@ -151,6 +137,7 @@ public class RecordFragment extends Fragment {
             itemModel.setPlanName(planRecordInfo.getPlanName());
             itemModel.setBeginTime(planRecordInfo.getStartTime());
             itemModel.setEndTime(planRecordInfo.getEndTime());
+            itemModel.setRecordId(planRecordInfo.getRecordId());
             itemModelList.add(itemModel);
         }
         currentDateTime = currentDateTime - (long) Constants.ONE_DAY_TOTAL_MILLI_SECS;

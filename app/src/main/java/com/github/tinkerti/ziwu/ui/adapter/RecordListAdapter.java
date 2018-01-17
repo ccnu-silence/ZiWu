@@ -153,6 +153,7 @@ public class RecordListAdapter extends RecyclerView.Adapter {
         private String planName;
         private long beginTime;
         private long endTime;
+        private String recordId;
 
         public String getPlanId() {
             return planId;
@@ -184,6 +185,15 @@ public class RecordListAdapter extends RecyclerView.Adapter {
 
         public void setEndTime(long endTime) {
             this.endTime = endTime;
+        }
+
+
+        public String getRecordId() {
+            return recordId;
+        }
+
+        public void setRecordId(String recordId) {
+            this.recordId = recordId;
         }
 
         @Override

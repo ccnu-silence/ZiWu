@@ -17,14 +17,15 @@ public class ModifyRecordDetailActivity extends BaseActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_modify_plan_record_time);
+        String recordId = getIntent().getStringExtra("recordId");
     }
 
 
     @Override
     public void onCreateTitleBar(TitleBar titleBar) {
         View view = titleBar.onCreateTitle(R.layout.action_bar_modify_plan_record_time);
-        TextView cancelView = (TextView) view.findViewById(R.id.tv_cancel_modify);
-        TextView saveView = (TextView) view.findViewById(R.id.tv_save_modify);
-        TextView nameView = (TextView) view.findViewById(R.id.tv_plan_name);
+        TextView cancelView = view.findViewById(R.id.tv_cancel_modify);
+        TextView saveView = view.findViewById(R.id.tv_save_modify);
+        TextView nameView = view.findViewById(R.id.tv_plan_name);
     }
 }

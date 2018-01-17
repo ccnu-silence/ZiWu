@@ -13,7 +13,7 @@ android {
     buildToolsVersion "27.0.0"
     defaultConfig {
         applicationId "com.github.tinkerti.ziwu"
-        minSdkVersion 16
+        minSdkVersion 23
         targetSdkVersion 24
         versionCode 1
         versionName "1.0"
