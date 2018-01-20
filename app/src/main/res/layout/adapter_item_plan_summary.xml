@@ -8,68 +8,80 @@
     <RelativeLayout
         android:id="@+id/ad_rl_plan_summary_view"
         android:layout_width="match_parent"
-        android:layout_height="45dp">
+        android:layout_height="@dimen/dimen_dp_44">
 
         <TextView
             android:id="@+id/ad_tv_plan_summary_name"
             style="@style/adapter_item_plan_summary_left_text_view"
             tools:text="产品文档" />
 
+        <ImageView
+            android:id="@+id/iv_expand_arrow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="@dimen/dimen_dp_15"
+            android:src="@mipmap/expand_arrow" />
+
         <TextView
             android:id="@+id/ad_tv_plan_summary_recording_time"
             style="@style/adapter_item_plan_summary_right_text_view"
+            android:layout_toLeftOf="@id/iv_expand_arrow"
             android:visibility="gone"
-            tools:text="00:00:00" />
+            tools:text="00:00:00"
+            tools:visibility="visible" />
+
     </RelativeLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dimen_dp_1"
+        android:layout_marginLeft="@dimen/dimen_dp_15"
+        android:layout_marginRight="@dimen/dimen_dp_15"
+        android:background="@color/color_divider_line" />
 
     <RelativeLayout
         android:id="@+id/ad_rl_plan_record_container"
         android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:visibility="gone"
-        tools:visibility="visible">
+        android:layout_height="@dimen/dimen_dp_60">
 
         <TextView
             android:id="@+id/ad_tv_plan_recorded_time"
             android:layout_width="wrap_content"
-            android:layout_height="30dp"
-            android:layout_marginLeft="25dp"
-            android:gravity="center_vertical"
-            tools:text="今天已经进行了3个小时" />
-        <RelativeLayout
+            android:layout_height="wrap_content"
+            android:textColor="@color/greenColor"
+            android:textSize="@dimen/text_size_sp_10"
+            android:layout_marginLeft="@dimen/dimen_dp_25"
+            android:layout_centerVertical="true"/>
+
+        <ImageView
+            android:id="@+id/iv_record_stop"
+            android:layout_width="@dimen/dimen_dp_20"
+            android:layout_height="@dimen/dimen_dp_20"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="@dimen/dimen_dp_50"
+            android:src="@mipmap/stop_button"
+            android:layout_centerVertical="true"/>
+
+        <ImageView
+            android:id="@+id/iv_record_start_or_pause"
+            android:layout_width="@dimen/dimen_dp_20"
+            android:layout_height="@dimen/dimen_dp_20"
+            android:layout_marginRight="@dimen/dimen_dp_20"
+            android:layout_toLeftOf="@id/iv_record_stop"
+            android:src="@mipmap/start_button"
+            android:layout_centerVertical="true"/>
+
+        <View
             android:layout_width="match_parent"
-            android:layout_height="30dp"
-            android:layout_below="@id/ad_tv_plan_recorded_time">
-            <TextView
-                android:id="@+id/ad_tv_plan_record_finish"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_alignParentRight="true"
-                android:layout_marginRight="25dp"
-                android:gravity="center_vertical"
-                android:text="@string/ad_item_plan_record_finish"
-                tools:text="完成" />
-
-            <TextView
-                android:id="@+id/ad_tv_plan_record_stop"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_marginRight="25dp"
-                android:layout_toLeftOf="@id/ad_tv_plan_record_finish"
-                android:gravity="center_vertical"
-                android:text="@string/ad_item_plan_record_stop"
-                tools:text="停止" />
-
-            <TextView
-                android:id="@+id/ad_tv_plan_record_begin"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_marginRight="25dp"
-                android:layout_toLeftOf="@id/ad_tv_plan_record_stop"
-                android:gravity="center_vertical"
-                android:text="@string/ad_item_plan_record_start"
-                tools:text="开始" />
-        </RelativeLayout>
+            android:layout_height="@dimen/dimen_dp_1"
+            android:layout_alignParentBottom="true"
+            android:layout_marginLeft="@dimen/dimen_dp_15"
+            android:layout_marginRight="@dimen/dimen_dp_15"
+            android:background="@color/color_divider_line" />
 
     </RelativeLayout>
+
+
 </LinearLayout>

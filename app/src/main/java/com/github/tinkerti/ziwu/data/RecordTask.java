@@ -100,7 +100,7 @@ public class RecordTask implements ITask {
                 beginTime = DateUtils.getCurrentWeekMorning();
                 endTime = DateUtils.getCurrentWeekNight();
                 break;
-            case Constants.LONG_TERM_TYPE:
+            case Constants.TYPE_IS_VALID:
                 beginTime = 0;
                 endTime = System.currentTimeMillis();
                 break;
@@ -129,7 +129,7 @@ public class RecordTask implements ITask {
             case Constants.WEEK_TYPE:
                 beginTime = DateUtils.getCurrentWeekMorning();
                 break;
-            case Constants.LONG_TERM_TYPE:
+            case Constants.TYPE_IS_VALID:
                 beginTime = 0;
                 break;
         }
@@ -145,7 +145,7 @@ public class RecordTask implements ITask {
             case Constants.WEEK_TYPE:
                 endTime = DateUtils.getCurrentWeekNight();
                 break;
-            case Constants.LONG_TERM_TYPE:
+            case Constants.TYPE_IS_VALID:
                 endTime = System.currentTimeMillis();
                 break;
         }
@@ -211,7 +211,7 @@ public class RecordTask implements ITask {
                 beginTime = DateUtils.getCurrentWeekMorning();
                 endTime = DateUtils.getCurrentWeekNight();
                 break;
-            case Constants.LONG_TERM_TYPE:
+            case Constants.TYPE_IS_VALID:
                 beginTime = 0;
                 endTime = System.currentTimeMillis();
                 break;
@@ -267,7 +267,7 @@ public class RecordTask implements ITask {
                 beginTime = DateUtils.getCurrentWeekMorning();
                 endTime = DateUtils.getCurrentWeekNight();
                 break;
-            case Constants.LONG_TERM_TYPE:
+            case Constants.TYPE_IS_VALID:
                 beginTime = 0;
                 endTime = System.currentTimeMillis();
                 break;
@@ -308,7 +308,7 @@ public class RecordTask implements ITask {
                 beginTime = DateUtils.getCurrentWeekMorning();
                 endTime = DateUtils.getCurrentWeekNight();
                 break;
-            case Constants.LONG_TERM_TYPE:
+            case Constants.TYPE_IS_VALID:
                 beginTime = 0;
                 endTime = System.currentTimeMillis();
                 break;

@@ -18,7 +18,7 @@
     <string name="add_plan_this_week">每周计划</string>
     <string name="add_plan_long_time">长期计划</string>
 
-    <string name="bottom_indicator_plan">计划</string>
+    <string name="bottom_indicator_task">任务</string>
     <string name="bottom_indicator_record">记录</string>
     <string name="bottom_indicator_me">我的</string>
 

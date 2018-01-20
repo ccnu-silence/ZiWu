@@ -94,8 +94,8 @@ public class RecordFragment extends Fragment {
                 planTypeTextView.setText(getString(R.string.plan_this_week));
                 drawRecordPieChart(type);
                 break;
-            case Constants.LONG_TERM_TYPE:
-                type = Constants.LONG_TERM_TYPE;
+            case Constants.TYPE_IS_VALID:
+                type = Constants.TYPE_IS_VALID;
                 planTypeTextView.setText(getString(R.string.plan_long_time));
                 drawRecordPieChart(type);
                 break;

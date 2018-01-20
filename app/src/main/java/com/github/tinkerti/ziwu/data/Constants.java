@@ -15,7 +15,7 @@ public class Constants {
     public static final int WEEK_TYPE = 1;
     public static final int MONTH_TYPE = 2;
     public static final int YEAR_TYPE = 3;
-    public static final int LONG_TERM_TYPE = 4;
+    public static final int TYPE_IS_VALID = 4;
 
     public static final String PLAN_DETAIL_TABLE_NAME = "PlanDetail";
     public static final String ADD_PLAN_DETAIL_TABLE_NAME = "AddPlanDetail";

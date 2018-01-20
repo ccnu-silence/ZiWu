@@ -55,7 +55,7 @@ public class SelectPlanTypePopupWindow extends PopupWindow {
             @Override
             public void onClick(View v) {
                 if(recordFragment!=null){
-                    recordFragment.selectPlanType(Constants.LONG_TERM_TYPE);
+                    recordFragment.selectPlanType(Constants.TYPE_IS_VALID);
                 }
                 dismiss();
             }

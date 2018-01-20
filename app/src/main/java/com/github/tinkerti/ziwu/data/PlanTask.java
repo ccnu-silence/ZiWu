@@ -46,7 +46,7 @@ public class PlanTask implements ITask {
                 beginTime = DateUtils.getCurrentWeekMorning();
                 endTime = DateUtils.getCurrentWeekNight();
                 break;
-            case Constants.LONG_TERM_TYPE:
+            case Constants.TYPE_IS_VALID:
                 beginTime = 0;
                 endTime = System.currentTimeMillis();
                 break;

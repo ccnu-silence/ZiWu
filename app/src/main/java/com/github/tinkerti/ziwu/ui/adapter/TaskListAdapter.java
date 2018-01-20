@@ -11,6 +11,7 @@ import android.text.style.ForegroundColorSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -31,9 +32,9 @@ import com.github.tinkerti.ziwu.ui.widget.RenameDialog;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PlanAdapter extends RecyclerView.Adapter {
+public class TaskListAdapter extends RecyclerView.Adapter {
     //TODO:需要把planType和recordState都写成枚举类型，日志内容跟易读些；
-    private static final String TAG = "PlanAdapter";
+    private static final String TAG = "TaskListAdapter";
     private static final int PLAN_CATEGORY_TYPE = 1;
     private static final int PLAN_SUMMARY_TYPE = 2;
     private static final int NO_PLAN_TYPE = 4;
@@ -41,8 +42,8 @@ public class PlanAdapter extends RecyclerView.Adapter {
     private RecordService.RecordServiceBinder binder;
     private Handler handler;//更新界面用；
 
-    public PlanAdapter() {
-        ZLog.d(TAG, "new PlanAdapter");
+    public TaskListAdapter() {
+        ZLog.d(TAG, "new TaskListAdapter");
         modelList = new ArrayList<>();
     }
 
@@ -124,28 +125,24 @@ public class PlanAdapter extends RecyclerView.Adapter {
 
         private TextView planNameTextView;
         private TextView recordingTimeTextView;
-        private View itemView;
         private RelativeLayout recordContainer;
         private RelativeLayout planSummaryView;
 
         private TextView detailRecordedTimeView;//点击显示记录详情时，展示已经进行的时间；
-        private TextView startButton;
-        private TextView stopButton;
-        private TextView finishButton;
+        private ImageView startButton;
+        private ImageView stopButton;
         private Context context;
 
 
         public PlanSummaryItemViewHolder(View itemView) {
             super(itemView);
-            planNameTextView = (TextView) itemView.findViewById(R.id.ad_tv_plan_summary_name);
-            recordingTimeTextView = (TextView) itemView.findViewById(R.id.ad_tv_plan_summary_recording_time);
-            recordContainer = (RelativeLayout) itemView.findViewById(R.id.ad_rl_plan_record_container);
-            planSummaryView = (RelativeLayout) itemView.findViewById(R.id.ad_rl_plan_summary_view);
-            this.itemView = itemView;
-            detailRecordedTimeView = (TextView) itemView.findViewById(R.id.ad_tv_plan_recorded_time);
-            startButton = (TextView) itemView.findViewById(R.id.ad_tv_plan_record_begin);
-            stopButton = (TextView) itemView.findViewById(R.id.ad_tv_plan_record_stop);
-            finishButton = (TextView) itemView.findViewById(R.id.ad_tv_plan_record_finish);
+            planNameTextView = itemView.findViewById(R.id.ad_tv_plan_summary_name);
+            recordingTimeTextView = itemView.findViewById(R.id.ad_tv_plan_summary_recording_time);
+            recordContainer = itemView.findViewById(R.id.ad_rl_plan_record_container);
+            planSummaryView = itemView.findViewById(R.id.ad_rl_plan_summary_view);
+            detailRecordedTimeView = itemView.findViewById(R.id.ad_tv_plan_recorded_time);
+            startButton = itemView.findViewById(R.id.iv_record_start_or_pause);
+            stopButton = itemView.findViewById(R.id.iv_record_stop);
             context = itemView.getContext();
         }
 
@@ -155,6 +152,7 @@ public class PlanAdapter extends RecyclerView.Adapter {
             planNameTextView.setText(planSummaryModel.getPlanName());
             String recordingTime = FormatTime.calculateTimeString(planSummaryModel.getRecordInfo().getTimeDuration());
             recordingTimeTextView.setText(recordingTime);
+            detailRecordedTimeView.setText(recordingTime);
             ZLog.d(TAG, planSummaryModel.getPlanName() + " recording time:" + recordingTime);
 
             //planRecordInfo对象，用来保存计划进行时间
@@ -169,7 +167,7 @@ public class PlanAdapter extends RecyclerView.Adapter {
             recordInfo.setTotalRecordTime(totalTime);
             ZLog.d(TAG, planSummaryModel.getPlanName() + " totalTime:" + totalTime);
             //之所以要加上timeDuration是因为，退出界面在现实的时候会出现时间跳动，因为部分正在计时着的时间实际上没有计入到数据库中；
-            detailRecordedTimeView.setText(getColoredString(context, planSummaryModel.getPlanName(), recordInfo.getTotalRecordTime() + recordInfo.getTimeDuration()));
+//            detailRecordedTimeView.setText(getColoredString(context, planSummaryModel.getPlanName(), recordInfo.getTotalRecordTime() + recordInfo.getTimeDuration()));
             ZLog.d(TAG, planSummaryModel.getPlanName() + " detail record time:" + (recordInfo.getTotalRecordTime() + recordInfo.getTimeDuration()) + "| time duration this time:" + recordInfo.getTimeDuration());
 
             //这个地方有点问题，需要优化下，这样做没有多大必要；
@@ -178,8 +176,9 @@ public class PlanAdapter extends RecyclerView.Adapter {
                 public void run() {
                     if (recordInfo != null) {
                         recordingTimeTextView.setText(FormatTime.calculateTimeString(recordInfo.getTimeDuration()));
+                        detailRecordedTimeView.setText(FormatTime.calculateTimeString(recordInfo.getTimeDuration()));
                         ZLog.d(TAG, planSummaryModel.getPlanName() + " (runnable)" + this + " recording time:" + FormatTime.calculateTimeString(recordInfo.getTimeDuration()));
-                        detailRecordedTimeView.setText(getColoredString(context, planSummaryModel.getPlanName(), recordInfo.getTotalRecordTime() + recordInfo.getTimeDuration()));
+//                        detailRecordedTimeView.setText(getColoredString(context, planSummaryModel.getPlanName(), recordInfo.getTotalRecordTime() + recordInfo.getTimeDuration()));
                         ZLog.d(TAG, planSummaryModel.getPlanName() + " (runnable)" + this + " detail record time:" + (recordInfo.getTotalRecordTime() + recordInfo.getTimeDuration()));
                     }
                     handler.postDelayed(this, 1000);
@@ -241,6 +240,8 @@ public class PlanAdapter extends RecyclerView.Adapter {
                         }
                         recordingTimeTextView.setVisibility(View.VISIBLE);
                         recordingTimeTextView.setText(FormatTime.calculateTimeString(recordInfo.getTimeDuration()));
+                        detailRecordedTimeView.setText(FormatTime.calculateTimeString(recordInfo.getTimeDuration()));
+
 
                     }
                 }
@@ -259,20 +260,12 @@ public class PlanAdapter extends RecyclerView.Adapter {
                             recordInfo.setRecordState(Constants.RECORD_STATE_STOP);
                             RecordTask.getInstance().updatePlanRecord(recordInfo);
                             long realRecordTime = RecordTask.getInstance().getPlanTotalRecordedTime(recordInfo, planSummaryModel.getPlanType());
-                            detailRecordedTimeView.setText(getColoredString(context, planSummaryModel.getPlanName(), realRecordTime));
+//                            detailRecordedTimeView.setText(getColoredString(context, planSummaryModel.getPlanName(), realRecordTime));
                             handler.removeCallbacks(recordInfo.getRefreshUiRunnable());
                             recordInfo.setTotalRecordTime(RecordTask.getInstance().getPlanTotalRecordedTime(recordInfo, planSummaryModel.getPlanType()));
                         }
                         recordingTimeTextView.setVisibility(View.GONE);
                     }
-                }
-            });
-
-            //点击完成该计划
-            finishButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-
                 }
             });
 
@@ -353,7 +346,7 @@ public class PlanAdapter extends RecyclerView.Adapter {
                 case Constants.WEEK_TYPE:
                     categoryTextView.setText(categoryTextView.getContext().getString(R.string.plan_this_week));
                     break;
-                case Constants.LONG_TERM_TYPE:
+                case Constants.TYPE_IS_VALID:
                     categoryTextView.setText(categoryTextView.getContext().getString(R.string.plan_long_time));
                     break;
             }

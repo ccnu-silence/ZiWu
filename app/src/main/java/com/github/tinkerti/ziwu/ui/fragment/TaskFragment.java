@@ -22,7 +22,7 @@ import com.github.tinkerti.ziwu.data.PlanTask;
 import com.github.tinkerti.ziwu.data.RecordTask;
 import com.github.tinkerti.ziwu.data.model.PlanDetailInfo;
 import com.github.tinkerti.ziwu.data.model.PlanRecordInfo;
-import com.github.tinkerti.ziwu.ui.adapter.PlanAdapter;
+import com.github.tinkerti.ziwu.ui.adapter.TaskListAdapter;
 import com.github.tinkerti.ziwu.ui.service.RecordService;
 import com.github.tinkerti.ziwu.ui.utils.ZLog;
 
@@ -36,9 +36,9 @@ import java.util.Map;
  * Created by tiankui on 4/9/17.
  */
 
-public class PlanFragment extends Fragment {
-    private static final String TAG = "PlanFragment";
-    PlanAdapter planAdapter;
+public class TaskFragment extends Fragment {
+    private static final String TAG = "TaskFragment";
+    TaskListAdapter taskListAdapter;
     int[] types;
     private RecordServiceConnection serviceConnection;
     private Map<String, PlanRecordInfo> planRecordInfoMap;
@@ -50,9 +50,9 @@ public class PlanFragment extends Fragment {
         super.onCreate(savedInstanceState);
         ZLog.d(TAG, "onCreate");
         planRecordInfoMap = new HashMap<>();
-        planAdapter = new PlanAdapter();
+        taskListAdapter = new TaskListAdapter();
         handler = new Handler(Looper.getMainLooper());
-        planAdapter.setHandler(handler);
+        taskListAdapter.setHandler(handler);
         initBindService();
     }
 
@@ -62,28 +62,28 @@ public class PlanFragment extends Fragment {
         ZLog.d(TAG, "onCreateView");
         View view = inflater.inflate(R.layout.fragment_plan_list, container, false);
         recyclerView = (RecyclerView) view.findViewById(R.id.fr_rv_plan_summary_list);
-        types = new int[]{Constants.LONG_TERM_TYPE};
+        types = new int[]{Constants.TYPE_IS_VALID};
         //从数据库中查询今天的计划清单
         //周计划列表
         //从数据库中查询本周的计划清单
         //获取长期计划
         getPlanListByType(types);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerView.setAdapter(planAdapter);
+        recyclerView.setAdapter(taskListAdapter);
         return view;
     }
 
     private void getPlanListByType(int[] types) {
-        List<PlanAdapter.ItemModel> itemModelList = new ArrayList<>();
+        List<TaskListAdapter.ItemModel> itemModelList = new ArrayList<>();
         for (int type : types) {
-            PlanAdapter.PlanCategoryModel planCategoryModel = new PlanAdapter.PlanCategoryModel();
-            planCategoryModel.setPlanType(type);  //根据类型来显示；
-            itemModelList.add(planCategoryModel);
+//            TaskListAdapter.PlanCategoryModel planCategoryModel = new TaskListAdapter.PlanCategoryModel();
+//            planCategoryModel.setPlanType(type);  //根据类型来显示；
+//            itemModelList.add(planCategoryModel);
             //todo:需要查询recordInfo的状态，查询出record_state 为recording的计划，再次启动界面之后需要恢复计时状态
             List<PlanDetailInfo> planList = PlanTask.getInstance().getPlanDetailInfoByType(type);
             if (planList.size() > 0) {
                 for (PlanDetailInfo planDetailInfo : planList) {
-                    PlanAdapter.PlanSummaryModel planSummaryModel = new PlanAdapter.PlanSummaryModel();
+                    TaskListAdapter.PlanSummaryModel planSummaryModel = new TaskListAdapter.PlanSummaryModel();
                     PlanRecordInfo planRecordInfo = planRecordInfoMap.get(planDetailInfo.getPlanId());
                     if (planRecordInfo == null) {
                         planRecordInfo = new PlanRecordInfo();
@@ -97,15 +97,15 @@ public class PlanFragment extends Fragment {
                 }
             } else {
                 //展示暂无计划
-                PlanAdapter.NoPlanModel noPlanModel = new PlanAdapter.NoPlanModel();
+                TaskListAdapter.NoPlanModel noPlanModel = new TaskListAdapter.NoPlanModel();
                 noPlanModel.setNoPlanType(type);
                 itemModelList.add(noPlanModel);
             }
         }
         //setModelList()中没有进行notifyDateSetChanged的原因，是因为着这样做的话计时会有问题
-        planAdapter.setModelList(itemModelList);
+        taskListAdapter.setModelList(itemModelList);
         //加上这一句代码，来刷新ui，否则的话，第一次进入app，添加计划，planList界面不刷新；
-        recyclerView.setAdapter(planAdapter);
+        recyclerView.setAdapter(taskListAdapter);
     }
 
     @Override
@@ -131,7 +131,7 @@ public class PlanFragment extends Fragment {
         public void onServiceConnected(ComponentName name, IBinder service) {
             ZLog.d(TAG, "onServiceConnected: record service connected");
             RecordService.RecordServiceBinder binder = (RecordService.RecordServiceBinder) service;
-            planAdapter.setBinder(binder);
+            taskListAdapter.setBinder(binder);
             planRecordInfoMap = binder.getRecordInfoHashMap();
             getPlanListByType(types);
             RecordTask.getInstance().notifyServiceConnected();//通知观察者service已经连接上了；

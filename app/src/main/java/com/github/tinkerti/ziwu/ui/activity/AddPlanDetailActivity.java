@@ -64,7 +64,7 @@ public class AddPlanDetailActivity extends BaseActivity {
             case Constants.WEEK_TYPE:
                 titleView.setText(getString(R.string.add_plan_this_week));
                 break;
-            case Constants.LONG_TERM_TYPE:
+            case Constants.TYPE_IS_VALID:
                 titleView.setText(getString(R.string.add_plan_long_time));
                 break;
         }
