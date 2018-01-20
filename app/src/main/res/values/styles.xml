@@ -61,7 +61,7 @@
         <item name="android:gravity">center_vertical</item>
         <item name="android:layout_marginRight">20dp</item>
         <item name="android:textSize">16sp</item>
-        <item name="android:textColor">@color/greenColor</item>
+        <item name="android:textColor">@color/record_time_recording_text</item>
     </style>
 
     <style name="popup_window_content">

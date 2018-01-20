@@ -16,4 +16,5 @@
     <color name="greenColor">#4CD964</color>
 
     <color name="color_divider_line">#E5E5E5</color>
+    <color name="record_time_recording_text">#FFD134</color>
 </resources>

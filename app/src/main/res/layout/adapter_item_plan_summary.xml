@@ -50,28 +50,29 @@
             android:id="@+id/ad_tv_plan_recorded_time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@color/greenColor"
-            android:textSize="@dimen/text_size_sp_10"
+            android:layout_centerVertical="true"
             android:layout_marginLeft="@dimen/dimen_dp_25"
-            android:layout_centerVertical="true"/>
+            android:visibility="gone"
+            android:textColor="@color/record_time_recording_text"
+            android:textSize="@dimen/text_size_sp_18" />
 
         <ImageView
             android:id="@+id/iv_record_stop"
-            android:layout_width="@dimen/dimen_dp_20"
-            android:layout_height="@dimen/dimen_dp_20"
+            android:layout_width="@dimen/dimen_dp_18"
+            android:layout_height="@dimen/dimen_dp_18"
             android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
             android:layout_marginRight="@dimen/dimen_dp_50"
-            android:src="@mipmap/stop_button"
-            android:layout_centerVertical="true"/>
+            android:src="@mipmap/stop_button" />
 
         <ImageView
             android:id="@+id/iv_record_start_or_pause"
-            android:layout_width="@dimen/dimen_dp_20"
-            android:layout_height="@dimen/dimen_dp_20"
-            android:layout_marginRight="@dimen/dimen_dp_20"
+            android:layout_width="@dimen/dimen_dp_18"
+            android:layout_height="@dimen/dimen_dp_18"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="@dimen/dimen_dp_40"
             android:layout_toLeftOf="@id/iv_record_stop"
-            android:src="@mipmap/start_button"
-            android:layout_centerVertical="true"/>
+            android:src="@mipmap/start_button" />
 
         <View
             android:layout_width="match_parent"

@@ -4,10 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
 import android.support.v7.widget.RecyclerView;
-import android.text.SpannableStringBuilder;
-import android.text.Spanned;
 import android.text.TextUtils;
-import android.text.style.ForegroundColorSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -123,24 +120,26 @@ public class TaskListAdapter extends RecyclerView.Adapter {
 
     public class PlanSummaryItemViewHolder extends ItemViewHolder {
 
-        private TextView planNameTextView;
+        private TextView taskNameTextView;
         private TextView recordingTimeTextView;
         private RelativeLayout recordContainer;
         private RelativeLayout planSummaryView;
 
-        private TextView detailRecordedTimeView;//点击显示记录详情时，展示已经进行的时间；
+        private TextView expandedRecordingTimeView;//点击显示记录详情时，展示已经进行的时间；
         private ImageView startButton;
         private ImageView stopButton;
         private Context context;
+        private ImageView arrowImageView;
 
 
         public PlanSummaryItemViewHolder(View itemView) {
             super(itemView);
-            planNameTextView = itemView.findViewById(R.id.ad_tv_plan_summary_name);
+            taskNameTextView = itemView.findViewById(R.id.ad_tv_plan_summary_name);
             recordingTimeTextView = itemView.findViewById(R.id.ad_tv_plan_summary_recording_time);
             recordContainer = itemView.findViewById(R.id.ad_rl_plan_record_container);
             planSummaryView = itemView.findViewById(R.id.ad_rl_plan_summary_view);
-            detailRecordedTimeView = itemView.findViewById(R.id.ad_tv_plan_recorded_time);
+            expandedRecordingTimeView = itemView.findViewById(R.id.ad_tv_plan_recorded_time);
+            arrowImageView = itemView.findViewById(R.id.iv_expand_arrow);
             startButton = itemView.findViewById(R.id.iv_record_start_or_pause);
             stopButton = itemView.findViewById(R.id.iv_record_stop);
             context = itemView.getContext();
@@ -149,15 +148,19 @@ public class TaskListAdapter extends RecyclerView.Adapter {
         @Override
         public void update(final int position) {
             final PlanSummaryModel planSummaryModel = (PlanSummaryModel) modelList.get(position);
-            planNameTextView.setText(planSummaryModel.getPlanName());
+            taskNameTextView.setText(planSummaryModel.getPlanName());
             String recordingTime = FormatTime.calculateTimeString(planSummaryModel.getRecordInfo().getTimeDuration());
             recordingTimeTextView.setText(recordingTime);
-            detailRecordedTimeView.setText(recordingTime);
+            expandedRecordingTimeView.setText(recordingTime);
             ZLog.d(TAG, planSummaryModel.getPlanName() + " recording time:" + recordingTime);
 
             //planRecordInfo对象，用来保存计划进行时间
             final PlanRecordInfo recordInfo = planSummaryModel.getRecordInfo();
-            if (recordInfo.getRecordState() == Constants.RECORD_STATE_RECORDING) {
+            if (recordInfo.isExpand()) {
+                expandedRecordingTimeView.setVisibility(View.VISIBLE);
+            }
+            if ((recordInfo.getRecordState() == Constants.RECORD_STATE_RECORDING || recordInfo.getRecordState() == Constants.RECORD_STATE_PAUSE)
+                    && !recordInfo.isExpand()) {
                 recordingTimeTextView.setVisibility(View.VISIBLE);
             }
             recordInfo.setPlanId(planSummaryModel.getPlanId());//这里为什么要设置planId?
@@ -167,7 +170,7 @@ public class TaskListAdapter extends RecyclerView.Adapter {
             recordInfo.setTotalRecordTime(totalTime);
             ZLog.d(TAG, planSummaryModel.getPlanName() + " totalTime:" + totalTime);
             //之所以要加上timeDuration是因为，退出界面在现实的时候会出现时间跳动，因为部分正在计时着的时间实际上没有计入到数据库中；
-//            detailRecordedTimeView.setText(getColoredString(context, planSummaryModel.getPlanName(), recordInfo.getTotalRecordTime() + recordInfo.getTimeDuration()));
+//            expandedRecordingTimeView.setText(getColoredString(context, planSummaryModel.getPlanName(), recordInfo.getTotalRecordTime() + recordInfo.getTimeDuration()));
             ZLog.d(TAG, planSummaryModel.getPlanName() + " detail record time:" + (recordInfo.getTotalRecordTime() + recordInfo.getTimeDuration()) + "| time duration this time:" + recordInfo.getTimeDuration());
 
             //这个地方有点问题，需要优化下，这样做没有多大必要；
@@ -176,9 +179,9 @@ public class TaskListAdapter extends RecyclerView.Adapter {
                 public void run() {
                     if (recordInfo != null) {
                         recordingTimeTextView.setText(FormatTime.calculateTimeString(recordInfo.getTimeDuration()));
-                        detailRecordedTimeView.setText(FormatTime.calculateTimeString(recordInfo.getTimeDuration()));
+                        expandedRecordingTimeView.setText(FormatTime.calculateTimeString(recordInfo.getTimeDuration()));
                         ZLog.d(TAG, planSummaryModel.getPlanName() + " (runnable)" + this + " recording time:" + FormatTime.calculateTimeString(recordInfo.getTimeDuration()));
-//                        detailRecordedTimeView.setText(getColoredString(context, planSummaryModel.getPlanName(), recordInfo.getTotalRecordTime() + recordInfo.getTimeDuration()));
+//                        expandedRecordingTimeView.setText(getColoredString(context, planSummaryModel.getPlanName(), recordInfo.getTotalRecordTime() + recordInfo.getTimeDuration()));
                         ZLog.d(TAG, planSummaryModel.getPlanName() + " (runnable)" + this + " detail record time:" + (recordInfo.getTotalRecordTime() + recordInfo.getTimeDuration()));
                     }
                     handler.postDelayed(this, 1000);
@@ -193,16 +196,6 @@ public class TaskListAdapter extends RecyclerView.Adapter {
             //如果是正在记录则需要去更新界面，而处于idle或者stop的状态，则不去更新
             if (recordInfo.getRecordState() == Constants.RECORD_STATE_RECORDING) {
                 handler.postDelayed(recordInfo.getRefreshUiRunnable(), 1000);
-//                RecordTask.getInstance().addBinderServiceObserver(new RecordTask.BinderServiceObserver() {
-//                    @Override
-//                    public void onServiceConnected() {
-//                        if (binder != null) {
-//                            binder.startRecord(recordInfo);
-//
-//                        }
-//                    }
-//                });
-
             } else if (recordInfo.getRecordState() == Constants.RECORD_STATE_IDLE
                     || recordInfo.getRecordState() == Constants.RECORD_STATE_STOP) {
                 handler.removeCallbacks(recordInfo.getRefreshUiRunnable());
@@ -218,10 +211,21 @@ public class TaskListAdapter extends RecyclerView.Adapter {
                 public void onClick(View v) {
                     if (!planSummaryModel.isShowRecordView()) {
                         recordContainer.setVisibility(View.VISIBLE);
+                        recordingTimeTextView.setVisibility(View.GONE);
+                        if (recordInfo.getRecordState() == Constants.RECORD_STATE_RECORDING
+                                || recordInfo.getRecordState() == Constants.RECORD_STATE_PAUSE) {
+                            expandedRecordingTimeView.setVisibility(View.VISIBLE);
+                        }
                         recordInfo.setExpand(true);
+                        arrowImageView.animate().setDuration(500).rotation(90).start();
                     } else {
                         recordContainer.setVisibility(View.GONE);
+                        if (recordInfo.getRecordState() == Constants.RECORD_STATE_RECORDING
+                                || recordInfo.getRecordState() == Constants.RECORD_STATE_PAUSE) {
+                            recordingTimeTextView.setVisibility(View.VISIBLE);
+                        }
                         recordInfo.setExpand(false);
+                        arrowImageView.animate().setDuration(500).rotation(0).start();
                     }
                     planSummaryModel.setShowRecordView(!planSummaryModel.isShowRecordView());
                 }
@@ -238,9 +242,8 @@ public class TaskListAdapter extends RecyclerView.Adapter {
                             binder.startRecord(recordInfo);
                             handler.postDelayed(recordInfo.getRefreshUiRunnable(), 1000);//点击开始更新计时view；
                         }
-                        recordingTimeTextView.setVisibility(View.VISIBLE);
-                        recordingTimeTextView.setText(FormatTime.calculateTimeString(recordInfo.getTimeDuration()));
-                        detailRecordedTimeView.setText(FormatTime.calculateTimeString(recordInfo.getTimeDuration()));
+                        expandedRecordingTimeView.setVisibility(View.VISIBLE);
+                        expandedRecordingTimeView.setText(FormatTime.calculateTimeString(recordInfo.getTimeDuration()));
 
 
                     }
@@ -259,12 +262,11 @@ public class TaskListAdapter extends RecyclerView.Adapter {
                             recordInfo.setRealRecordTime(recordInfo.getEndTime() - recordInfo.getStartTime());
                             recordInfo.setRecordState(Constants.RECORD_STATE_STOP);
                             RecordTask.getInstance().updatePlanRecord(recordInfo);
-                            long realRecordTime = RecordTask.getInstance().getPlanTotalRecordedTime(recordInfo, planSummaryModel.getPlanType());
-//                            detailRecordedTimeView.setText(getColoredString(context, planSummaryModel.getPlanName(), realRecordTime));
                             handler.removeCallbacks(recordInfo.getRefreshUiRunnable());
                             recordInfo.setTotalRecordTime(RecordTask.getInstance().getPlanTotalRecordedTime(recordInfo, planSummaryModel.getPlanType()));
                         }
                         recordingTimeTextView.setVisibility(View.GONE);
+                        expandedRecordingTimeView.setVisibility(View.GONE);
                     }
                 }
             });
@@ -494,20 +496,4 @@ public class TaskListAdapter extends RecyclerView.Adapter {
     public void setBinder(RecordService.RecordServiceBinder binder) {
         this.binder = binder;
     }
-
-    private SpannableStringBuilder getColoredString(Context context, String name, long totalRecordTime) {
-        SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder(context.getString(R.string.ad_item_plan_recorded_time,
-                name,
-                FormatTime.calculateTimeString(totalRecordTime)));
-        spannableStringBuilder.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.plan_list_name_color)),
-                0,
-                name.length(),
-                Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
-        spannableStringBuilder.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.greenColor)),
-                spannableStringBuilder.length() - FormatTime.calculateTimeString(totalRecordTime).length(),
-                spannableStringBuilder.length(),
-                Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
-        return spannableStringBuilder;
-    }
-
 }
