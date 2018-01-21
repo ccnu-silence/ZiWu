@@ -72,13 +72,12 @@
                 android:src="@mipmap/stop_button" />
         </FrameLayout>
 
-
         <FrameLayout
             android:id="@+id/fl_start_button_container"
             android:layout_width="@dimen/dimen_dp_40"
             android:layout_height="match_parent"
             android:layout_centerVertical="true"
-            android:layout_marginRight="@dimen/dimen_dp_40"
+            android:layout_marginRight="@dimen/dimen_dp_20"
             android:layout_toLeftOf="@id/fl_stop_button_container">
 
             <ImageView
