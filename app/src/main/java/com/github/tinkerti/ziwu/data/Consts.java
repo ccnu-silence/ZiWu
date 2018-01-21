@@ -6,10 +6,10 @@ package com.github.tinkerti.ziwu.data;
 
 public class Consts {
 
-    public static final int RENAME_PLAN=0;
-    public static final int DELETE_PLAN=1;
-    public static final int TRANSFER_PLAN=2;
-    public static final int CHECK_DETAIL=3;
+    public static final int RENAME_PLAN = 0;
+    public static final int DELETE_PLAN = 1;
+    public static final int TRANSFER_PLAN = 2;
+    public static final int CHECK_DETAIL = 3;
 
     public static final int DAY_TYPE = 0;
     public static final int WEEK_TYPE = 1;
@@ -18,7 +18,6 @@ public class Consts {
     public static final int TYPE_IS_VALID = 4;
 
     public static final String PLAN_DETAIL_TABLE_NAME = "PlanDetail";
-    public static final String ADD_PLAN_DETAIL_TABLE_NAME = "AddPlanDetail";
     public static final String RECORD_DETAIL_TABLE_NAME = "RecordDetail";
 
     public static final String PLAN_DETAIL_TABLE_COLUMN_PLAN_ID = "planId";
@@ -32,35 +31,40 @@ public class Consts {
     public static final String PLAN_DETAIL_TABLE_COLUMN_PLAN_JOIN_PARENT_ID = "planJoinParentId";
     public static final String PLAN_DETAIL_TABLE_COLUMN_PLAN_TAG = "planTag";
 
-    public static final String SERVICE_RECORDING_PLAN_INFO_LIST="planRecordingList";
+    public static final String SERVICE_RECORDING_PLAN_INFO_LIST = "planRecordingList";
 
 
-    public static final int NOTIFICATION_START_ACTIVITY=11;
+    public static final int NOTIFICATION_START_ACTIVITY = 11;
 
-    public static final int RECORD_STATE_IDLE=100;
-    public static final int RECORD_STATE_RECORDING=101;
-    public static final int RECORD_STATE_PAUSE=102;
-    public static final int RECORD_STATE_STOP=103;
+    public static final int RECORD_STATE_IDLE = 100;
+    public static final int RECORD_STATE_RECORDING = 101;
+    public static final int RECORD_STATE_PAUSE = 102;
+    public static final int RECORD_STATE_STOP = 103;
 
-    public static final int ADD_PLAN_REQUEST=1000;
+    public static final int ADD_PLAN_REQUEST = 1000;
 
-    public static final float ONE_DAY_TOTAL_MILLI_SECS=1*24*60*60*1000.0f;
-    public static final float SEVEN_DAY_TOTAL_MILLIS_SECS=7*ONE_DAY_TOTAL_MILLI_SECS;
+    public static final float ONE_DAY_TOTAL_MILLI_SECS = 1 * 24 * 60 * 60 * 1000.0f;
+    public static final float SEVEN_DAY_TOTAL_MILLIS_SECS = 7 * ONE_DAY_TOTAL_MILLI_SECS;
 
-    public static final int RECORD_DATE_TITLE=0;
-    public static final int RECORD_LIST_ITEM=1;
+    public static final int RECORD_DATE_TITLE = 0;
+    public static final int RECORD_LIST_ITEM = 1;
 
+    public static final String CREATE_PLAN_DETAIL_TABLE = "create table " + PLAN_DETAIL_TABLE_NAME +
+            " ( planId text not null primary key, " +
+            " planName text not null," +
+            " planType integer not null, " +
+            " createTime integer not null ," +
+            " planPriority integer not null ," +
+            " planTime integer ," +
+            " planJoinParentId text ," +
+            " planTag text, " +
+            " planNote text )";
 
-    public static final String CREATE_ADD_PLAN_DETAIL_TABLE = "create table " + ADD_PLAN_DETAIL_TABLE_NAME + " ( planId text not null primary key, " +
-            "planName text not null, planType integer not null, " +
-            "createTime integer not null , planPriority integer not null , planTime integer , planJoinParentId text ," +
-            "planTag text )";
-
-    public static final String CREATE_PLAN_DETAIL_TABLE = "create table " + PLAN_DETAIL_TABLE_NAME + " ( planId text not null primary key, " +
-            "planName text not null, planType integer not null, " +
-            "createTime integer not null , planPriority integer not null , planTime integer , planJoinParentId text ," +
-            "planTag text )";
-
-    public static final String CREATE_RECORD_DETAIL_TABLE = "create table if not exists " + RECORD_DETAIL_TABLE_NAME + " ( recordId text not null primary key," +
-            "planId text , beginTime integer , endTime integer , timeDuration integer, recordState integer )";
+    public static final String CREATE_RECORD_DETAIL_TABLE = "create table if not exists " + RECORD_DETAIL_TABLE_NAME +
+            " ( recordId text not null primary key," +
+            " planId text ," +
+            " beginTime integer ," +
+            " endTime integer ," +
+            " timeDuration integer," +
+            " recordState integer )";
 }

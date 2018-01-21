@@ -24,7 +24,6 @@ public class TaskManager {
 
     private TaskManager() {
         taskList = new ArrayList<>();
-        taskList.add(AddPlanTask.getInstance());
     }
 
     public static void init(Context context) {

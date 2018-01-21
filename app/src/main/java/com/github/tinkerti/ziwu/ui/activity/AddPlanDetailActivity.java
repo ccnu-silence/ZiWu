@@ -11,8 +11,6 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.github.tinkerti.ziwu.R;
-import com.github.tinkerti.ziwu.data.AddPlanTask;
-import com.github.tinkerti.ziwu.data.PlanTask;
 import com.github.tinkerti.ziwu.ui.adapter.AddPlanAdapter;
 
 import java.util.ArrayList;
@@ -26,11 +24,6 @@ public class AddPlanDetailActivity extends BaseActivity {
     RecyclerView addPlanRecyclerView;
     private int type;
     private AddPlanAdapter addPlanAdapter;
-
-
-    public SaveTaskInfoListener getSaveTaskInfoListener() {
-        return saveTaskInfoListener;
-    }
 
     public void setSaveTaskInfoListener(SaveTaskInfoListener saveTaskInfoListener) {
         this.saveTaskInfoListener = saveTaskInfoListener;
@@ -62,8 +55,6 @@ public class AddPlanDetailActivity extends BaseActivity {
         view.findViewById(R.id.tv_cancel_add_plan_detail).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                PlanTask.getInstance().deletePlanDetailInfo();
-                AddPlanTask.getInstance().deletePlanDetailInfo();
                 finish();
             }
         });
@@ -73,7 +64,6 @@ public class AddPlanDetailActivity extends BaseActivity {
                 if (saveTaskInfoListener != null) {
                     saveTaskInfoListener.saveTaskInfo();
                 }
-                AddPlanTask.getInstance().deletePlanDetailInfo();
                 finish();
             }
         });

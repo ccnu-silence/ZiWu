@@ -83,7 +83,8 @@ public class PlanTask implements ITask {
                 info.getPlanPriority() + ", " +
                 info.getPlanTime() + ", '" +
                 info.getPlanJoinParentId() + "', '" +
-                info.getPlanTag() +
+                info.getPlanTag() + "', '" +
+                info.getPlanNote() +
                 "' )";
         TaskManager.getInstance().getDb().execSQL(sql);
     }
@@ -93,13 +94,6 @@ public class PlanTask implements ITask {
         TaskManager.getInstance().getDb().execSQL(sql);
     }
 
-    /**
-     * where column_name in (select column_name from table_name)这里需要加上括号，否则会报错
-     */
-    public void deletePlanDetailInfo() {
-        String sql = "delete from " + Consts.PLAN_DETAIL_TABLE_NAME + " where planId in (select planId from " + Consts.ADD_PLAN_DETAIL_TABLE_NAME + ")";
-        TaskManager.getInstance().getDb().execSQL(sql);
-    }
 
     public void renamePlan(PlanDetailInfo info) {
         String sql = "update " + Consts.PLAN_DETAIL_TABLE_NAME +

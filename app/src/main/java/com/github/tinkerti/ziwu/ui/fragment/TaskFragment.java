@@ -56,12 +56,8 @@ public class TaskFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         ZLog.d(TAG, "onCreateView");
         View view = inflater.inflate(R.layout.fragment_plan_list, container, false);
-        recyclerView = (RecyclerView) view.findViewById(R.id.fr_rv_plan_summary_list);
+        recyclerView = view.findViewById(R.id.fr_rv_plan_summary_list);
         types = new int[]{Consts.TYPE_IS_VALID};
-        //从数据库中查询今天的计划清单
-        //周计划列表
-        //从数据库中查询本周的计划清单
-        //获取长期计划
         getPlanListByType(types);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(taskListAdapter);

@@ -18,6 +18,16 @@ public class PlanBaseInfo implements Parcelable{
     private String planTag;
     private String planDuration;
 
+    public String getPlanNote() {
+        return planNote;
+    }
+
+    public void setPlanNote(String planNote) {
+        this.planNote = planNote;
+    }
+
+    private String planNote;
+
     public PlanBaseInfo(){}
 
     protected PlanBaseInfo(Parcel in) {
