@@ -44,7 +44,7 @@ public class DBHelper extends SQLiteOpenHelper {
     }
 
     private void updateDb1TO2(SQLiteDatabase database) {
-        String sql = "ALTER TABLE " + Consts.PLAN_DETAIL_TABLE_NAME + " ADD COLUMN planNote text";
+        String sql = "ALTER TABLE " + Consts.TABLE_NAME_PLAN_DETAIL + " ADD COLUMN planNote text";
         database.execSQL(sql);
     }
 }

@@ -21,7 +21,7 @@ import com.github.mikephil.charting.utils.ColorTemplate;
 import com.github.tinkerti.ziwu.R;
 import com.github.tinkerti.ziwu.data.Consts;
 import com.github.tinkerti.ziwu.data.RecordTask;
-import com.github.tinkerti.ziwu.data.model.PlanRecordInfo;
+import com.github.tinkerti.ziwu.data.model.TaskRecordInfo;
 import com.github.tinkerti.ziwu.ui.activity.ModifyRecordDetailActivity;
 import com.github.tinkerti.ziwu.ui.adapter.RecordListAdapter;
 import com.github.tinkerti.ziwu.ui.utils.DateUtils;
@@ -117,27 +117,27 @@ public class RecordFragment extends Fragment {
         long recordEndTime = RecordTask.getInstance().getPlanRecordEndTimeByType(recordType);
         boolean once = false;
         boolean onceBeforeToday = false;
-        List<PlanRecordInfo> planRecordInfoList = RecordTask.getInstance().getPlanRecordListByType(
+        List<TaskRecordInfo> taskRecordInfoList = RecordTask.getInstance().getTaskRecordListByType(
                 recordFirstTime,
                 recordEndTime);
-        for (PlanRecordInfo planRecordInfo : planRecordInfoList) {
-            if (planRecordInfo.getStartTime() > DateUtils.getTodayMorning() && !once) {
+        for (TaskRecordInfo taskRecordInfo : taskRecordInfoList) {
+            if (taskRecordInfo.getBeginTime() > DateUtils.getTodayMorning() && !once) {
                 RecordListAdapter.RecordDateItemModel recordDateItemModel = new RecordListAdapter.RecordDateItemModel();
                 recordDateItemModel.setDateName(getString(R.string.plan_today));
                 once = true;
                 itemModelList.add(recordDateItemModel);
             }
-            if (planRecordInfo.getStartTime() < DateUtils.getTodayMorning() && !onceBeforeToday) {
+            if (taskRecordInfo.getBeginTime() < DateUtils.getTodayMorning() && !onceBeforeToday) {
                 RecordListAdapter.RecordDateItemModel recordDateItemModel = new RecordListAdapter.RecordDateItemModel();
-                recordDateItemModel.setDateName(DateUtils.getDateFormat(planRecordInfo.getStartTime()));
+                recordDateItemModel.setDateName(DateUtils.getDateFormat(taskRecordInfo.getBeginTime()));
                 onceBeforeToday = true;
                 itemModelList.add(recordDateItemModel);
             }
             RecordListAdapter.RecordListItemModel itemModel = new RecordListAdapter.RecordListItemModel();
-            itemModel.setPlanName(planRecordInfo.getPlanName());
-            itemModel.setBeginTime(planRecordInfo.getStartTime());
-            itemModel.setEndTime(planRecordInfo.getEndTime());
-            itemModel.setRecordId(planRecordInfo.getRecordId());
+            itemModel.setPlanName(taskRecordInfo.getPlanName());
+            itemModel.setBeginTime(taskRecordInfo.getBeginTime());
+            itemModel.setEndTime(taskRecordInfo.getEndTime());
+            itemModel.setRecordId(taskRecordInfo.getRecordId());
             itemModelList.add(itemModel);
         }
         currentDateTime = currentDateTime - (long) Consts.ONE_DAY_TOTAL_MILLI_SECS;
@@ -145,7 +145,7 @@ public class RecordFragment extends Fragment {
     }
 
     private void drawRecordPieChart(int recordType) {
-        List<PlanRecordInfo> planRecordInfoList = RecordTask.getInstance().getPlanHistoryTime(recordType);
+        List<TaskRecordInfo> taskRecordInfoList = RecordTask.getInstance().getPlanHistoryTime(recordType);
         float totalRecordTime = RecordTask.getInstance().getPlanTotalRecordedTimeByType(recordType);
         if (totalRecordTime - 0.0 < 0.0000000001) {
             planNoRecord.setVisibility(View.VISIBLE);
@@ -177,7 +177,7 @@ public class RecordFragment extends Fragment {
 
         //添加数据
         List<PieEntry> entries = new ArrayList<>();
-        for (PlanRecordInfo recordInfo : planRecordInfoList) {
+        for (TaskRecordInfo recordInfo : taskRecordInfoList) {
             float percent = recordInfo.getTimeDuration() / totalRecordTime;
             if (percent - 0 > 0.01) {
 //                entries.add(new PieEntry(percent * 100, recordInfo.getPlanName(), count));  //自己计算好百分比

@@ -1,9 +1,9 @@
 package com.github.tinkerti.ziwu.data;
 
 import android.database.Cursor;
+import android.text.TextUtils;
 
-import com.github.tinkerti.ziwu.data.model.PlanDetailInfo;
-import com.github.tinkerti.ziwu.data.model.PlanRecordInfo;
+import com.github.tinkerti.ziwu.data.model.TaskRecordInfo;
 import com.github.tinkerti.ziwu.ui.utils.DateUtils;
 
 import java.util.ArrayList;
@@ -13,20 +13,19 @@ import java.util.List;
  * Created by tiankui on 5/7/17.
  */
 
-public class RecordTask implements ITask {
-    List<BinderServiceObserver> observerList;
+public class RecordTask extends ITask {
 
     public RecordTask() {
-        observerList = new ArrayList<>();
     }
 
     private static class SingletonHolder {
         private static RecordTask sIns = new RecordTask();
     }
 
-    @Override
-    public void onInit() {
 
+    @Override
+    void onInit(TaskManager taskManager) {
+        this.taskManager = taskManager;
     }
 
     @Override
@@ -38,21 +37,21 @@ public class RecordTask implements ITask {
         return SingletonHolder.sIns;
     }
 
-    public void addPlanRecord(PlanRecordInfo recordInfo) {
+    public void addTaskRecord(TaskRecordInfo recordInfo) {
         String sql = "insert into " +
-                Consts.RECORD_DETAIL_TABLE_NAME +
+                Consts.TABLE_NAME_RECORD_DETAIL +
                 " values('" +
                 recordInfo.getRecordId() + "','" +
                 recordInfo.getPlanId() + "'," +
-                recordInfo.getStartTime() + "," +
+                recordInfo.getBeginTime() + "," +
                 recordInfo.getEndTime() + "," +
                 recordInfo.getRealRecordTime() + "," +
                 recordInfo.getRecordState() + ")";
         TaskManager.getDbHelper().getWritableDatabase().execSQL(sql);
     }
 
-    public void updatePlanRecord(PlanRecordInfo recordInfo) {
-        String sql = "update " + Consts.RECORD_DETAIL_TABLE_NAME +
+    public void updateTaskRecord(TaskRecordInfo recordInfo) {
+        String sql = "update " + Consts.TABLE_NAME_RECORD_DETAIL +
                 " set endTime= " + recordInfo.getEndTime() +
                 ",timeDuration=" + recordInfo.getRealRecordTime() +
                 ",recordState=" + recordInfo.getRecordState() +
@@ -61,64 +60,6 @@ public class RecordTask implements ITask {
         TaskManager.getDbHelper().getWritableDatabase().execSQL(sql);
     }
 
-    public List<PlanRecordInfo> getPlanInRecordingState(PlanDetailInfo planDetailInfo) {
-        List<PlanRecordInfo> recordInfoList = new ArrayList<>();
-        String sql = "select * from " + Consts.RECORD_DETAIL_TABLE_NAME +
-                " where planId= '" + planDetailInfo.getPlanId() +
-                "' and recordState=" + Consts.RECORD_STATE_RECORDING +
-                " order by beginTime desc";
-        Cursor cursor = TaskManager.getDbHelper().getWritableDatabase().rawQuery(sql, null);
-        while (cursor.moveToNext()) {
-            PlanRecordInfo recordInfo = new PlanRecordInfo();
-            recordInfo.setRecordId(cursor.getString(cursor.getColumnIndex("recordId")));
-            recordInfo.setPlanId(cursor.getString(cursor.getColumnIndex("planId")));
-            recordInfo.setStartTime(cursor.getLong(cursor.getColumnIndex("beginTime")));
-            recordInfo.setEndTime(cursor.getLong(cursor.getColumnIndex("endTime")));
-            recordInfo.setTimeDuration(cursor.getLong(cursor.getColumnIndex("timeDuration")));
-            recordInfo.setRecordState(cursor.getInt(cursor.getColumnIndex("recordState")));
-            recordInfoList.add(recordInfo);
-        }
-        return recordInfoList;
-    }
-
-    /**
-     * 根据计划的类型来获取计划已经进行的时间；
-     *
-     * @param recordInfo
-     * @param type
-     * @return
-     */
-    public long getPlanTotalRecordedTime(PlanRecordInfo recordInfo, int type) {
-        long beginTime = 0;
-        long endTime = System.currentTimeMillis();
-        switch (type) {
-            case Consts.DAY_TYPE:
-                beginTime = DateUtils.getTodayMorning();
-                endTime = DateUtils.getTodayNight();
-                break;
-            case Consts.MONTH_TYPE:
-                beginTime = DateUtils.getCurrentWeekMorning();
-                endTime = DateUtils.getCurrentWeekNight();
-                break;
-            case Consts.TYPE_IS_VALID:
-                beginTime = 0;
-                endTime = System.currentTimeMillis();
-                break;
-        }
-        String sql = "select sum(timeDuration) from " + Consts.RECORD_DETAIL_TABLE_NAME +
-                " where planId='" + recordInfo.getPlanId() +
-                "' and beginTime>" + beginTime +
-                " and endTime<" + endTime;
-        Cursor cursor = TaskManager.getDbHelper().getWritableDatabase().rawQuery(sql, null);
-        try {
-            while (cursor.moveToNext()) {
-                return cursor.getLong(0);
-            }
-        } finally {
-            cursor.close();
-        }
-        return 0l;
-    }
 
     public long getPlanRecordStartTimeByType(int type) {
         long beginTime = 0;
@@ -152,8 +93,8 @@ public class RecordTask implements ITask {
         return endTime;
     }
 
-    public List<PlanRecordInfo> getPlanRecordListByType(long beginTime, long endTime) {
-        List<PlanRecordInfo> planRecordInfoList = new ArrayList<>();
+    public List<TaskRecordInfo> getTaskRecordListByType(long beginTime, long endTime) {
+        List<TaskRecordInfo> taskRecordInfoList = new ArrayList<>();
         String sql = "select " +
                 "RecordDetail.planId," +
                 "planName," +
@@ -167,15 +108,15 @@ public class RecordTask implements ITask {
                 "beginTime," +
                 "endTime, " +
                 "recordState" +
-                " from " + Consts.RECORD_DETAIL_TABLE_NAME +
-                " inner join " + Consts.PLAN_DETAIL_TABLE_NAME +
+                " from " + Consts.TABLE_NAME_RECORD_DETAIL +
+                " inner join " + Consts.TABLE_NAME_PLAN_DETAIL +
                 " on RecordDetail.planId=PlanDetail.planId where beginTime> " + beginTime +
                 " and endTime< " + endTime +
                 " order by beginTime desc";
         Cursor cursor = TaskManager.getDbHelper().getWritableDatabase().rawQuery(sql, null);
         try {
             while (cursor.moveToNext()) {
-                PlanRecordInfo recordInfo = new PlanRecordInfo();
+                TaskRecordInfo recordInfo = new TaskRecordInfo();
                 recordInfo.setPlanId(cursor.getString(cursor.getColumnIndex("planId")));
                 recordInfo.setPlanName(cursor.getString(cursor.getColumnIndex("planName")));
                 recordInfo.setPlanType(cursor.getInt(cursor.getColumnIndex("planType")));
@@ -185,77 +126,21 @@ public class RecordTask implements ITask {
                 recordInfo.setPlanJoinParentId(cursor.getString(cursor.getColumnIndex("planJoinParentId")));
                 recordInfo.setPlanTag(cursor.getString(cursor.getColumnIndex("planTag")));
                 recordInfo.setTimeDuration(cursor.getLong(cursor.getColumnIndex("timeDuration")));
-                recordInfo.setStartTime(cursor.getLong(cursor.getColumnIndex("beginTime")));
+                recordInfo.setBeginTime(cursor.getLong(cursor.getColumnIndex("beginTime")));
                 recordInfo.setEndTime(cursor.getLong(cursor.getColumnIndex("endTime")));
                 recordInfo.setRecordState(cursor.getInt(cursor.getColumnIndex("recordState")));
 
-                planRecordInfoList.add(recordInfo);
+                taskRecordInfoList.add(recordInfo);
             }
         } finally {
             cursor.close();
         }
 
-        return planRecordInfoList;
+        return taskRecordInfoList;
     }
 
-    public List<PlanRecordInfo> getPlanRecordListByType(int type) {
-        List<PlanRecordInfo> planRecordInfoList = new ArrayList<>();
-        long beginTime = 0;
-        long endTime = System.currentTimeMillis();
-        switch (type) {
-            case Consts.DAY_TYPE:
-                beginTime = DateUtils.getTodayMorning();
-                endTime = DateUtils.getTodayNight();
-                break;
-            case Consts.MONTH_TYPE:
-                beginTime = DateUtils.getCurrentWeekMorning();
-                endTime = DateUtils.getCurrentWeekNight();
-                break;
-            case Consts.TYPE_IS_VALID:
-                beginTime = 0;
-                endTime = System.currentTimeMillis();
-                break;
-        }
-        String sql = "select RecordDetail.planId," +
-                "planName," +
-                "planType," +
-                "createTime," +
-                "planPriority," +
-                "planTime," +
-                "planJoinParentId," +
-                "planTag," +
-                "timeDuration," +
-                "beginTime," +
-                "endTime, " +
-                "recordState" +
-                " from " + Consts.RECORD_DETAIL_TABLE_NAME +
-                " inner join " + Consts.PLAN_DETAIL_TABLE_NAME +
-                " on RecordDetail.planId=PlanDetail.planId where beginTime> " + beginTime +
-                " and endTime< " + endTime +
-                " order by beginTime desc";
-        Cursor cursor = TaskManager.getDbHelper().getWritableDatabase().rawQuery(sql, null);
-        while (cursor.moveToNext()) {
-            PlanRecordInfo recordInfo = new PlanRecordInfo();
-            recordInfo.setPlanId(cursor.getString(cursor.getColumnIndex("planId")));
-            recordInfo.setPlanName(cursor.getString(cursor.getColumnIndex("planName")));
-            recordInfo.setPlanType(cursor.getInt(cursor.getColumnIndex("planType")));
-            recordInfo.setCreateTime(cursor.getLong(cursor.getColumnIndex("createTime")));
-            recordInfo.setPlanPriority(cursor.getInt(cursor.getColumnIndex("planPriority")));
-            recordInfo.setPlanTime(cursor.getLong(cursor.getColumnIndex("planTime")));
-            recordInfo.setPlanJoinParentId(cursor.getString(cursor.getColumnIndex("planJoinParentId")));
-            recordInfo.setPlanTag(cursor.getString(cursor.getColumnIndex("planTag")));
-            recordInfo.setTimeDuration(cursor.getLong(cursor.getColumnIndex("timeDuration")));
-            recordInfo.setStartTime(cursor.getLong(cursor.getColumnIndex("beginTime")));
-            recordInfo.setEndTime(cursor.getLong(cursor.getColumnIndex("endTime")));
-            recordInfo.setRecordState(cursor.getInt(cursor.getColumnIndex("recordState")));
-
-            planRecordInfoList.add(recordInfo);
-        }
-        return planRecordInfoList;
-    }
-
-    public List<PlanRecordInfo> getPlanHistoryTime(int type) {
-        List<PlanRecordInfo> planRecordInfoList = new ArrayList<>();
+    public List<TaskRecordInfo> getPlanHistoryTime(int type) {
+        List<TaskRecordInfo> taskRecordInfoList = new ArrayList<>();
         long beginTime = 0;
         long endTime = System.currentTimeMillis();
         switch (type) {
@@ -273,14 +158,14 @@ public class RecordTask implements ITask {
                 break;
         }
         String sql = "select RecordDetail.planId,planName,planType,createTime,planPriority,planTime,planJoinParentId,planTag,sum(timeDuration) as sumTime " +
-                "from " + Consts.RECORD_DETAIL_TABLE_NAME +
-                " inner join " + Consts.PLAN_DETAIL_TABLE_NAME +
+                "from " + Consts.TABLE_NAME_RECORD_DETAIL +
+                " inner join " + Consts.TABLE_NAME_PLAN_DETAIL +
                 " on RecordDetail.planId=PlanDetail.planId where beginTime> " + beginTime +
                 " and endTime< " + endTime +
                 " group by RecordDetail.planId";
         Cursor cursor = TaskManager.getDbHelper().getWritableDatabase().rawQuery(sql, null);
         while (cursor.moveToNext()) {
-            PlanRecordInfo recordInfo = new PlanRecordInfo();
+            TaskRecordInfo recordInfo = new TaskRecordInfo();
             recordInfo.setPlanId(cursor.getString(cursor.getColumnIndex("planId")));
             recordInfo.setPlanName(cursor.getString(cursor.getColumnIndex("planName")));
             recordInfo.setPlanType(cursor.getInt(cursor.getColumnIndex("planType")));
@@ -291,9 +176,9 @@ public class RecordTask implements ITask {
             recordInfo.setPlanTag(cursor.getString(cursor.getColumnIndex("planTag")));
             recordInfo.setTimeDuration(cursor.getLong(cursor.getColumnIndex("sumTime")));
 
-            planRecordInfoList.add(recordInfo);
+            taskRecordInfoList.add(recordInfo);
         }
-        return planRecordInfoList;
+        return taskRecordInfoList;
     }
 
     public long getPlanTotalRecordedTimeByType(int type) {
@@ -313,7 +198,7 @@ public class RecordTask implements ITask {
                 endTime = System.currentTimeMillis();
                 break;
         }
-        String sql = "select sum(timeDuration) from " + Consts.RECORD_DETAIL_TABLE_NAME +
+        String sql = "select sum(timeDuration) from " + Consts.TABLE_NAME_RECORD_DETAIL +
                 " where beginTime>" + beginTime +
                 " and endTime<" + endTime;
         Cursor cursor = TaskManager.getDbHelper().getWritableDatabase().rawQuery(sql, null);
@@ -324,26 +209,33 @@ public class RecordTask implements ITask {
     }
 
     public void deleteRecordInfoByPlanId(String planId) {
-        String deleteSql = "delete from " + Consts.RECORD_DETAIL_TABLE_NAME + " where " + Consts.PLAN_DETAIL_TABLE_COLUMN_PLAN_ID + "= '" + planId + "'";
+        String deleteSql = "delete from " + Consts.TABLE_NAME_RECORD_DETAIL + " where " + Consts.PLAN_DETAIL_TABLE_COLUMN_PLAN_ID + "= '" + planId + "'";
         TaskManager.getDbHelper().getWritableDatabase().execSQL(deleteSql);
     }
-
-    public void addBinderServiceObserver(BinderServiceObserver observer) {
-        observerList.add(observer);
-    }
-
-    public void removeBinderServiceObserver(BinderServiceObserver observer) {
-        observerList.remove(observer);
-    }
-
-    public void notifyServiceConnected() {
-        for (BinderServiceObserver observer : observerList) {
-            observer.onServiceConnected();
+    
+    public void getLatestOneRecordInfo(final String planId, final SimpleResultCallback<List<TaskRecordInfo>> callback) {
+        if (TextUtils.isEmpty(planId)) {
+            return;
         }
+        taskManager.getWorkHandler().post(new Runnable() {
+            @Override
+            public void run() {
+                List<TaskRecordInfo> recordInfoList = getLatestOneRecordInfoFromDb(planId);
+                callback.onSuccess(recordInfoList);
+            }
+        });
     }
 
-    public interface BinderServiceObserver {
-        public void onServiceConnected();
+    public List<TaskRecordInfo> getLatestOneRecordInfoFromDb(String planId) {
+        List<TaskRecordInfo> recordInfoList = new ArrayList<>();
+        String sql = "select recordId, max(beginTime) from "
+                + Consts.TABLE_NAME_RECORD_DETAIL + " where planId = '" + planId + "'";
+        Cursor cursor = taskManager.getDb().rawQuery(sql, null);
+        while (cursor.moveToNext()) {
+            TaskRecordInfo recordInfo = new TaskRecordInfo();
+            recordInfo.setRecordId(cursor.getString(0));
+            recordInfo.setBeginTime(cursor.getLong(1));
+        }
+        return recordInfoList;
     }
-
 }

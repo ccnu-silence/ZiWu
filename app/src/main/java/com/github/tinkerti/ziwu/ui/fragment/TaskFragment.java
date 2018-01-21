@@ -19,9 +19,8 @@ import android.view.ViewGroup;
 import com.github.tinkerti.ziwu.R;
 import com.github.tinkerti.ziwu.data.Consts;
 import com.github.tinkerti.ziwu.data.PlanTask;
-import com.github.tinkerti.ziwu.data.RecordTask;
 import com.github.tinkerti.ziwu.data.model.PlanDetailInfo;
-import com.github.tinkerti.ziwu.data.model.PlanRecordInfo;
+import com.github.tinkerti.ziwu.data.model.TaskRecordInfo;
 import com.github.tinkerti.ziwu.ui.adapter.TaskListAdapter;
 import com.github.tinkerti.ziwu.ui.service.RecordService;
 import com.github.tinkerti.ziwu.ui.utils.ZLog;
@@ -36,7 +35,7 @@ public class TaskFragment extends Fragment {
     TaskListAdapter taskListAdapter;
     int[] types;
     private RecordServiceConnection serviceConnection;
-    private Map<String, PlanRecordInfo> planRecordInfoMap;
+    private Map<String, TaskRecordInfo> planRecordInfoMap;
     private RecyclerView recyclerView;
     private Handler handler;
 
@@ -72,14 +71,16 @@ public class TaskFragment extends Fragment {
             if (planList.size() > 0) {
                 for (PlanDetailInfo planDetailInfo : planList) {
                     TaskListAdapter.PlanSummaryModel planSummaryModel = new TaskListAdapter.PlanSummaryModel();
-                    PlanRecordInfo planRecordInfo = planRecordInfoMap.get(planDetailInfo.getPlanId());
-                    if (planRecordInfo == null) {
-                        planRecordInfo = new PlanRecordInfo();
-                        planRecordInfoMap.put(planDetailInfo.getPlanId(), planRecordInfo);
+                    //从数据库中查询该任务最后一条记录的状态，若是RECORD_STATE_PAUSE，那么需要加上前面连续都是RECORD_STATE_PAUSE的时间
+
+                    TaskRecordInfo taskRecordInfo = planRecordInfoMap.get(planDetailInfo.getPlanId());
+                    if (taskRecordInfo == null) {
+                        taskRecordInfo = new TaskRecordInfo();
+                        planRecordInfoMap.put(planDetailInfo.getPlanId(), taskRecordInfo);
                     }
                     planSummaryModel.setPlanName(planDetailInfo.getPlanName());
                     planSummaryModel.setPlanId(planDetailInfo.getPlanId());
-                    planSummaryModel.setRecordInfo(planRecordInfo);
+                    planSummaryModel.setRecordInfo(taskRecordInfo);
                     planSummaryModel.setPlanType(type);
                     itemModelList.add(planSummaryModel);
                 }
@@ -122,7 +123,6 @@ public class TaskFragment extends Fragment {
             taskListAdapter.setBinder(binder);
             planRecordInfoMap = binder.getRecordInfoHashMap();
             getPlanListByType(types);
-            RecordTask.getInstance().notifyServiceConnected();//通知观察者service已经连接上了；
         }
 
         @Override

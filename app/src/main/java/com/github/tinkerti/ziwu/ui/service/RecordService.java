@@ -17,7 +17,7 @@ import com.github.tinkerti.ziwu.R;
 import com.github.tinkerti.ziwu.data.Consts;
 import com.github.tinkerti.ziwu.data.RecordTask;
 import com.github.tinkerti.ziwu.data.model.NotificationInfo;
-import com.github.tinkerti.ziwu.data.model.PlanRecordInfo;
+import com.github.tinkerti.ziwu.data.model.TaskRecordInfo;
 import com.github.tinkerti.ziwu.ui.activity.MainActivity;
 import com.github.tinkerti.ziwu.ui.utils.CommonUtils;
 import com.github.tinkerti.ziwu.ui.utils.FormatTime;
@@ -38,8 +38,8 @@ public class RecordService extends Service {
 
     private static final String TAG = "RecordService";
     private Handler handler;
-    private HashMap<String, PlanRecordInfo> recordInfoHashMap;
-    private ArrayList<PlanRecordInfo> recordInfoArrayList;
+    private HashMap<String, TaskRecordInfo> recordInfoHashMap;
+    private ArrayList<TaskRecordInfo> recordInfoArrayList;
 
 
     @Override
@@ -57,9 +57,9 @@ public class RecordService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent != null) {
-            List<PlanRecordInfo> recordInfoList = intent.getParcelableArrayListExtra(Consts.SERVICE_RECORDING_PLAN_INFO_LIST);
+            List<TaskRecordInfo> recordInfoList = intent.getParcelableArrayListExtra(Consts.SERVICE_RECORDING_PLAN_INFO_LIST);
             if (recordInfoList != null) {
-                for (PlanRecordInfo info : recordInfoList) {
+                for (TaskRecordInfo info : recordInfoList) {
                     recordInfoHashMap.put(info.getPlanId(), info);
                 }
             }
@@ -74,11 +74,11 @@ public class RecordService extends Service {
     }
 
     public class RecordServiceBinder extends Binder {
-        public HashMap<String, PlanRecordInfo> getRecordInfoHashMap() {
+        public HashMap<String, TaskRecordInfo> getRecordInfoHashMap() {
             return recordInfoHashMap;
         }
 
-        public void startRecord(final PlanRecordInfo recordInfo) {
+        public void startNewRecord(final TaskRecordInfo recordInfo) {
             ZLog.d(TAG, "start record:" + recordInfo.getPlanName());
             recordInfoHashMap.put(recordInfo.getPlanId(), recordInfo);
             recordInfoArrayList.add(recordInfo);
@@ -86,7 +86,7 @@ public class RecordService extends Service {
             final Runnable startRecordRunnable = new Runnable() {
                 @Override
                 public void run() {
-                    long timeDuration = System.currentTimeMillis() - recordInfo.getStartTime();//矫正锁屏时计时不准确的问题
+                    long timeDuration = System.currentTimeMillis() - recordInfo.getBeginTime();//矫正锁屏时计时不准确的问题
                     if (timeDuration > recordInfo.getTimeDuration()) {
                         recordInfo.setTimeDuration(timeDuration);
                     }
@@ -107,19 +107,20 @@ public class RecordService extends Service {
                 }
             };
             handler.postDelayed(startRecordRunnable, 1000);
-            recordInfo.setStartTime(System.currentTimeMillis());
+            recordInfo.setBeginTime(System.currentTimeMillis());
             recordInfo.setRecordId(UUID.randomUUID().toString());
             recordInfo.setRecordState(Consts.RECORD_STATE_RECORDING);
             recordInfo.setEndTime(System.currentTimeMillis());
             recordInfo.setRealRecordTime(0);
-            RecordTask.getInstance().addPlanRecord(recordInfo);
+            RecordTask.getInstance().addTaskRecord(recordInfo);
         }
 
-        public void pauseRecord(PlanRecordInfo recordInfo){
+        public void stopRecord(TaskRecordInfo recordInfo, boolean isPause) {
+            recordInfo.setEndTime(System.currentTimeMillis());
+            recordInfo.setRealRecordTime(recordInfo.getEndTime() - recordInfo.getBeginTime());
+            recordInfo.setRecordState(isPause ? Consts.RECORD_STATE_PAUSE : Consts.RECORD_STATE_STOP);
+            RecordTask.getInstance().updateTaskRecord(recordInfo);
 
-        }
-
-        public void stopRecord(PlanRecordInfo recordInfo) {
             ZLog.d(TAG, "stop record:" + recordInfo.getPlanName());
             handler.removeCallbacks(recordInfo.getRecordTimeRunnable());
             ZLog.d(TAG, "remove runnable " + recordInfo.getRecordTimeRunnable());
@@ -133,7 +134,7 @@ public class RecordService extends Service {
         }
     }
 
-    private void showNotification(PlanRecordInfo recordInfo) {
+    private void showNotification(TaskRecordInfo recordInfo) {
         ZLog.d(TAG, "show notification");
         RemoteViews notificationView = new RemoteViews(getPackageName(), R.layout.notification_content_view);
         Intent intent = new Intent(getApplicationContext(), MainActivity.class);
@@ -160,11 +161,5 @@ public class RecordService extends Service {
         Intent intent = new Intent(this, RecordService.class);
         intent.putParcelableArrayListExtra(SERVICE_RECORDING_PLAN_INFO_LIST, recordInfoArrayList);
         startService(intent);
-//        for(PlanRecordInfo recordInfo:recordInfoArrayList){
-//            recordInfo.setEndTime(System.currentTimeMillis());
-//            recordInfo.setRealRecordTime(recordInfo.getEndTime() - recordInfo.getStartTime());
-//            recordInfo.setRecordState(Consts.RECORD_STATE_STOP);
-//            RecordTask.getInstance().updatePlanRecord(recordInfo);
-//        }
     }
 }

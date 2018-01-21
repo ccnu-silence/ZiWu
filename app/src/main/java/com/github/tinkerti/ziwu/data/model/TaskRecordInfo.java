@@ -9,7 +9,7 @@ import com.github.tinkerti.ziwu.data.Consts;
  * Created by tiankui on 4/30/17.
  */
 
-public class PlanRecordInfo extends PlanBaseInfo implements Parcelable {
+public class TaskRecordInfo extends PlanBaseInfo implements Parcelable {
 
     public String getRecordId() {
         return recordId;
@@ -20,10 +20,10 @@ public class PlanRecordInfo extends PlanBaseInfo implements Parcelable {
     }
 
     private String recordId;
-    private long startTime;
+    private long beginTime;
     private long endTime;
     private long timeDuration = 0;
-    private int recordState = Consts.RECORD_STATE_IDLE;
+    private int recordState = Consts.RECORD_STATE_STOP;
     private Runnable refreshUiRunnable;//用于定时刷新计时的ui
     private boolean isExpand = false;
     private NotificationInfo notificationInfo;
@@ -81,11 +81,11 @@ public class PlanRecordInfo extends PlanBaseInfo implements Parcelable {
     public void setNotificationInfo(NotificationInfo notificationInfo) {
         this.notificationInfo = notificationInfo;
     }
-    public PlanRecordInfo() {
+    public TaskRecordInfo() {
     }
 
-    protected PlanRecordInfo(Parcel in) {
-        startTime = in.readLong();
+    protected TaskRecordInfo(Parcel in) {
+        beginTime = in.readLong();
         endTime = in.readLong();
         timeDuration = in.readLong();
         recordState = in.readInt();
@@ -94,24 +94,24 @@ public class PlanRecordInfo extends PlanBaseInfo implements Parcelable {
         notificationInfo=in.readParcelable(Thread.currentThread().getContextClassLoader()) ;
     }
 
-    public static final Creator<PlanRecordInfo> CREATOR = new Creator<PlanRecordInfo>() {
+    public static final Creator<TaskRecordInfo> CREATOR = new Creator<TaskRecordInfo>() {
         @Override
-        public PlanRecordInfo createFromParcel(Parcel in) {
-            return new PlanRecordInfo(in);
+        public TaskRecordInfo createFromParcel(Parcel in) {
+            return new TaskRecordInfo(in);
         }
 
         @Override
-        public PlanRecordInfo[] newArray(int size) {
-            return new PlanRecordInfo[size];
+        public TaskRecordInfo[] newArray(int size) {
+            return new TaskRecordInfo[size];
         }
     };
 
-    public long getStartTime() {
-        return startTime;
+    public long getBeginTime() {
+        return beginTime;
     }
 
-    public void setStartTime(long startTime) {
-        this.startTime = startTime;
+    public void setBeginTime(long beginTime) {
+        this.beginTime = beginTime;
     }
 
     public long getEndTime() {
@@ -145,7 +145,7 @@ public class PlanRecordInfo extends PlanBaseInfo implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeLong(startTime);
+        dest.writeLong(beginTime);
         dest.writeLong(endTime);
         dest.writeLong(timeDuration);
         dest.writeInt(recordState);

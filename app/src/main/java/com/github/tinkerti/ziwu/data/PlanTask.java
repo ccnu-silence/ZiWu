@@ -4,7 +4,6 @@ import android.database.Cursor;
 
 import com.github.tinkerti.ziwu.data.model.AddPlanDetailInfo;
 import com.github.tinkerti.ziwu.data.model.PlanDetailInfo;
-import com.github.tinkerti.ziwu.ui.utils.DateUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,15 +12,15 @@ import java.util.List;
  * Created by tiankui on 4/23/17.
  */
 
-public class PlanTask implements ITask {
+public class PlanTask extends ITask {
 
     private static class SingleTonHolder {
         private static PlanTask sIns = new PlanTask();
     }
 
     @Override
-    public void onInit() {
-
+    void onInit(TaskManager taskManager) {
+        this.taskManager = taskManager;
     }
 
     @Override
@@ -38,21 +37,13 @@ public class PlanTask implements ITask {
         long beginTime = 0;
         long endTime = System.currentTimeMillis();
         switch (type) {
-            case Consts.DAY_TYPE:
-                beginTime = DateUtils.getTodayMorning();
-                endTime = DateUtils.getTodayNight();
-                break;
-            case Consts.MONTH_TYPE:
-                beginTime = DateUtils.getCurrentWeekMorning();
-                endTime = DateUtils.getCurrentWeekNight();
-                break;
             case Consts.TYPE_IS_VALID:
                 beginTime = 0;
                 endTime = System.currentTimeMillis();
                 break;
         }
         String sql = "select * from " +
-                Consts.PLAN_DETAIL_TABLE_NAME
+                Consts.TABLE_NAME_PLAN_DETAIL
                 + " where " + Consts.PLAN_DETAIL_TABLE_COLUMN_PLAN_TYPE
                 + " = " + type + " and createTime>" + beginTime;
         Cursor cursor = TaskManager.getInstance().getDb().rawQuery(sql, null);
@@ -66,6 +57,7 @@ public class PlanTask implements ITask {
             planDetailInfo.setPlanTime(cursor.getLong(cursor.getColumnIndex(Consts.PLAN_DETAIL_TABLE_COLUMN_PLAN_TIME)));
             planDetailInfo.setPlanJoinParentId(cursor.getString(cursor.getColumnIndex(Consts.PLAN_DETAIL_TABLE_COLUMN_PLAN_JOIN_PARENT_ID)));
             planDetailInfo.setPlanTag(cursor.getString(cursor.getColumnIndex(Consts.PLAN_DETAIL_TABLE_COLUMN_PLAN_TAG)));
+            planDetailInfo.setPlanNote(cursor.getString(cursor.getColumnIndex(Consts.PLAN_DETAIL_TABLE_COLUMN_PLAN_NOTE)));
             planDetailInfoList.add(planDetailInfo);
         }
         cursor.close();
@@ -74,7 +66,7 @@ public class PlanTask implements ITask {
 
     public void addPlanToDb(AddPlanDetailInfo info) {
         //在插入的时候书写sql语句出现了问题，text类型的数据需要额外添加''引号来表示；
-        String sql = "insert or replace into " + Consts.PLAN_DETAIL_TABLE_NAME +
+        String sql = "insert or replace into " + Consts.TABLE_NAME_PLAN_DETAIL +
                 " values ( '" +
                 info.getPlanId() + "', '" +
                 info.getPlanName() + "', " +
@@ -90,13 +82,13 @@ public class PlanTask implements ITask {
     }
 
     public void deletePlanDetailInfoById(String planId) {
-        String sql = "delete from " + Consts.PLAN_DETAIL_TABLE_NAME + " where " + Consts.PLAN_DETAIL_TABLE_COLUMN_PLAN_ID + " = '" + planId + "'";
+        String sql = "delete from " + Consts.TABLE_NAME_PLAN_DETAIL + " where " + Consts.PLAN_DETAIL_TABLE_COLUMN_PLAN_ID + " = '" + planId + "'";
         TaskManager.getInstance().getDb().execSQL(sql);
     }
 
 
     public void renamePlan(PlanDetailInfo info) {
-        String sql = "update " + Consts.PLAN_DETAIL_TABLE_NAME +
+        String sql = "update " + Consts.TABLE_NAME_PLAN_DETAIL +
                 " set planName= '" + info.getPlanName() +
                 "' where planId='" + info.getPlanId() +
                 "'";

@@ -17,7 +17,7 @@ import com.github.tinkerti.ziwu.data.Consts;
 import com.github.tinkerti.ziwu.data.PlanTask;
 import com.github.tinkerti.ziwu.data.RecordTask;
 import com.github.tinkerti.ziwu.data.model.PlanDetailInfo;
-import com.github.tinkerti.ziwu.data.model.PlanRecordInfo;
+import com.github.tinkerti.ziwu.data.model.TaskRecordInfo;
 import com.github.tinkerti.ziwu.ui.activity.AddTaskActivity;
 import com.github.tinkerti.ziwu.ui.service.RecordService;
 import com.github.tinkerti.ziwu.ui.utils.FormatTime;
@@ -155,21 +155,23 @@ public class TaskListAdapter extends RecyclerView.Adapter {
             ZLog.d(TAG, planSummaryModel.getPlanName() + " recording time:" + recordingTime);
 
             //planRecordInfo对象，用来保存计划进行时间
-            final PlanRecordInfo recordInfo = planSummaryModel.getRecordInfo();
-            if (recordInfo.isExpand()) {
-                expandedRecordingTimeView.setVisibility(View.VISIBLE);
+            final TaskRecordInfo recordInfo = planSummaryModel.getRecordInfo();
+            if ((recordInfo.getRecordState() == Consts.RECORD_STATE_RECORDING
+                    || recordInfo.getRecordState() == Consts.RECORD_STATE_PAUSE)) {
+                if (recordInfo.isExpand()) {
+                    expandedRecordingTimeView.setVisibility(View.VISIBLE);
+                    recordingTimeTextView.setVisibility(View.GONE);
+                } else {
+                    recordingTimeTextView.setVisibility(View.VISIBLE);
+                    expandedRecordingTimeView.setVisibility(View.GONE);
+                }
             }
-            if ((recordInfo.getRecordState() == Consts.RECORD_STATE_RECORDING || recordInfo.getRecordState() == Consts.RECORD_STATE_PAUSE)
-                    && !recordInfo.isExpand()) {
-                recordingTimeTextView.setVisibility(View.VISIBLE);
+            if (recordInfo.getRecordState() == Consts.RECORD_STATE_RECORDING) {
+                startButton.setImageDrawable(planSummaryView.getContext().getResources().getDrawable(R.mipmap.pause_record_icon));
             }
             recordInfo.setPlanId(planSummaryModel.getPlanId());//这里为什么要设置planId?
             //设置recordView是否显示；
             recordContainer.setVisibility(recordInfo.isExpand() ? View.VISIBLE : View.GONE);
-            long totalTime = RecordTask.getInstance().getPlanTotalRecordedTime(recordInfo, planSummaryModel.getPlanType());
-            recordInfo.setTotalRecordTime(totalTime);
-            ZLog.d(TAG, planSummaryModel.getPlanName() + " totalTime:" + totalTime);
-            ZLog.d(TAG, planSummaryModel.getPlanName() + " detail record time:" + (recordInfo.getTotalRecordTime() + recordInfo.getTimeDuration()) + "| time duration this time:" + recordInfo.getTimeDuration());
 
             //这个地方有点问题，需要优化下，这样做没有多大必要；
             Runnable recordRunnable = new Runnable() {
@@ -179,7 +181,6 @@ public class TaskListAdapter extends RecyclerView.Adapter {
                         recordingTimeTextView.setText(FormatTime.calculateTimeString(recordInfo.getTimeDuration()));
                         expandedRecordingTimeView.setText(FormatTime.calculateTimeString(recordInfo.getTimeDuration()));
                         ZLog.d(TAG, planSummaryModel.getPlanName() + " (runnable)" + this + " recording time:" + FormatTime.calculateTimeString(recordInfo.getTimeDuration()));
-                        ZLog.d(TAG, planSummaryModel.getPlanName() + " (runnable)" + this + " detail record time:" + (recordInfo.getTotalRecordTime() + recordInfo.getTimeDuration()));
                     }
                     handler.postDelayed(this, 1000);
                 }
@@ -193,16 +194,15 @@ public class TaskListAdapter extends RecyclerView.Adapter {
             //如果是正在记录则需要去更新界面，而处于idle或者stop的状态，则不去更新
             if (recordInfo.getRecordState() == Consts.RECORD_STATE_RECORDING) {
                 handler.postDelayed(recordInfo.getRefreshUiRunnable(), 1000);
-            } else if (recordInfo.getRecordState() == Consts.RECORD_STATE_IDLE
-                    || recordInfo.getRecordState() == Consts.RECORD_STATE_STOP) {
+            } else if (recordInfo.getRecordState() == Consts.RECORD_STATE_STOP
+                    || recordInfo.getRecordState() == Consts.RECORD_STATE_PAUSE) {
                 handler.removeCallbacks(recordInfo.getRefreshUiRunnable());
             }
-
         }
 
         private void setListener(final int pos) {
             final PlanSummaryModel planSummaryModel = (PlanSummaryModel) modelList.get(pos);
-            final PlanRecordInfo recordInfo = planSummaryModel.getRecordInfo();
+            final TaskRecordInfo recordInfo = planSummaryModel.getRecordInfo();
             planSummaryView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -214,7 +214,7 @@ public class TaskListAdapter extends RecyclerView.Adapter {
                             expandedRecordingTimeView.setVisibility(View.VISIBLE);
                         }
                         recordInfo.setExpand(true);
-                        arrowImageView.animate().setDuration(500).rotation(90).start();
+                        arrowImageView.animate().setDuration(300).rotation(90).start();
                     } else {
                         recordContainer.setVisibility(View.GONE);
                         if (recordInfo.getRecordState() == Consts.RECORD_STATE_RECORDING
@@ -222,7 +222,7 @@ public class TaskListAdapter extends RecyclerView.Adapter {
                             recordingTimeTextView.setVisibility(View.VISIBLE);
                         }
                         recordInfo.setExpand(false);
-                        arrowImageView.animate().setDuration(500).rotation(0).start();
+                        arrowImageView.animate().setDuration(300).rotation(0).start();
                     }
                     planSummaryModel.setShowRecordView(!planSummaryModel.isShowRecordView());
                 }
@@ -233,17 +233,16 @@ public class TaskListAdapter extends RecyclerView.Adapter {
                 @Override
                 public void onClick(View v) {
                     if (binder != null) {
-                        if (recordInfo.getRecordState() == Consts.RECORD_STATE_IDLE
-                                || recordInfo.getRecordState() == Consts.RECORD_STATE_STOP) {
+                        if (recordInfo.getRecordState() == Consts.RECORD_STATE_STOP
+                                || recordInfo.getRecordState() == Consts.RECORD_STATE_PAUSE) {
                             recordInfo.setTimeDuration(0);//为了解决，锁屏之后，结束计时，然后再开始计时，记录详情时间记录问题；
-                            binder.startRecord(recordInfo);
+                            binder.startNewRecord(recordInfo);
                             handler.postDelayed(recordInfo.getRefreshUiRunnable(), 1000);//点击开始更新计时view；
                             startButton.setImageDrawable(planSummaryView.getContext().getResources().getDrawable(R.mipmap.pause_record_icon));
-                        } else if (recordInfo.getRecordState() == Consts.RECORD_STATE_PAUSE) {
-
                         } else if (recordInfo.getRecordState() == Consts.RECORD_STATE_RECORDING) {
                             startButton.setImageDrawable(planSummaryView.getContext().getResources().getDrawable(R.mipmap.start_button));
-                            binder.pauseRecord(recordInfo);
+                            binder.stopRecord(recordInfo, true);
+                            handler.removeCallbacks(recordInfo.getRefreshUiRunnable());
                         }
                         expandedRecordingTimeView.setVisibility(View.VISIBLE);
                         expandedRecordingTimeView.setText(FormatTime.calculateTimeString(recordInfo.getTimeDuration()));
@@ -258,14 +257,10 @@ public class TaskListAdapter extends RecyclerView.Adapter {
                     if (binder != null) {
                         //需要判断下记录状态，否则的话，点击stopButton会一致进行增加计时的操作；
                         if (recordInfo.getRecordState() == Consts.RECORD_STATE_RECORDING) {
-                            binder.stopRecord(recordInfo);
-                            recordInfo.setEndTime(System.currentTimeMillis());
-                            recordInfo.setRealRecordTime(recordInfo.getEndTime() - recordInfo.getStartTime());
-                            recordInfo.setRecordState(Consts.RECORD_STATE_STOP);
-                            RecordTask.getInstance().updatePlanRecord(recordInfo);
+                            binder.stopRecord(recordInfo, false);
                             handler.removeCallbacks(recordInfo.getRefreshUiRunnable());
-                            recordInfo.setTotalRecordTime(RecordTask.getInstance().getPlanTotalRecordedTime(recordInfo, planSummaryModel.getPlanType()));
                         }
+                        startButton.setImageDrawable(planSummaryView.getContext().getResources().getDrawable(R.mipmap.start_button));
                         recordingTimeTextView.setVisibility(View.GONE);
                         expandedRecordingTimeView.setVisibility(View.GONE);
                     }
@@ -295,7 +290,6 @@ public class TaskListAdapter extends RecyclerView.Adapter {
                                                 //注意需要更新adapter中的pos位置的数据，这样调用notifyItemChange才会刷新
                                                 //之前不刷新是因为更改的不是modelList中的数据；
                                                 notifyItemChanged(pos);
-//                                                 notifyDataSetChanged();
                                             }
                                         }
                                     });
@@ -439,7 +433,7 @@ public class TaskListAdapter extends RecyclerView.Adapter {
         private String planName;
         private int planType;
         private boolean isShowRecordView = false;
-        private PlanRecordInfo recordInfo;
+        private TaskRecordInfo recordInfo;
 
         @Override
         public int getType() {
@@ -481,11 +475,11 @@ public class TaskListAdapter extends RecyclerView.Adapter {
         }
 
 
-        public PlanRecordInfo getRecordInfo() {
+        public TaskRecordInfo getRecordInfo() {
             return recordInfo;
         }
 
-        public void setRecordInfo(PlanRecordInfo recordInfo) {
+        public void setRecordInfo(TaskRecordInfo recordInfo) {
             this.recordInfo = recordInfo;
         }
     }

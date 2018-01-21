@@ -2,6 +2,9 @@ package com.github.tinkerti.ziwu.data;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.Handler;
+import android.os.HandlerThread;
+import android.os.Looper;
 
 import com.github.tinkerti.ziwu.data.db.DBHelper;
 
@@ -19,11 +22,20 @@ public class TaskManager {
     private static TaskManager sInstance;
     private static DBHelper dbHelper;
     private static SQLiteDatabase db;
-
     private List<ITask> taskList;
+    private Handler workHandler;
+    private Handler uiHandler;
 
     private TaskManager() {
+        HandlerThread handlerThread = new HandlerThread("handlerThread");
+        handlerThread.start();
+        workHandler = new Handler(handlerThread.getLooper());
+        uiHandler = new Handler(Looper.getMainLooper());
         taskList = new ArrayList<>();
+        taskList.add(new RecordTask());
+        for (ITask task : taskList) {
+            task.onInit(this);
+        }
     }
 
     public static void init(Context context) {
@@ -39,10 +51,6 @@ public class TaskManager {
         return dbHelper;
     }
 
-    public static void setDbHelper(DBHelper dbHelper) {
-        TaskManager.dbHelper = dbHelper;
-    }
-
     public void loginSuccess(Context context, String userId) {
         openDB(context, userId);
     }
@@ -51,15 +59,17 @@ public class TaskManager {
         return db;
     }
 
-    public void setDb(SQLiteDatabase db) {
-        TaskManager.db = db;
-    }
-
     public void openDB(Context context, String userId) {
         DBHelper.setDBPath(context, userId);
         dbHelper = new DBHelper(context, DB_NAME, null, DB_VERSION);
         db = dbHelper.getReadableDatabase();
     }
 
+    public Handler getWorkHandler() {
+        return workHandler;
+    }
 
+    public Handler getUiHandler() {
+        return uiHandler;
+    }
 }

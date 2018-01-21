@@ -17,8 +17,8 @@ public class Consts {
     public static final int YEAR_TYPE = 3;
     public static final int TYPE_IS_VALID = 4;
 
-    public static final String PLAN_DETAIL_TABLE_NAME = "PlanDetail";
-    public static final String RECORD_DETAIL_TABLE_NAME = "RecordDetail";
+    public static final String TABLE_NAME_PLAN_DETAIL = "PlanDetail";
+    public static final String TABLE_NAME_RECORD_DETAIL = "RecordDetail";
 
     public static final String PLAN_DETAIL_TABLE_COLUMN_PLAN_ID = "planId";
     public static final String PLAN_DETAIL_TABLE_COLUMN_PLAN_TYPE = "planType";
@@ -30,13 +30,13 @@ public class Consts {
 
     public static final String PLAN_DETAIL_TABLE_COLUMN_PLAN_JOIN_PARENT_ID = "planJoinParentId";
     public static final String PLAN_DETAIL_TABLE_COLUMN_PLAN_TAG = "planTag";
+    public static final String PLAN_DETAIL_TABLE_COLUMN_PLAN_NOTE = "planNote";
 
     public static final String SERVICE_RECORDING_PLAN_INFO_LIST = "planRecordingList";
 
 
     public static final int NOTIFICATION_START_ACTIVITY = 11;
 
-    public static final int RECORD_STATE_IDLE = 100;
     public static final int RECORD_STATE_RECORDING = 101;
     public static final int RECORD_STATE_PAUSE = 102;
     public static final int RECORD_STATE_STOP = 103;
@@ -49,7 +49,7 @@ public class Consts {
     public static final int RECORD_DATE_TITLE = 0;
     public static final int RECORD_LIST_ITEM = 1;
 
-    public static final String CREATE_PLAN_DETAIL_TABLE = "create table " + PLAN_DETAIL_TABLE_NAME +
+    public static final String CREATE_PLAN_DETAIL_TABLE = "create table " + TABLE_NAME_PLAN_DETAIL +
             " ( planId text not null primary key, " +
             " planName text not null," +
             " planType integer not null, " +
@@ -60,7 +60,7 @@ public class Consts {
             " planTag text, " +
             " planNote text )";
 
-    public static final String CREATE_RECORD_DETAIL_TABLE = "create table if not exists " + RECORD_DETAIL_TABLE_NAME +
+    public static final String CREATE_RECORD_DETAIL_TABLE = "create table if not exists " + TABLE_NAME_RECORD_DETAIL +
             " ( recordId text not null primary key," +
             " planId text ," +
             " beginTime integer ," +
