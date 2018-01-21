@@ -57,4 +57,6 @@
     <string name="cancel_modify">取消</string>
 
     <string name="before_today">今天以前</string>
+    <string name="add_new_task">添加任务</string>
+    <string name="task_note">备注</string>
 </resources>

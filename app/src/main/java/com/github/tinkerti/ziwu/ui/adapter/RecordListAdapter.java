@@ -8,7 +8,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.github.tinkerti.ziwu.R;
-import com.github.tinkerti.ziwu.data.Constants;
+import com.github.tinkerti.ziwu.data.Consts;
 import com.github.tinkerti.ziwu.ui.utils.DateUtils;
 
 import java.util.List;
@@ -28,11 +28,11 @@ public class RecordListAdapter extends RecyclerView.Adapter {
         LayoutInflater inflater = (LayoutInflater) parent.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View view;
         switch (viewType) {
-            case Constants.RECORD_DATE_TITLE:
+            case Consts.RECORD_DATE_TITLE:
                 view = inflater.inflate(R.layout.adapter_record_list_item_date_title, parent, false);
                 viewHolder = new RecordDateItemViewHolder(view);
                 break;
-            case Constants.RECORD_LIST_ITEM:
+            case Consts.RECORD_LIST_ITEM:
                 view = inflater.inflate(R.layout.adapter_record_list_item_detail, parent, false);
                 viewHolder = new RecordListItemViewHolder(view);
                 break;
@@ -55,10 +55,10 @@ public class RecordListAdapter extends RecyclerView.Adapter {
     public int getItemViewType(int position) {
         ItemModel itemModel = modelList.get(position);
         if (itemModel instanceof RecordDateItemModel) {
-            return Constants.RECORD_DATE_TITLE;
+            return Consts.RECORD_DATE_TITLE;
         }
         if (itemModel instanceof RecordListItemModel) {
-            return Constants.RECORD_LIST_ITEM;
+            return Consts.RECORD_LIST_ITEM;
         }
         return super.getItemViewType(position);
     }
@@ -143,7 +143,7 @@ public class RecordListAdapter extends RecyclerView.Adapter {
 
         @Override
         public int getType() {
-            return Constants.RECORD_DATE_TITLE;
+            return Consts.RECORD_DATE_TITLE;
         }
     }
 
@@ -198,7 +198,7 @@ public class RecordListAdapter extends RecyclerView.Adapter {
 
         @Override
         public int getType() {
-            return Constants.RECORD_LIST_ITEM;
+            return Consts.RECORD_LIST_ITEM;
         }
     }
 

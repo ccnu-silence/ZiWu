@@ -3,7 +3,7 @@ package com.github.tinkerti.ziwu.data.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.github.tinkerti.ziwu.data.Constants;
+import com.github.tinkerti.ziwu.data.Consts;
 
 /**
  * Created by tiankui on 4/30/17.
@@ -23,7 +23,7 @@ public class PlanRecordInfo extends PlanBaseInfo implements Parcelable {
     private long startTime;
     private long endTime;
     private long timeDuration = 0;
-    private int recordState = Constants.RECORD_STATE_IDLE;
+    private int recordState = Consts.RECORD_STATE_IDLE;
     private Runnable refreshUiRunnable;//用于定时刷新计时的ui
     private boolean isExpand = false;
     private NotificationInfo notificationInfo;

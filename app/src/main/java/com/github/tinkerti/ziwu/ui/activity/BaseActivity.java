@@ -61,4 +61,6 @@ public class BaseActivity extends FragmentActivity {
             return view;
         }
     }
+
+    public void onOptionClick(){}
 }

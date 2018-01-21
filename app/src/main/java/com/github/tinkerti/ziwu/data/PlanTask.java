@@ -38,34 +38,34 @@ public class PlanTask implements ITask {
         long beginTime = 0;
         long endTime = System.currentTimeMillis();
         switch (type) {
-            case Constants.DAY_TYPE:
+            case Consts.DAY_TYPE:
                 beginTime = DateUtils.getTodayMorning();
                 endTime = DateUtils.getTodayNight();
                 break;
-            case Constants.MONTH_TYPE:
+            case Consts.MONTH_TYPE:
                 beginTime = DateUtils.getCurrentWeekMorning();
                 endTime = DateUtils.getCurrentWeekNight();
                 break;
-            case Constants.TYPE_IS_VALID:
+            case Consts.TYPE_IS_VALID:
                 beginTime = 0;
                 endTime = System.currentTimeMillis();
                 break;
         }
         String sql = "select * from " +
-                Constants.PLAN_DETAIL_TABLE_NAME
-                + " where " + Constants.PLAN_DETAIL_TABLE_COLUMN_PLAN_TYPE
+                Consts.PLAN_DETAIL_TABLE_NAME
+                + " where " + Consts.PLAN_DETAIL_TABLE_COLUMN_PLAN_TYPE
                 + " = " + type + " and createTime>" + beginTime;
         Cursor cursor = TaskManager.getInstance().getDb().rawQuery(sql, null);
         while (cursor.moveToNext()) {
             PlanDetailInfo planDetailInfo = new PlanDetailInfo();
-            planDetailInfo.setPlanId(cursor.getString(cursor.getColumnIndex(Constants.PLAN_DETAIL_TABLE_COLUMN_PLAN_ID)));
-            planDetailInfo.setPlanName(cursor.getString(cursor.getColumnIndex(Constants.PLAN_DETAIL_TABLE_COLUMN_PLAN_NAME)));
-            planDetailInfo.setPlanType(cursor.getInt(cursor.getColumnIndex(Constants.PLAN_DETAIL_TABLE_COLUMN_PLAN_TYPE)));
-            planDetailInfo.setCreateTime(cursor.getLong(cursor.getColumnIndex(Constants.PLAN_DETAIL_TABLE_COLUMN_PLAN_CREATE_TIME)));
-            planDetailInfo.setPlanPriority(cursor.getInt(cursor.getColumnIndex(Constants.PLAN_DETAIL_TABLE_COLUMN_PLAN_PRIORITY)));
-            planDetailInfo.setPlanTime(cursor.getLong(cursor.getColumnIndex(Constants.PLAN_DETAIL_TABLE_COLUMN_PLAN_TIME)));
-            planDetailInfo.setPlanJoinParentId(cursor.getString(cursor.getColumnIndex(Constants.PLAN_DETAIL_TABLE_COLUMN_PLAN_JOIN_PARENT_ID)));
-            planDetailInfo.setPlanTag(cursor.getString(cursor.getColumnIndex(Constants.PLAN_DETAIL_TABLE_COLUMN_PLAN_TAG)));
+            planDetailInfo.setPlanId(cursor.getString(cursor.getColumnIndex(Consts.PLAN_DETAIL_TABLE_COLUMN_PLAN_ID)));
+            planDetailInfo.setPlanName(cursor.getString(cursor.getColumnIndex(Consts.PLAN_DETAIL_TABLE_COLUMN_PLAN_NAME)));
+            planDetailInfo.setPlanType(cursor.getInt(cursor.getColumnIndex(Consts.PLAN_DETAIL_TABLE_COLUMN_PLAN_TYPE)));
+            planDetailInfo.setCreateTime(cursor.getLong(cursor.getColumnIndex(Consts.PLAN_DETAIL_TABLE_COLUMN_PLAN_CREATE_TIME)));
+            planDetailInfo.setPlanPriority(cursor.getInt(cursor.getColumnIndex(Consts.PLAN_DETAIL_TABLE_COLUMN_PLAN_PRIORITY)));
+            planDetailInfo.setPlanTime(cursor.getLong(cursor.getColumnIndex(Consts.PLAN_DETAIL_TABLE_COLUMN_PLAN_TIME)));
+            planDetailInfo.setPlanJoinParentId(cursor.getString(cursor.getColumnIndex(Consts.PLAN_DETAIL_TABLE_COLUMN_PLAN_JOIN_PARENT_ID)));
+            planDetailInfo.setPlanTag(cursor.getString(cursor.getColumnIndex(Consts.PLAN_DETAIL_TABLE_COLUMN_PLAN_TAG)));
             planDetailInfoList.add(planDetailInfo);
         }
         cursor.close();
@@ -74,7 +74,7 @@ public class PlanTask implements ITask {
 
     public void addPlanToDb(AddPlanDetailInfo info) {
         //在插入的时候书写sql语句出现了问题，text类型的数据需要额外添加''引号来表示；
-        String sql = "insert or replace into " + Constants.PLAN_DETAIL_TABLE_NAME +
+        String sql = "insert or replace into " + Consts.PLAN_DETAIL_TABLE_NAME +
                 " values ( '" +
                 info.getPlanId() + "', '" +
                 info.getPlanName() + "', " +
@@ -89,7 +89,7 @@ public class PlanTask implements ITask {
     }
 
     public void deletePlanDetailInfoById(String planId) {
-        String sql = "delete from " + Constants.PLAN_DETAIL_TABLE_NAME + " where " + Constants.PLAN_DETAIL_TABLE_COLUMN_PLAN_ID + " = '" + planId + "'";
+        String sql = "delete from " + Consts.PLAN_DETAIL_TABLE_NAME + " where " + Consts.PLAN_DETAIL_TABLE_COLUMN_PLAN_ID + " = '" + planId + "'";
         TaskManager.getInstance().getDb().execSQL(sql);
     }
 
@@ -97,12 +97,12 @@ public class PlanTask implements ITask {
      * where column_name in (select column_name from table_name)这里需要加上括号，否则会报错
      */
     public void deletePlanDetailInfo() {
-        String sql = "delete from " + Constants.PLAN_DETAIL_TABLE_NAME + " where planId in (select planId from " + Constants.ADD_PLAN_DETAIL_TABLE_NAME + ")";
+        String sql = "delete from " + Consts.PLAN_DETAIL_TABLE_NAME + " where planId in (select planId from " + Consts.ADD_PLAN_DETAIL_TABLE_NAME + ")";
         TaskManager.getInstance().getDb().execSQL(sql);
     }
 
     public void renamePlan(PlanDetailInfo info) {
-        String sql = "update " + Constants.PLAN_DETAIL_TABLE_NAME +
+        String sql = "update " + Consts.PLAN_DETAIL_TABLE_NAME +
                 " set planName= '" + info.getPlanName() +
                 "' where planId='" + info.getPlanId() +
                 "'";

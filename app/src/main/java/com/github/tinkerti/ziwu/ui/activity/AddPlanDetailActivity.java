@@ -12,13 +12,10 @@ import android.widget.TextView;
 
 import com.github.tinkerti.ziwu.R;
 import com.github.tinkerti.ziwu.data.AddPlanTask;
-import com.github.tinkerti.ziwu.data.Constants;
 import com.github.tinkerti.ziwu.data.PlanTask;
-import com.github.tinkerti.ziwu.data.model.AddPlanDetailInfo;
 import com.github.tinkerti.ziwu.ui.adapter.AddPlanAdapter;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by tiankui on 4/9/17.
@@ -30,25 +27,28 @@ public class AddPlanDetailActivity extends BaseActivity {
     private int type;
     private AddPlanAdapter addPlanAdapter;
 
+
+    public SaveTaskInfoListener getSaveTaskInfoListener() {
+        return saveTaskInfoListener;
+    }
+
+    public void setSaveTaskInfoListener(SaveTaskInfoListener saveTaskInfoListener) {
+        this.saveTaskInfoListener = saveTaskInfoListener;
+    }
+
+    private SaveTaskInfoListener saveTaskInfoListener;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         type = getIntent().getIntExtra("type", -1);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_plan_detail);
-        addPlanRecyclerView = (RecyclerView) findViewById(R.id.ac_rv_add_plan_detail);
+        addPlanRecyclerView = findViewById(R.id.ac_rv_add_plan_detail);
         addPlanRecyclerView.setLayoutManager(new LinearLayoutManager(getBaseContext()));
-        addPlanAdapter = new AddPlanAdapter();
+        addPlanAdapter = new AddPlanAdapter(this);
         ArrayList<AddPlanAdapter.ItemModel> modelList = new ArrayList<>();
-        List<AddPlanDetailInfo> addPlanDetailInfoList = AddPlanTask.getInstance().getPlanDetailInfoByType(type);
-        for (AddPlanDetailInfo addPlanDetailInfo : addPlanDetailInfoList) {
-            AddPlanAdapter.AddSummaryModel addSummaryModel = new AddPlanAdapter.AddSummaryModel();
-            addSummaryModel.setName(addPlanDetailInfo.getPlanName());
-            addSummaryModel.setId(addPlanDetailInfo.getPlanId());
-            modelList.add(addSummaryModel);
-        }
-        AddPlanAdapter.AddEditModel addEditModel = new AddPlanAdapter.AddEditModel();
-        addEditModel.setPlanType(type);
-        modelList.add(addEditModel);
+        AddPlanAdapter.AddTaskItemModel addTaskItemModel = new AddPlanAdapter.AddTaskItemModel();
+        modelList.add(addTaskItemModel);
         addPlanAdapter.setModelList(modelList);
         addPlanRecyclerView.setAdapter(addPlanAdapter);
     }
@@ -56,18 +56,8 @@ public class AddPlanDetailActivity extends BaseActivity {
     @Override
     public void onCreateTitleBar(TitleBar titleBar) {
         View view = titleBar.onCreateTitle(R.layout.title_bar_add_plan_detail);
-        TextView titleView = (TextView) view.findViewById(R.id.tv_add_plan_detail_title);
-        switch (type) {
-            case Constants.DAY_TYPE:
-                titleView.setText(getString(R.string.add_plan_today));
-                break;
-            case Constants.WEEK_TYPE:
-                titleView.setText(getString(R.string.add_plan_this_week));
-                break;
-            case Constants.TYPE_IS_VALID:
-                titleView.setText(getString(R.string.add_plan_long_time));
-                break;
-        }
+        TextView titleView = view.findViewById(R.id.tv_add_plan_detail_title);
+        titleView.setText(getString(R.string.add_new_task));
 
         view.findViewById(R.id.tv_cancel_add_plan_detail).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -80,10 +70,17 @@ public class AddPlanDetailActivity extends BaseActivity {
         view.findViewById(R.id.tv_ok_add_plan_detail).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (saveTaskInfoListener != null) {
+                    saveTaskInfoListener.saveTaskInfo();
+                }
                 AddPlanTask.getInstance().deletePlanDetailInfo();
                 finish();
             }
         });
+    }
+
+    public interface SaveTaskInfoListener {
+        void saveTaskInfo();
     }
 
     // 点击editText外，失去焦点；

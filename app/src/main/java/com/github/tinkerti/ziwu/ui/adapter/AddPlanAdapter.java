@@ -1,5 +1,6 @@
 package com.github.tinkerti.ziwu.ui.adapter;
 
+import android.app.Activity;
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -14,8 +15,11 @@ import android.widget.Toast;
 
 import com.github.tinkerti.ziwu.R;
 import com.github.tinkerti.ziwu.data.AddPlanTask;
+import com.github.tinkerti.ziwu.data.Consts;
 import com.github.tinkerti.ziwu.data.PlanTask;
 import com.github.tinkerti.ziwu.data.model.AddPlanDetailInfo;
+import com.github.tinkerti.ziwu.ui.activity.AddPlanDetailActivity;
+import com.github.tinkerti.ziwu.ui.widget.AddTaskItemLayout;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,11 +34,14 @@ public class AddPlanAdapter extends RecyclerView.Adapter {
     private static final int MODEL_ADD_EDIT_TYPE = 1;
     private static final int MODEL_ADD_SUMMARY_TYPE = 2;
     private static final int MODEL_ADD_DETAIL_TYPE = 3;
+    private static final int MODEL_ADD_TASK_ITEM = 4;
 
     private ArrayList<ItemModel> modelList;
+    private Activity activity;
 
-    public AddPlanAdapter() {
+    public AddPlanAdapter(Activity activity) {
         modelList = new ArrayList<>();
+        this.activity = activity;
     }
 
     @Override
@@ -55,6 +62,10 @@ public class AddPlanAdapter extends RecyclerView.Adapter {
                 view = inflater.inflate(R.layout.adapter_item_add_plan_detail, parent, false);
                 itemViewHolder = new AddDetailViewHolder(view);
                 break;
+            case MODEL_ADD_TASK_ITEM:
+                view = inflater.inflate(R.layout.ad_item_add_task, parent, false);
+                itemViewHolder = new AddTaskItemViewHolder(view);
+                break;
         }
         return itemViewHolder;
     }
@@ -70,6 +81,9 @@ public class AddPlanAdapter extends RecyclerView.Adapter {
         }
         if (itemModel instanceof AddDetailModel) {
             ((AddDetailViewHolder) holder).update(position);
+        }
+        if (itemModel instanceof AddTaskItemModel) {
+            ((AddTaskItemViewHolder) holder).update(position);
         }
     }
 
@@ -98,6 +112,40 @@ public class AddPlanAdapter extends RecyclerView.Adapter {
 
         public abstract void update(int position);
     }
+
+    public class AddTaskItemViewHolder extends ItemViewHolder {
+
+        private AddTaskItemLayout nameItemView;
+        private AddTaskItemLayout noteItemView;
+
+        public AddTaskItemViewHolder(View itemView) {
+            super(itemView);
+            nameItemView = itemView.findViewById(R.id.atl_name_item);
+            noteItemView = itemView.findViewById(R.id.atl_note_item);
+        }
+
+        @Override
+        public void update(int position) {
+            final AddTaskItemModel model = (AddTaskItemModel) modelList.get(position);
+            if (activity instanceof AddPlanDetailActivity) {
+                AddPlanDetailActivity addPlanDetailActivity = (AddPlanDetailActivity) activity;
+                addPlanDetailActivity.setSaveTaskInfoListener(new AddPlanDetailActivity.SaveTaskInfoListener() {
+                    @Override
+                    public void saveTaskInfo() {
+                        AddPlanDetailInfo addPlanDetailInfo = new AddPlanDetailInfo();
+                        addPlanDetailInfo.setPlanId(UUID.randomUUID().toString());
+                        addPlanDetailInfo.setPlanType(Consts.TYPE_IS_VALID);
+                        addPlanDetailInfo.setPlanName(nameItemView.getItemContent());
+                        addPlanDetailInfo.setCreateTime(System.currentTimeMillis());
+                        AddPlanTask.getInstance().addPlanToDb(addPlanDetailInfo);
+                        PlanTask.getInstance().addPlanToDb(addPlanDetailInfo);
+                    }
+                });
+            }
+
+        }
+    }
+
 
     public class AddEditViewHolder extends ItemViewHolder {
 
@@ -288,6 +336,33 @@ public class AddPlanAdapter extends RecyclerView.Adapter {
 
         public void setId(String id) {
             this.id = id;
+        }
+    }
+
+    public static class AddTaskItemModel extends ItemModel {
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        private String name;
+
+        public String getContent() {
+            return content;
+        }
+
+        public void setContent(String content) {
+            this.content = content;
+        }
+
+        private String content;
+
+        @Override
+        public int getType() {
+            return MODEL_ADD_TASK_ITEM;
         }
     }
 

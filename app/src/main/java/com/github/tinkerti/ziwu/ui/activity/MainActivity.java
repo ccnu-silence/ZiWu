@@ -6,13 +6,15 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 
 import com.github.tinkerti.ziwu.R;
 import com.github.tinkerti.ziwu.ui.fragment.MeFragment;
-import com.github.tinkerti.ziwu.ui.fragment.TaskFragment;
 import com.github.tinkerti.ziwu.ui.fragment.RecordFragment;
+import com.github.tinkerti.ziwu.ui.fragment.TaskFragment;
 import com.github.tinkerti.ziwu.ui.utils.ZLog;
+import com.github.tinkerti.ziwu.ui.widget.OptionPopupWindow;
 import com.github.tinkerti.ziwu.ui.widget.TabIndicatorItemView;
 
 import java.util.ArrayList;
@@ -84,7 +86,21 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     @Override
     public void onCreateTitleBar(TitleBar titleBar) {
         ZLog.d(TAG, "onCreateTitleBar");
-        titleBar.onCreateTitle(R.layout.bar_plan_content_title);
+        View view = titleBar.onCreateTitle(R.layout.bar_plan_content_title);
+        //task add popup window
+        final FrameLayout optionImage = view.findViewById(R.id.iv_more_option);
+        optionImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (v.getTag() != null && ((OptionPopupWindow) v.getTag()).isShowing()) {
+                    ((OptionPopupWindow) v.getTag()).dismiss();
+                } else {
+                    OptionPopupWindow popupWindow = new OptionPopupWindow(v.getContext());
+                    popupWindow.showAsDropDown(optionImage, (int) optionImage.getX(), 0);
+                    v.setTag(popupWindow);
+                }
+            }
+        });
     }
 
     @Override

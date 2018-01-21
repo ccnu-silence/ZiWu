@@ -13,7 +13,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.github.tinkerti.ziwu.R;
-import com.github.tinkerti.ziwu.data.Constants;
+import com.github.tinkerti.ziwu.data.Consts;
 import com.github.tinkerti.ziwu.data.PlanTask;
 import com.github.tinkerti.ziwu.data.RecordTask;
 import com.github.tinkerti.ziwu.data.model.PlanDetailInfo;
@@ -159,7 +159,7 @@ public class TaskListAdapter extends RecyclerView.Adapter {
             if (recordInfo.isExpand()) {
                 expandedRecordingTimeView.setVisibility(View.VISIBLE);
             }
-            if ((recordInfo.getRecordState() == Constants.RECORD_STATE_RECORDING || recordInfo.getRecordState() == Constants.RECORD_STATE_PAUSE)
+            if ((recordInfo.getRecordState() == Consts.RECORD_STATE_RECORDING || recordInfo.getRecordState() == Consts.RECORD_STATE_PAUSE)
                     && !recordInfo.isExpand()) {
                 recordingTimeTextView.setVisibility(View.VISIBLE);
             }
@@ -194,10 +194,10 @@ public class TaskListAdapter extends RecyclerView.Adapter {
             setListener(position);
 
             //如果是正在记录则需要去更新界面，而处于idle或者stop的状态，则不去更新
-            if (recordInfo.getRecordState() == Constants.RECORD_STATE_RECORDING) {
+            if (recordInfo.getRecordState() == Consts.RECORD_STATE_RECORDING) {
                 handler.postDelayed(recordInfo.getRefreshUiRunnable(), 1000);
-            } else if (recordInfo.getRecordState() == Constants.RECORD_STATE_IDLE
-                    || recordInfo.getRecordState() == Constants.RECORD_STATE_STOP) {
+            } else if (recordInfo.getRecordState() == Consts.RECORD_STATE_IDLE
+                    || recordInfo.getRecordState() == Consts.RECORD_STATE_STOP) {
                 handler.removeCallbacks(recordInfo.getRefreshUiRunnable());
             }
 
@@ -212,16 +212,16 @@ public class TaskListAdapter extends RecyclerView.Adapter {
                     if (!planSummaryModel.isShowRecordView()) {
                         recordContainer.setVisibility(View.VISIBLE);
                         recordingTimeTextView.setVisibility(View.GONE);
-                        if (recordInfo.getRecordState() == Constants.RECORD_STATE_RECORDING
-                                || recordInfo.getRecordState() == Constants.RECORD_STATE_PAUSE) {
+                        if (recordInfo.getRecordState() == Consts.RECORD_STATE_RECORDING
+                                || recordInfo.getRecordState() == Consts.RECORD_STATE_PAUSE) {
                             expandedRecordingTimeView.setVisibility(View.VISIBLE);
                         }
                         recordInfo.setExpand(true);
                         arrowImageView.animate().setDuration(500).rotation(90).start();
                     } else {
                         recordContainer.setVisibility(View.GONE);
-                        if (recordInfo.getRecordState() == Constants.RECORD_STATE_RECORDING
-                                || recordInfo.getRecordState() == Constants.RECORD_STATE_PAUSE) {
+                        if (recordInfo.getRecordState() == Consts.RECORD_STATE_RECORDING
+                                || recordInfo.getRecordState() == Consts.RECORD_STATE_PAUSE) {
                             recordingTimeTextView.setVisibility(View.VISIBLE);
                         }
                         recordInfo.setExpand(false);
@@ -236,8 +236,8 @@ public class TaskListAdapter extends RecyclerView.Adapter {
                 @Override
                 public void onClick(View v) {
                     if (binder != null) {
-                        if (recordInfo.getRecordState() == Constants.RECORD_STATE_IDLE
-                                || recordInfo.getRecordState() == Constants.RECORD_STATE_STOP) {
+                        if (recordInfo.getRecordState() == Consts.RECORD_STATE_IDLE
+                                || recordInfo.getRecordState() == Consts.RECORD_STATE_STOP) {
                             recordInfo.setTimeDuration(0);//为了解决，锁屏之后，结束计时，然后再开始计时，记录详情时间记录问题；
                             binder.startRecord(recordInfo);
                             handler.postDelayed(recordInfo.getRefreshUiRunnable(), 1000);//点击开始更新计时view；
@@ -256,11 +256,11 @@ public class TaskListAdapter extends RecyclerView.Adapter {
                 public void onClick(View v) {
                     if (binder != null) {
                         //需要判断下记录状态，否则的话，点击stopButton会一致进行增加计时的操作；
-                        if (recordInfo.getRecordState() == Constants.RECORD_STATE_RECORDING) {
+                        if (recordInfo.getRecordState() == Consts.RECORD_STATE_RECORDING) {
                             binder.stopRecord(recordInfo);
                             recordInfo.setEndTime(System.currentTimeMillis());
                             recordInfo.setRealRecordTime(recordInfo.getEndTime() - recordInfo.getStartTime());
-                            recordInfo.setRecordState(Constants.RECORD_STATE_STOP);
+                            recordInfo.setRecordState(Consts.RECORD_STATE_STOP);
                             RecordTask.getInstance().updatePlanRecord(recordInfo);
                             handler.removeCallbacks(recordInfo.getRefreshUiRunnable());
                             recordInfo.setTotalRecordTime(RecordTask.getInstance().getPlanTotalRecordedTime(recordInfo, planSummaryModel.getPlanType()));
@@ -280,7 +280,7 @@ public class TaskListAdapter extends RecyclerView.Adapter {
                         @Override
                         public void onClick(final int position) {
                             switch (position) {
-                                case Constants.RENAME_PLAN:
+                                case Consts.RENAME_PLAN:
                                     RenameDialog renameDialog = new RenameDialog(context);
                                     renameDialog.setListener(new RenameDialog.DialogClickListener() {
                                         @Override
@@ -301,7 +301,7 @@ public class TaskListAdapter extends RecyclerView.Adapter {
                                     renameDialog.show();
                                     renameDialog.setTextContent(planSummaryModel.getPlanName());
                                     break;
-                                case Constants.DELETE_PLAN:
+                                case Consts.DELETE_PLAN:
                                     DeleteConfirmDialog deleteConfirmDialog = new DeleteConfirmDialog(context);
                                     deleteConfirmDialog.setListener(new DeleteConfirmDialog.DialogClickListener() {
                                         @Override
@@ -315,9 +315,9 @@ public class TaskListAdapter extends RecyclerView.Adapter {
                                     deleteConfirmDialog.show();
                                     deleteConfirmDialog.setTitleView(planSummaryModel.getPlanName());
                                     break;
-                                case Constants.TRANSFER_PLAN:
+                                case Consts.TRANSFER_PLAN:
                                     break;
-                                case Constants.CHECK_DETAIL:
+                                case Consts.CHECK_DETAIL:
                                     break;
                             }
                         }
@@ -342,13 +342,13 @@ public class TaskListAdapter extends RecyclerView.Adapter {
         public void update(int position) {
             PlanCategoryModel planCategoryModel = (PlanCategoryModel) modelList.get(position);
             switch (planCategoryModel.getPlanType()) {
-                case Constants.DAY_TYPE:
+                case Consts.DAY_TYPE:
                     categoryTextView.setText(categoryTextView.getContext().getString(R.string.plan_today));
                     break;
-                case Constants.WEEK_TYPE:
+                case Consts.WEEK_TYPE:
                     categoryTextView.setText(categoryTextView.getContext().getString(R.string.plan_this_week));
                     break;
-                case Constants.TYPE_IS_VALID:
+                case Consts.TYPE_IS_VALID:
                     categoryTextView.setText(categoryTextView.getContext().getString(R.string.plan_long_time));
                     break;
             }

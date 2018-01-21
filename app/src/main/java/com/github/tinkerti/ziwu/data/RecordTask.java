@@ -40,7 +40,7 @@ public class RecordTask implements ITask {
 
     public void addPlanRecord(PlanRecordInfo recordInfo) {
         String sql = "insert into " +
-                Constants.RECORD_DETAIL_TABLE_NAME +
+                Consts.RECORD_DETAIL_TABLE_NAME +
                 " values('" +
                 recordInfo.getRecordId() + "','" +
                 recordInfo.getPlanId() + "'," +
@@ -52,7 +52,7 @@ public class RecordTask implements ITask {
     }
 
     public void updatePlanRecord(PlanRecordInfo recordInfo) {
-        String sql = "update " + Constants.RECORD_DETAIL_TABLE_NAME +
+        String sql = "update " + Consts.RECORD_DETAIL_TABLE_NAME +
                 " set endTime= " + recordInfo.getEndTime() +
                 ",timeDuration=" + recordInfo.getRealRecordTime() +
                 ",recordState=" + recordInfo.getRecordState() +
@@ -63,9 +63,9 @@ public class RecordTask implements ITask {
 
     public List<PlanRecordInfo> getPlanInRecordingState(PlanDetailInfo planDetailInfo) {
         List<PlanRecordInfo> recordInfoList = new ArrayList<>();
-        String sql = "select * from " + Constants.RECORD_DETAIL_TABLE_NAME +
+        String sql = "select * from " + Consts.RECORD_DETAIL_TABLE_NAME +
                 " where planId= '" + planDetailInfo.getPlanId() +
-                "' and recordState=" + Constants.RECORD_STATE_RECORDING +
+                "' and recordState=" + Consts.RECORD_STATE_RECORDING +
                 " order by beginTime desc";
         Cursor cursor = TaskManager.getDbHelper().getWritableDatabase().rawQuery(sql, null);
         while (cursor.moveToNext()) {
@@ -92,20 +92,20 @@ public class RecordTask implements ITask {
         long beginTime = 0;
         long endTime = System.currentTimeMillis();
         switch (type) {
-            case Constants.DAY_TYPE:
+            case Consts.DAY_TYPE:
                 beginTime = DateUtils.getTodayMorning();
                 endTime = DateUtils.getTodayNight();
                 break;
-            case Constants.MONTH_TYPE:
+            case Consts.MONTH_TYPE:
                 beginTime = DateUtils.getCurrentWeekMorning();
                 endTime = DateUtils.getCurrentWeekNight();
                 break;
-            case Constants.TYPE_IS_VALID:
+            case Consts.TYPE_IS_VALID:
                 beginTime = 0;
                 endTime = System.currentTimeMillis();
                 break;
         }
-        String sql = "select sum(timeDuration) from " + Constants.RECORD_DETAIL_TABLE_NAME +
+        String sql = "select sum(timeDuration) from " + Consts.RECORD_DETAIL_TABLE_NAME +
                 " where planId='" + recordInfo.getPlanId() +
                 "' and beginTime>" + beginTime +
                 " and endTime<" + endTime;
@@ -123,13 +123,13 @@ public class RecordTask implements ITask {
     public long getPlanRecordStartTimeByType(int type) {
         long beginTime = 0;
         switch (type) {
-            case Constants.DAY_TYPE:
+            case Consts.DAY_TYPE:
                 beginTime = DateUtils.getTodayMorning();
                 break;
-            case Constants.WEEK_TYPE:
+            case Consts.WEEK_TYPE:
                 beginTime = DateUtils.getCurrentWeekMorning();
                 break;
-            case Constants.TYPE_IS_VALID:
+            case Consts.TYPE_IS_VALID:
                 beginTime = 0;
                 break;
         }
@@ -139,13 +139,13 @@ public class RecordTask implements ITask {
     public long getPlanRecordEndTimeByType(int type) {
         long endTime = System.currentTimeMillis();
         switch (type) {
-            case Constants.DAY_TYPE:
+            case Consts.DAY_TYPE:
                 endTime = DateUtils.getTodayNight();
                 break;
-            case Constants.WEEK_TYPE:
+            case Consts.WEEK_TYPE:
                 endTime = DateUtils.getCurrentWeekNight();
                 break;
-            case Constants.TYPE_IS_VALID:
+            case Consts.TYPE_IS_VALID:
                 endTime = System.currentTimeMillis();
                 break;
         }
@@ -167,8 +167,8 @@ public class RecordTask implements ITask {
                 "beginTime," +
                 "endTime, " +
                 "recordState" +
-                " from " + Constants.RECORD_DETAIL_TABLE_NAME +
-                " inner join " + Constants.PLAN_DETAIL_TABLE_NAME +
+                " from " + Consts.RECORD_DETAIL_TABLE_NAME +
+                " inner join " + Consts.PLAN_DETAIL_TABLE_NAME +
                 " on RecordDetail.planId=PlanDetail.planId where beginTime> " + beginTime +
                 " and endTime< " + endTime +
                 " order by beginTime desc";
@@ -203,15 +203,15 @@ public class RecordTask implements ITask {
         long beginTime = 0;
         long endTime = System.currentTimeMillis();
         switch (type) {
-            case Constants.DAY_TYPE:
+            case Consts.DAY_TYPE:
                 beginTime = DateUtils.getTodayMorning();
                 endTime = DateUtils.getTodayNight();
                 break;
-            case Constants.MONTH_TYPE:
+            case Consts.MONTH_TYPE:
                 beginTime = DateUtils.getCurrentWeekMorning();
                 endTime = DateUtils.getCurrentWeekNight();
                 break;
-            case Constants.TYPE_IS_VALID:
+            case Consts.TYPE_IS_VALID:
                 beginTime = 0;
                 endTime = System.currentTimeMillis();
                 break;
@@ -228,8 +228,8 @@ public class RecordTask implements ITask {
                 "beginTime," +
                 "endTime, " +
                 "recordState" +
-                " from " + Constants.RECORD_DETAIL_TABLE_NAME +
-                " inner join " + Constants.PLAN_DETAIL_TABLE_NAME +
+                " from " + Consts.RECORD_DETAIL_TABLE_NAME +
+                " inner join " + Consts.PLAN_DETAIL_TABLE_NAME +
                 " on RecordDetail.planId=PlanDetail.planId where beginTime> " + beginTime +
                 " and endTime< " + endTime +
                 " order by beginTime desc";
@@ -259,22 +259,22 @@ public class RecordTask implements ITask {
         long beginTime = 0;
         long endTime = System.currentTimeMillis();
         switch (type) {
-            case Constants.DAY_TYPE:
+            case Consts.DAY_TYPE:
                 beginTime = DateUtils.getTodayMorning();
                 endTime = DateUtils.getTodayNight();
                 break;
-            case Constants.MONTH_TYPE:
+            case Consts.MONTH_TYPE:
                 beginTime = DateUtils.getCurrentWeekMorning();
                 endTime = DateUtils.getCurrentWeekNight();
                 break;
-            case Constants.TYPE_IS_VALID:
+            case Consts.TYPE_IS_VALID:
                 beginTime = 0;
                 endTime = System.currentTimeMillis();
                 break;
         }
         String sql = "select RecordDetail.planId,planName,planType,createTime,planPriority,planTime,planJoinParentId,planTag,sum(timeDuration) as sumTime " +
-                "from " + Constants.RECORD_DETAIL_TABLE_NAME +
-                " inner join " + Constants.PLAN_DETAIL_TABLE_NAME +
+                "from " + Consts.RECORD_DETAIL_TABLE_NAME +
+                " inner join " + Consts.PLAN_DETAIL_TABLE_NAME +
                 " on RecordDetail.planId=PlanDetail.planId where beginTime> " + beginTime +
                 " and endTime< " + endTime +
                 " group by RecordDetail.planId";
@@ -300,20 +300,20 @@ public class RecordTask implements ITask {
         long beginTime = 0;
         long endTime = System.currentTimeMillis();
         switch (type) {
-            case Constants.DAY_TYPE:
+            case Consts.DAY_TYPE:
                 beginTime = DateUtils.getTodayMorning();
                 endTime = DateUtils.getTodayNight();
                 break;
-            case Constants.MONTH_TYPE:
+            case Consts.MONTH_TYPE:
                 beginTime = DateUtils.getCurrentWeekMorning();
                 endTime = DateUtils.getCurrentWeekNight();
                 break;
-            case Constants.TYPE_IS_VALID:
+            case Consts.TYPE_IS_VALID:
                 beginTime = 0;
                 endTime = System.currentTimeMillis();
                 break;
         }
-        String sql = "select sum(timeDuration) from " + Constants.RECORD_DETAIL_TABLE_NAME +
+        String sql = "select sum(timeDuration) from " + Consts.RECORD_DETAIL_TABLE_NAME +
                 " where beginTime>" + beginTime +
                 " and endTime<" + endTime;
         Cursor cursor = TaskManager.getDbHelper().getWritableDatabase().rawQuery(sql, null);
@@ -324,7 +324,7 @@ public class RecordTask implements ITask {
     }
 
     public void deleteRecordInfoByPlanId(String planId) {
-        String deleteSql = "delete from " + Constants.RECORD_DETAIL_TABLE_NAME + " where " + Constants.PLAN_DETAIL_TABLE_COLUMN_PLAN_ID + "= '" + planId + "'";
+        String deleteSql = "delete from " + Consts.RECORD_DETAIL_TABLE_NAME + " where " + Consts.PLAN_DETAIL_TABLE_COLUMN_PLAN_ID + "= '" + planId + "'";
         TaskManager.getDbHelper().getWritableDatabase().execSQL(deleteSql);
     }
 

@@ -1,6 +1,6 @@
 package com.github.tinkerti.ziwu.ui.utils;
 
-import com.github.tinkerti.ziwu.data.Constants;
+import com.github.tinkerti.ziwu.data.Consts;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -166,16 +166,16 @@ public class DateUtils {
     public static long getStartTimeByType(int type, int count) {
         long time = 0;
         switch (type) {
-            case Constants.DAY_TYPE:
+            case Consts.DAY_TYPE:
                 time = getDayStartTime(count);
                 break;
-            case Constants.WEEK_TYPE:
+            case Consts.WEEK_TYPE:
                 time = getWeekStartTime(count);
                 break;
-            case Constants.MONTH_TYPE:
+            case Consts.MONTH_TYPE:
                 time = getMonthStartTime(count);
                 break;
-            case Constants.YEAR_TYPE:
+            case Consts.YEAR_TYPE:
                 time = getYearStartTime(count);
                 break;
         }
@@ -185,16 +185,16 @@ public class DateUtils {
     public static long getEndTimeByType(int type, int count) {
         long time = 0;
         switch (type) {
-            case Constants.DAY_TYPE:
+            case Consts.DAY_TYPE:
                 time = getDayEndTime(count);
                 break;
-            case Constants.WEEK_TYPE:
+            case Consts.WEEK_TYPE:
                 time = getWeekEndTime(count);
                 break;
-            case Constants.MONTH_TYPE:
+            case Consts.MONTH_TYPE:
                 time = getMonthEndTime(count);
                 break;
-            case Constants.YEAR_TYPE:
+            case Consts.YEAR_TYPE:
                 time = getYearEndTime(count);
                 break;
         }

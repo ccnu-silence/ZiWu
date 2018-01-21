@@ -4,7 +4,7 @@ package com.github.tinkerti.ziwu.data;
  * Created by tiankui on 4/9/17.
  */
 
-public class Constants {
+public class Consts {
 
     public static final int RENAME_PLAN=0;
     public static final int DELETE_PLAN=1;

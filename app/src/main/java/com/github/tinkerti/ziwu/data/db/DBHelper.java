@@ -5,7 +5,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import com.github.tinkerti.ziwu.AppContext;
-import com.github.tinkerti.ziwu.data.Constants;
+import com.github.tinkerti.ziwu.data.Consts;
 
 import java.io.File;
 
@@ -35,9 +35,9 @@ public class DBHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         //两个planTable,一个记录添加创建时候的表
         //一个记录创建完成的表；
-        db.execSQL(Constants.CREATE_ADD_PLAN_DETAIL_TABLE);
-        db.execSQL(Constants.CREATE_PLAN_DETAIL_TABLE);
-        db.execSQL(Constants.CREATE_RECORD_DETAIL_TABLE);
+        db.execSQL(Consts.CREATE_ADD_PLAN_DETAIL_TABLE);
+        db.execSQL(Consts.CREATE_PLAN_DETAIL_TABLE);
+        db.execSQL(Consts.CREATE_RECORD_DETAIL_TABLE);
     }
 
     @Override

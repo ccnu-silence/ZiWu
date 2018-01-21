@@ -17,4 +17,6 @@
 
     <color name="color_divider_line">#E5E5E5</color>
     <color name="record_time_recording_text">#FFD134</color>
+    <color name="color_transparent">@android:color/transparent</color>
+    <color name="divider_line">#E5E5E5</color>
 </resources>

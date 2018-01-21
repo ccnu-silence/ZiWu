@@ -19,7 +19,7 @@ import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
 import com.github.mikephil.charting.utils.ColorTemplate;
 import com.github.tinkerti.ziwu.R;
-import com.github.tinkerti.ziwu.data.Constants;
+import com.github.tinkerti.ziwu.data.Consts;
 import com.github.tinkerti.ziwu.data.RecordTask;
 import com.github.tinkerti.ziwu.data.model.PlanRecordInfo;
 import com.github.tinkerti.ziwu.ui.activity.ModifyRecordDetailActivity;
@@ -47,7 +47,7 @@ public class RecordFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        type = Constants.DAY_TYPE;
+        type = Consts.DAY_TYPE;
     }
 
     @Nullable
@@ -84,18 +84,18 @@ public class RecordFragment extends Fragment {
 
     public void selectPlanType(int recordType) {
         switch (recordType) {
-            case Constants.DAY_TYPE:
-                type = Constants.DAY_TYPE;
+            case Consts.DAY_TYPE:
+                type = Consts.DAY_TYPE;
                 planTypeTextView.setText(getString(R.string.plan_today));
                 drawRecordPieChart(type);
                 break;
-            case Constants.WEEK_TYPE:
-                type = Constants.WEEK_TYPE;
+            case Consts.WEEK_TYPE:
+                type = Consts.WEEK_TYPE;
                 planTypeTextView.setText(getString(R.string.plan_this_week));
                 drawRecordPieChart(type);
                 break;
-            case Constants.TYPE_IS_VALID:
-                type = Constants.TYPE_IS_VALID;
+            case Consts.TYPE_IS_VALID:
+                type = Consts.TYPE_IS_VALID;
                 planTypeTextView.setText(getString(R.string.plan_long_time));
                 drawRecordPieChart(type);
                 break;
@@ -140,7 +140,7 @@ public class RecordFragment extends Fragment {
             itemModel.setRecordId(planRecordInfo.getRecordId());
             itemModelList.add(itemModel);
         }
-        currentDateTime = currentDateTime - (long) Constants.ONE_DAY_TOTAL_MILLI_SECS;
+        currentDateTime = currentDateTime - (long) Consts.ONE_DAY_TOTAL_MILLI_SECS;
         recordListAdapter.setModelList(itemModelList);
     }
 

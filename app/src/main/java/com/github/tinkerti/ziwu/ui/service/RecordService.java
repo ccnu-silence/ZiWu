@@ -14,7 +14,7 @@ import android.support.annotation.Nullable;
 import android.widget.RemoteViews;
 
 import com.github.tinkerti.ziwu.R;
-import com.github.tinkerti.ziwu.data.Constants;
+import com.github.tinkerti.ziwu.data.Consts;
 import com.github.tinkerti.ziwu.data.RecordTask;
 import com.github.tinkerti.ziwu.data.model.NotificationInfo;
 import com.github.tinkerti.ziwu.data.model.PlanRecordInfo;
@@ -28,7 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
-import static com.github.tinkerti.ziwu.data.Constants.SERVICE_RECORDING_PLAN_INFO_LIST;
+import static com.github.tinkerti.ziwu.data.Consts.SERVICE_RECORDING_PLAN_INFO_LIST;
 
 /**
  * Created by tiankui on 4/30/17.
@@ -57,7 +57,7 @@ public class RecordService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent != null) {
-            List<PlanRecordInfo> recordInfoList = intent.getParcelableArrayListExtra(Constants.SERVICE_RECORDING_PLAN_INFO_LIST);
+            List<PlanRecordInfo> recordInfoList = intent.getParcelableArrayListExtra(Consts.SERVICE_RECORDING_PLAN_INFO_LIST);
             if (recordInfoList != null) {
                 for (PlanRecordInfo info : recordInfoList) {
                     recordInfoHashMap.put(info.getPlanId(), info);
@@ -101,7 +101,7 @@ public class RecordService extends Service {
                         }
                     }
                     ZLog.d(TAG, recordInfo.getPlanName() + "(runnable)" + this + " time duration:" + recordInfo.getTimeDuration());
-                    recordInfo.setRecordState(Constants.RECORD_STATE_RECORDING);
+                    recordInfo.setRecordState(Consts.RECORD_STATE_RECORDING);
                     handler.postDelayed(this, 1000);
                     recordInfo.setRecordTimeRunnable(this);
                 }
@@ -109,7 +109,7 @@ public class RecordService extends Service {
             handler.postDelayed(startRecordRunnable, 1000);
             recordInfo.setStartTime(System.currentTimeMillis());
             recordInfo.setRecordId(UUID.randomUUID().toString());
-            recordInfo.setRecordState(Constants.RECORD_STATE_RECORDING);
+            recordInfo.setRecordState(Consts.RECORD_STATE_RECORDING);
             recordInfo.setEndTime(System.currentTimeMillis());
             recordInfo.setRealRecordTime(0);
             RecordTask.getInstance().addPlanRecord(recordInfo);
@@ -133,7 +133,7 @@ public class RecordService extends Service {
         ZLog.d(TAG, "show notification");
         RemoteViews notificationView = new RemoteViews(getPackageName(), R.layout.notification_content_view);
         Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), Constants.NOTIFICATION_START_ACTIVITY, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), Consts.NOTIFICATION_START_ACTIVITY, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         Notification notification = new Notification.Builder(getApplicationContext())
                 .setSmallIcon(R.mipmap.notification_icon)
                 .setContent(notificationView)
@@ -159,7 +159,7 @@ public class RecordService extends Service {
 //        for(PlanRecordInfo recordInfo:recordInfoArrayList){
 //            recordInfo.setEndTime(System.currentTimeMillis());
 //            recordInfo.setRealRecordTime(recordInfo.getEndTime() - recordInfo.getStartTime());
-//            recordInfo.setRecordState(Constants.RECORD_STATE_STOP);
+//            recordInfo.setRecordState(Consts.RECORD_STATE_STOP);
 //            RecordTask.getInstance().updatePlanRecord(recordInfo);
 //        }
     }

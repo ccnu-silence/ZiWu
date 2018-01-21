@@ -17,7 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.github.tinkerti.ziwu.R;
-import com.github.tinkerti.ziwu.data.Constants;
+import com.github.tinkerti.ziwu.data.Consts;
 import com.github.tinkerti.ziwu.data.PlanTask;
 import com.github.tinkerti.ziwu.data.RecordTask;
 import com.github.tinkerti.ziwu.data.model.PlanDetailInfo;
@@ -30,11 +30,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-
-/**
- * Created by tiankui on 4/9/17.
- */
 
 public class TaskFragment extends Fragment {
     private static final String TAG = "TaskFragment";
@@ -62,7 +57,7 @@ public class TaskFragment extends Fragment {
         ZLog.d(TAG, "onCreateView");
         View view = inflater.inflate(R.layout.fragment_plan_list, container, false);
         recyclerView = (RecyclerView) view.findViewById(R.id.fr_rv_plan_summary_list);
-        types = new int[]{Constants.TYPE_IS_VALID};
+        types = new int[]{Consts.TYPE_IS_VALID};
         //从数据库中查询今天的计划清单
         //周计划列表
         //从数据库中查询本周的计划清单
@@ -76,9 +71,6 @@ public class TaskFragment extends Fragment {
     private void getPlanListByType(int[] types) {
         List<TaskListAdapter.ItemModel> itemModelList = new ArrayList<>();
         for (int type : types) {
-//            TaskListAdapter.PlanCategoryModel planCategoryModel = new TaskListAdapter.PlanCategoryModel();
-//            planCategoryModel.setPlanType(type);  //根据类型来显示；
-//            itemModelList.add(planCategoryModel);
             //todo:需要查询recordInfo的状态，查询出record_state 为recording的计划，再次启动界面之后需要恢复计时状态
             List<PlanDetailInfo> planList = PlanTask.getInstance().getPlanDetailInfoByType(type);
             if (planList.size() > 0) {
@@ -145,7 +137,7 @@ public class TaskFragment extends Fragment {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == Constants.ADD_PLAN_REQUEST) {
+        if (requestCode == Consts.ADD_PLAN_REQUEST) {
 
         }
     }

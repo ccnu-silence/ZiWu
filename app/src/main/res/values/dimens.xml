@@ -19,6 +19,7 @@
     <dimen name="dimen_dp_48">48dp</dimen>
     <dimen name="dimen_dp_50">50dp</dimen>
     <dimen name="dimen_dp_60">60dp</dimen>
+    <dimen name="dimen_dp_120">120dp</dimen>
 
     <dimen name="text_size_sp_10">10sp</dimen>
     <dimen name="text_size_sp_11">11sp</dimen>
