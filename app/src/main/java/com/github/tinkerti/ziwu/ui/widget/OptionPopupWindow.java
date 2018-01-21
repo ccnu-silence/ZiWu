@@ -7,7 +7,7 @@ import android.view.View;
 import android.widget.PopupWindow;
 
 import com.github.tinkerti.ziwu.R;
-import com.github.tinkerti.ziwu.ui.activity.AddPlanDetailActivity;
+import com.github.tinkerti.ziwu.ui.activity.AddTaskActivity;
 
 /**
  * Created by tiankui on 1/20/18.
@@ -23,7 +23,7 @@ public class OptionPopupWindow extends PopupWindow {
         content.findViewById(R.id.omi_add_new_task).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(context, AddPlanDetailActivity.class);
+                Intent intent = new Intent(context, AddTaskActivity.class);
                 context.startActivity(intent);
                 dismiss();
             }

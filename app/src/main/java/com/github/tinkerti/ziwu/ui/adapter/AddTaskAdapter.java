@@ -13,7 +13,7 @@ import com.github.tinkerti.ziwu.R;
 import com.github.tinkerti.ziwu.data.Consts;
 import com.github.tinkerti.ziwu.data.PlanTask;
 import com.github.tinkerti.ziwu.data.model.AddPlanDetailInfo;
-import com.github.tinkerti.ziwu.ui.activity.AddPlanDetailActivity;
+import com.github.tinkerti.ziwu.ui.activity.AddTaskActivity;
 import com.github.tinkerti.ziwu.ui.widget.AddTaskItemLayout;
 
 import java.util.ArrayList;
@@ -24,13 +24,13 @@ import java.util.UUID;
  * Created by tiankui on 4/12/17.
  */
 
-public class AddPlanAdapter extends RecyclerView.Adapter {
+public class AddTaskAdapter extends RecyclerView.Adapter {
 
     private static final int MODEL_ADD_TASK_ITEM = 4;
     private ArrayList<ItemModel> modelList;
     private Activity activity;
 
-    public AddPlanAdapter(Activity activity) {
+    public AddTaskAdapter(Activity activity) {
         modelList = new ArrayList<>();
         this.activity = activity;
     }
@@ -97,9 +97,9 @@ public class AddPlanAdapter extends RecyclerView.Adapter {
         @Override
         public void update(int position) {
             final AddTaskItemModel model = (AddTaskItemModel) modelList.get(position);
-            if (activity instanceof AddPlanDetailActivity) {
-                AddPlanDetailActivity addPlanDetailActivity = (AddPlanDetailActivity) activity;
-                addPlanDetailActivity.setSaveTaskInfoListener(new AddPlanDetailActivity.SaveTaskInfoListener() {
+            if (activity instanceof AddTaskActivity) {
+                AddTaskActivity addTaskActivity = (AddTaskActivity) activity;
+                addTaskActivity.setSaveTaskInfoListener(new AddTaskActivity.SaveTaskInfoListener() {
                     @Override
                     public void saveTaskInfo() {
                         AddPlanDetailInfo addPlanDetailInfo = new AddPlanDetailInfo();

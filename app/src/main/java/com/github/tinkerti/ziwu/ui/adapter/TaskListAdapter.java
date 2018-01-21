@@ -18,7 +18,7 @@ import com.github.tinkerti.ziwu.data.PlanTask;
 import com.github.tinkerti.ziwu.data.RecordTask;
 import com.github.tinkerti.ziwu.data.model.PlanDetailInfo;
 import com.github.tinkerti.ziwu.data.model.PlanRecordInfo;
-import com.github.tinkerti.ziwu.ui.activity.AddPlanDetailActivity;
+import com.github.tinkerti.ziwu.ui.activity.AddTaskActivity;
 import com.github.tinkerti.ziwu.ui.service.RecordService;
 import com.github.tinkerti.ziwu.ui.utils.FormatTime;
 import com.github.tinkerti.ziwu.ui.utils.ZLog;
@@ -169,8 +169,6 @@ public class TaskListAdapter extends RecyclerView.Adapter {
             long totalTime = RecordTask.getInstance().getPlanTotalRecordedTime(recordInfo, planSummaryModel.getPlanType());
             recordInfo.setTotalRecordTime(totalTime);
             ZLog.d(TAG, planSummaryModel.getPlanName() + " totalTime:" + totalTime);
-            //之所以要加上timeDuration是因为，退出界面在现实的时候会出现时间跳动，因为部分正在计时着的时间实际上没有计入到数据库中；
-//            expandedRecordingTimeView.setText(getColoredString(context, planSummaryModel.getPlanName(), recordInfo.getTotalRecordTime() + recordInfo.getTimeDuration()));
             ZLog.d(TAG, planSummaryModel.getPlanName() + " detail record time:" + (recordInfo.getTotalRecordTime() + recordInfo.getTimeDuration()) + "| time duration this time:" + recordInfo.getTimeDuration());
 
             //这个地方有点问题，需要优化下，这样做没有多大必要；
@@ -181,7 +179,6 @@ public class TaskListAdapter extends RecyclerView.Adapter {
                         recordingTimeTextView.setText(FormatTime.calculateTimeString(recordInfo.getTimeDuration()));
                         expandedRecordingTimeView.setText(FormatTime.calculateTimeString(recordInfo.getTimeDuration()));
                         ZLog.d(TAG, planSummaryModel.getPlanName() + " (runnable)" + this + " recording time:" + FormatTime.calculateTimeString(recordInfo.getTimeDuration()));
-//                        expandedRecordingTimeView.setText(getColoredString(context, planSummaryModel.getPlanName(), recordInfo.getTotalRecordTime() + recordInfo.getTimeDuration()));
                         ZLog.d(TAG, planSummaryModel.getPlanName() + " (runnable)" + this + " detail record time:" + (recordInfo.getTotalRecordTime() + recordInfo.getTimeDuration()));
                     }
                     handler.postDelayed(this, 1000);
@@ -241,11 +238,15 @@ public class TaskListAdapter extends RecyclerView.Adapter {
                             recordInfo.setTimeDuration(0);//为了解决，锁屏之后，结束计时，然后再开始计时，记录详情时间记录问题；
                             binder.startRecord(recordInfo);
                             handler.postDelayed(recordInfo.getRefreshUiRunnable(), 1000);//点击开始更新计时view；
+                            startButton.setImageDrawable(planSummaryView.getContext().getResources().getDrawable(R.mipmap.pause_record_icon));
+                        } else if (recordInfo.getRecordState() == Consts.RECORD_STATE_PAUSE) {
+
+                        } else if (recordInfo.getRecordState() == Consts.RECORD_STATE_RECORDING) {
+                            startButton.setImageDrawable(planSummaryView.getContext().getResources().getDrawable(R.mipmap.start_button));
+                            binder.pauseRecord(recordInfo);
                         }
                         expandedRecordingTimeView.setVisibility(View.VISIBLE);
                         expandedRecordingTimeView.setText(FormatTime.calculateTimeString(recordInfo.getTimeDuration()));
-
-
                     }
                 }
             });
@@ -371,7 +372,7 @@ public class TaskListAdapter extends RecyclerView.Adapter {
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent intent = new Intent(itemView.getContext(), AddPlanDetailActivity.class);
+                    Intent intent = new Intent(itemView.getContext(), AddTaskActivity.class);
                     intent.putExtra("type", noPlanModel.getNoPlanType());
                     itemView.getContext().startActivity(intent);
                 }

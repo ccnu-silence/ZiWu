@@ -11,19 +11,15 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.github.tinkerti.ziwu.R;
-import com.github.tinkerti.ziwu.ui.adapter.AddPlanAdapter;
+import com.github.tinkerti.ziwu.ui.adapter.AddTaskAdapter;
 
 import java.util.ArrayList;
 
-/**
- * Created by tiankui on 4/9/17.
- */
+public class AddTaskActivity extends BaseActivity {
 
-public class AddPlanDetailActivity extends BaseActivity {
-
-    RecyclerView addPlanRecyclerView;
+    RecyclerView addTaskRecyclerView;
     private int type;
-    private AddPlanAdapter addPlanAdapter;
+    private AddTaskAdapter addTaskAdapter;
 
     public void setSaveTaskInfoListener(SaveTaskInfoListener saveTaskInfoListener) {
         this.saveTaskInfoListener = saveTaskInfoListener;
@@ -36,14 +32,14 @@ public class AddPlanDetailActivity extends BaseActivity {
         type = getIntent().getIntExtra("type", -1);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_plan_detail);
-        addPlanRecyclerView = findViewById(R.id.ac_rv_add_plan_detail);
-        addPlanRecyclerView.setLayoutManager(new LinearLayoutManager(getBaseContext()));
-        addPlanAdapter = new AddPlanAdapter(this);
-        ArrayList<AddPlanAdapter.ItemModel> modelList = new ArrayList<>();
-        AddPlanAdapter.AddTaskItemModel addTaskItemModel = new AddPlanAdapter.AddTaskItemModel();
+        addTaskRecyclerView = findViewById(R.id.ac_rv_add_plan_detail);
+        addTaskRecyclerView.setLayoutManager(new LinearLayoutManager(getBaseContext()));
+        addTaskAdapter = new AddTaskAdapter(this);
+        ArrayList<AddTaskAdapter.ItemModel> modelList = new ArrayList<>();
+        AddTaskAdapter.AddTaskItemModel addTaskItemModel = new AddTaskAdapter.AddTaskItemModel();
         modelList.add(addTaskItemModel);
-        addPlanAdapter.setModelList(modelList);
-        addPlanRecyclerView.setAdapter(addPlanAdapter);
+        addTaskAdapter.setModelList(modelList);
+        addTaskRecyclerView.setAdapter(addTaskAdapter);
     }
 
     @Override

@@ -115,6 +115,10 @@ public class RecordService extends Service {
             RecordTask.getInstance().addPlanRecord(recordInfo);
         }
 
+        public void pauseRecord(PlanRecordInfo recordInfo){
+
+        }
+
         public void stopRecord(PlanRecordInfo recordInfo) {
             ZLog.d(TAG, "stop record:" + recordInfo.getPlanName());
             handler.removeCallbacks(recordInfo.getRecordTimeRunnable());
