@@ -19,6 +19,8 @@ import android.view.ViewGroup;
 import com.github.tinkerti.ziwu.R;
 import com.github.tinkerti.ziwu.data.Consts;
 import com.github.tinkerti.ziwu.data.PlanTask;
+import com.github.tinkerti.ziwu.data.RecordTask;
+import com.github.tinkerti.ziwu.data.SimpleResultCallback;
 import com.github.tinkerti.ziwu.data.model.PlanDetailInfo;
 import com.github.tinkerti.ziwu.data.model.TaskRecordInfo;
 import com.github.tinkerti.ziwu.ui.adapter.TaskListAdapter;
@@ -64,25 +66,35 @@ public class TaskFragment extends Fragment {
     }
 
     private void getPlanListByType(int[] types) {
-        List<TaskListAdapter.ItemModel> itemModelList = new ArrayList<>();
-        for (int type : types) {
+        final List<TaskListAdapter.ItemModel> itemModelList = new ArrayList<>();
+        for (final int type : types) {
             //todo:需要查询recordInfo的状态，查询出record_state 为recording的计划，再次启动界面之后需要恢复计时状态
             List<PlanDetailInfo> planList = PlanTask.getInstance().getPlanDetailInfoByType(type);
             if (planList.size() > 0) {
-                for (PlanDetailInfo planDetailInfo : planList) {
-                    TaskListAdapter.PlanSummaryModel planSummaryModel = new TaskListAdapter.PlanSummaryModel();
+                for (final PlanDetailInfo planDetailInfo : planList) {
+                    final TaskListAdapter.PlanSummaryModel planSummaryModel = new TaskListAdapter.PlanSummaryModel();
                     //从数据库中查询该任务最后一条记录的状态，若是RECORD_STATE_PAUSE，那么需要加上前面连续都是RECORD_STATE_PAUSE的时间
+                    RecordTask.getInstance().getRecordTime(planDetailInfo.getPlanId(), new SimpleResultCallback<Long>() {
+                        @Override
+                        protected void onSuccessOnUIThread(Long time) {
+                            TaskRecordInfo taskRecordInfo = planRecordInfoMap.get(planDetailInfo.getPlanId());
+                            if (taskRecordInfo == null) {
+                                taskRecordInfo = new TaskRecordInfo();
+                                planRecordInfoMap.put(planDetailInfo.getPlanId(), taskRecordInfo);
+                            }
+                            taskRecordInfo.setTimeDuration(time);
+                            planSummaryModel.setPlanName(planDetailInfo.getPlanName());
+                            planSummaryModel.setPlanId(planDetailInfo.getPlanId());
+                            planSummaryModel.setRecordInfo(taskRecordInfo);
+                            planSummaryModel.setPlanType(type);
+                            itemModelList.add(planSummaryModel);
 
-                    TaskRecordInfo taskRecordInfo = planRecordInfoMap.get(planDetailInfo.getPlanId());
-                    if (taskRecordInfo == null) {
-                        taskRecordInfo = new TaskRecordInfo();
-                        planRecordInfoMap.put(planDetailInfo.getPlanId(), taskRecordInfo);
-                    }
-                    planSummaryModel.setPlanName(planDetailInfo.getPlanName());
-                    planSummaryModel.setPlanId(planDetailInfo.getPlanId());
-                    planSummaryModel.setRecordInfo(taskRecordInfo);
-                    planSummaryModel.setPlanType(type);
-                    itemModelList.add(planSummaryModel);
+                            //setModelList()中没有进行notifyDateSetChanged的原因，是因为着这样做的话计时会有问题
+                            taskListAdapter.setModelList(itemModelList);
+                            //加上这一句代码，来刷新ui，否则的话，第一次进入app，添加计划，planList界面不刷新；
+                            recyclerView.setAdapter(taskListAdapter);
+                        }
+                    });
                 }
             } else {
                 //展示暂无计划

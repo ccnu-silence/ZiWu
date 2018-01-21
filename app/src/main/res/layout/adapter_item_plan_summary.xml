@@ -52,27 +52,42 @@
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_marginLeft="@dimen/dimen_dp_25"
-            android:visibility="gone"
             android:textColor="@color/record_time_recording_text"
-            android:textSize="@dimen/text_size_sp_18" />
+            android:textSize="@dimen/text_size_sp_18"
+            android:visibility="gone" />
 
-        <ImageView
-            android:id="@+id/iv_record_stop"
-            android:layout_width="@dimen/dimen_dp_18"
-            android:layout_height="@dimen/dimen_dp_18"
+        <FrameLayout
+            android:id="@+id/fl_stop_button_container"
+            android:layout_width="@dimen/dimen_dp_40"
+            android:layout_height="match_parent"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
-            android:layout_marginRight="@dimen/dimen_dp_50"
-            android:src="@mipmap/stop_button" />
+            android:layout_marginRight="@dimen/dimen_dp_50">
 
-        <ImageView
-            android:id="@+id/iv_record_start_or_pause"
-            android:layout_width="@dimen/dimen_dp_18"
-            android:layout_height="@dimen/dimen_dp_18"
+            <ImageView
+                android:id="@+id/iv_record_stop"
+                android:layout_width="@dimen/dimen_dp_18"
+                android:layout_height="@dimen/dimen_dp_18"
+                android:layout_gravity="center"
+                android:src="@mipmap/stop_button" />
+        </FrameLayout>
+
+
+        <FrameLayout
+            android:id="@+id/fl_start_button_container"
+            android:layout_width="@dimen/dimen_dp_40"
+            android:layout_height="match_parent"
             android:layout_centerVertical="true"
             android:layout_marginRight="@dimen/dimen_dp_40"
-            android:layout_toLeftOf="@id/iv_record_stop"
-            android:src="@mipmap/start_button" />
+            android:layout_toLeftOf="@id/fl_stop_button_container">
+
+            <ImageView
+                android:id="@+id/iv_record_start_or_pause"
+                android:layout_width="@dimen/dimen_dp_18"
+                android:layout_height="@dimen/dimen_dp_18"
+                android:layout_gravity="center"
+                android:src="@mipmap/start_button" />
+        </FrameLayout>
 
         <View
             android:layout_width="match_parent"

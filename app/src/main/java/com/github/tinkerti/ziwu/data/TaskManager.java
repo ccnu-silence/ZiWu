@@ -33,6 +33,7 @@ public class TaskManager {
         uiHandler = new Handler(Looper.getMainLooper());
         taskList = new ArrayList<>();
         taskList.add(new RecordTask());
+        taskList.add(new PlanTask());
         for (ITask task : taskList) {
             task.onInit(this);
         }

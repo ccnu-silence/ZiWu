@@ -8,6 +8,7 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -130,6 +131,8 @@ public class TaskListAdapter extends RecyclerView.Adapter {
         private ImageView stopButton;
         private Context context;
         private ImageView arrowImageView;
+        private FrameLayout startContainer;
+        private FrameLayout stopContainer;
 
 
         public PlanSummaryItemViewHolder(View itemView) {
@@ -140,6 +143,8 @@ public class TaskListAdapter extends RecyclerView.Adapter {
             planSummaryView = itemView.findViewById(R.id.ad_rl_plan_summary_view);
             expandedRecordingTimeView = itemView.findViewById(R.id.ad_tv_plan_recorded_time);
             arrowImageView = itemView.findViewById(R.id.iv_expand_arrow);
+            startContainer = itemView.findViewById(R.id.fl_start_button_container);
+            stopContainer = itemView.findViewById(R.id.fl_stop_button_container);
             startButton = itemView.findViewById(R.id.iv_record_start_or_pause);
             stopButton = itemView.findViewById(R.id.iv_record_stop);
             context = itemView.getContext();
@@ -156,8 +161,7 @@ public class TaskListAdapter extends RecyclerView.Adapter {
 
             //planRecordInfo对象，用来保存计划进行时间
             final TaskRecordInfo recordInfo = planSummaryModel.getRecordInfo();
-            if ((recordInfo.getRecordState() == Consts.RECORD_STATE_RECORDING
-                    || recordInfo.getRecordState() == Consts.RECORD_STATE_PAUSE)) {
+            if (recordInfo.getRecordState() == Consts.RECORD_STATE_PAUSE) {
                 if (recordInfo.isExpand()) {
                     expandedRecordingTimeView.setVisibility(View.VISIBLE);
                     recordingTimeTextView.setVisibility(View.GONE);
@@ -174,10 +178,12 @@ public class TaskListAdapter extends RecyclerView.Adapter {
             recordContainer.setVisibility(recordInfo.isExpand() ? View.VISIBLE : View.GONE);
 
             //这个地方有点问题，需要优化下，这样做没有多大必要；
-            Runnable recordRunnable = new Runnable() {
+            final Runnable recordRunnable = new Runnable() {
                 @Override
                 public void run() {
                     if (recordInfo != null) {
+                        expandedRecordingTimeView.setVisibility(recordInfo.isExpand() ? View.VISIBLE : View.GONE);
+                        recordingTimeTextView.setVisibility(recordInfo.isExpand() ? View.GONE : View.VISIBLE);
                         recordingTimeTextView.setText(FormatTime.calculateTimeString(recordInfo.getTimeDuration()));
                         expandedRecordingTimeView.setText(FormatTime.calculateTimeString(recordInfo.getTimeDuration()));
                         ZLog.d(TAG, planSummaryModel.getPlanName() + " (runnable)" + this + " recording time:" + FormatTime.calculateTimeString(recordInfo.getTimeDuration()));
@@ -229,13 +235,16 @@ public class TaskListAdapter extends RecyclerView.Adapter {
             });
 
             //点击开始计时，如果处于计时进行中的状态，点击暂停计时
-            startButton.setOnClickListener(new View.OnClickListener() {
+            startContainer.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     if (binder != null) {
-                        if (recordInfo.getRecordState() == Consts.RECORD_STATE_STOP
-                                || recordInfo.getRecordState() == Consts.RECORD_STATE_PAUSE) {
+                        if (recordInfo.getRecordState() == Consts.RECORD_STATE_STOP) {
                             recordInfo.setTimeDuration(0);//为了解决，锁屏之后，结束计时，然后再开始计时，记录详情时间记录问题；
+                            binder.startNewRecord(recordInfo);
+                            handler.postDelayed(recordInfo.getRefreshUiRunnable(), 1000);//点击开始更新计时view；
+                            startButton.setImageDrawable(planSummaryView.getContext().getResources().getDrawable(R.mipmap.pause_record_icon));
+                        } else if (recordInfo.getRecordState() == Consts.RECORD_STATE_PAUSE) {
                             binder.startNewRecord(recordInfo);
                             handler.postDelayed(recordInfo.getRefreshUiRunnable(), 1000);//点击开始更新计时view；
                             startButton.setImageDrawable(planSummaryView.getContext().getResources().getDrawable(R.mipmap.pause_record_icon));
@@ -251,12 +260,13 @@ public class TaskListAdapter extends RecyclerView.Adapter {
             });
 
             //点击结束计时
-            stopButton.setOnClickListener(new View.OnClickListener() {
+            stopContainer.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     if (binder != null) {
                         //需要判断下记录状态，否则的话，点击stopButton会一致进行增加计时的操作；
-                        if (recordInfo.getRecordState() == Consts.RECORD_STATE_RECORDING) {
+                        if (recordInfo.getRecordState() == Consts.RECORD_STATE_RECORDING
+                                || recordInfo.getRecordState() == Consts.RECORD_STATE_PAUSE) {
                             binder.stopRecord(recordInfo, false);
                             handler.removeCallbacks(recordInfo.getRefreshUiRunnable());
                         }

@@ -19,8 +19,8 @@ public class PlanTask extends ITask {
     }
 
     @Override
-    void onInit(TaskManager taskManager) {
-        this.taskManager = taskManager;
+    protected void onInit(TaskManager taskManager) {
+        super.onInit(taskManager);
     }
 
     @Override

@@ -124,7 +124,9 @@ public class RecordService extends Service {
             ZLog.d(TAG, "stop record:" + recordInfo.getPlanName());
             handler.removeCallbacks(recordInfo.getRecordTimeRunnable());
             ZLog.d(TAG, "remove runnable " + recordInfo.getRecordTimeRunnable());
-            recordInfo.setTimeDuration(0l);
+            if (!isPause) {
+                recordInfo.setTimeDuration(0l);
+            }
             NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
             if (recordInfo.getNotificationInfo() != null) {
                 notificationManager.cancel(recordInfo.getNotificationInfo().getId());

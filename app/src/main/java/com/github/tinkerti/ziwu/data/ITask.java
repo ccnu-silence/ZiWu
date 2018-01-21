@@ -10,7 +10,9 @@ public abstract class ITask {
     /**
      * 初始化
      */
-    abstract void onInit(TaskManager taskManager);
+    protected void onInit(TaskManager taskManager) {
+        this.taskManager = taskManager;
+    }
 
     abstract void onLoginSuccess();
 

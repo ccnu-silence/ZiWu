@@ -24,8 +24,8 @@ public class RecordTask extends ITask {
 
 
     @Override
-    void onInit(TaskManager taskManager) {
-        this.taskManager = taskManager;
+    protected void onInit(TaskManager taskManager) {
+        super.onInit(taskManager);
     }
 
     @Override
@@ -212,30 +212,77 @@ public class RecordTask extends ITask {
         String deleteSql = "delete from " + Consts.TABLE_NAME_RECORD_DETAIL + " where " + Consts.PLAN_DETAIL_TABLE_COLUMN_PLAN_ID + "= '" + planId + "'";
         TaskManager.getDbHelper().getWritableDatabase().execSQL(deleteSql);
     }
-    
-    public void getLatestOneRecordInfo(final String planId, final SimpleResultCallback<List<TaskRecordInfo>> callback) {
+
+    public void getRecordTime(final String planId, final SimpleResultCallback<Long> callback) {
         if (TextUtils.isEmpty(planId)) {
             return;
         }
-        taskManager.getWorkHandler().post(new Runnable() {
+        TaskManager.getInstance().getInstance().getWorkHandler().post(new Runnable() {
             @Override
             public void run() {
-                List<TaskRecordInfo> recordInfoList = getLatestOneRecordInfoFromDb(planId);
-                callback.onSuccess(recordInfoList);
+                TaskRecordInfo taskRecordInfo = getLatestRecordInfoFromDb(planId);
+                TaskRecordInfo stopRecordInfo = getLatestRecordInStopStateFromDb(planId);
+                long timeDuration = 0;
+                if (taskRecordInfo.getRecordId() == null
+                        || taskRecordInfo.getRecordId() == null) {
+                    callback.onSuccess(timeDuration);
+                    return;
+                }
+                if (!taskRecordInfo.getRecordId().equals(stopRecordInfo.getRecordId())) {
+                    timeDuration = getRecordDurationFromDb(planId, stopRecordInfo.getBeginTime(), taskRecordInfo.getBeginTime());
+                }
+                callback.onSuccess(timeDuration);
             }
         });
     }
 
-    public List<TaskRecordInfo> getLatestOneRecordInfoFromDb(String planId) {
-        List<TaskRecordInfo> recordInfoList = new ArrayList<>();
-        String sql = "select recordId, max(beginTime) from "
-                + Consts.TABLE_NAME_RECORD_DETAIL + " where planId = '" + planId + "'";
-        Cursor cursor = taskManager.getDb().rawQuery(sql, null);
+    public long getRecordDurationFromDb(String planId, long begin, long stop) {
+        String sql = "select sum(timeDuration) from " + Consts.TABLE_NAME_RECORD_DETAIL
+                + " where planId = '" + planId + "' and beginTime > " + begin + " and beginTime <= " + stop;
+        Cursor cursor = TaskManager.getInstance().getDb().rawQuery(sql, null);
+        long timeDuration = 0;
         while (cursor.moveToNext()) {
-            TaskRecordInfo recordInfo = new TaskRecordInfo();
+            timeDuration = cursor.getLong(0);
+        }
+        return timeDuration;
+    }
+
+    public TaskRecordInfo getLatestRecordInStopStateFromDb(String planId) {
+        String sql = "select recordId, max(beginTime), recordState from "
+                + Consts.TABLE_NAME_RECORD_DETAIL + " where planId = '" + planId + "' and recordState = " + Consts.RECORD_STATE_STOP;
+        TaskRecordInfo recordInfo = new TaskRecordInfo();
+        Cursor cursor = TaskManager.getInstance().getDb().rawQuery(sql, null);
+        while (cursor.moveToNext()) {
             recordInfo.setRecordId(cursor.getString(0));
             recordInfo.setBeginTime(cursor.getLong(1));
+            recordInfo.setRecordState(cursor.getInt(2));
         }
-        return recordInfoList;
+        return recordInfo;
+    }
+
+    public void getLatestOneRecordInfo(final String planId, final SimpleResultCallback<TaskRecordInfo> callback) {
+        if (TextUtils.isEmpty(planId)) {
+            return;
+        }
+        TaskManager.getInstance().getWorkHandler().post(new Runnable() {
+            @Override
+            public void run() {
+                TaskRecordInfo recordInfo = getLatestRecordInfoFromDb(planId);
+                callback.onSuccess(recordInfo);
+            }
+        });
+    }
+
+    public TaskRecordInfo getLatestRecordInfoFromDb(String planId) {
+        TaskRecordInfo recordInfo = new TaskRecordInfo();
+        String sql = "select recordId, max(beginTime), recordState from "
+                + Consts.TABLE_NAME_RECORD_DETAIL + " where planId = '" + planId + "'";
+        Cursor cursor = TaskManager.getInstance().getDb().rawQuery(sql, null);
+        while (cursor.moveToNext()) {
+            recordInfo.setRecordId(cursor.getString(0));
+            recordInfo.setBeginTime(cursor.getLong(1));
+            recordInfo.setRecordState(cursor.getInt(2));
+        }
+        return recordInfo;
     }
 }
