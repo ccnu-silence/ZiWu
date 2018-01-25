@@ -11,7 +11,6 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import com.github.tinkerti.ziwu.R;
-import com.github.tinkerti.ziwu.data.Consts;
 import com.github.tinkerti.ziwu.ui.fragment.RecordFragment;
 
 /**
@@ -37,7 +36,6 @@ public class SelectPlanTypePopupWindow extends PopupWindow {
             @Override
             public void onClick(View v) {
                 if (recordFragment != null) {
-                    recordFragment.selectPlanType(Consts.DAY_TYPE);
                 }
                 dismiss();
             }
@@ -46,7 +44,6 @@ public class SelectPlanTypePopupWindow extends PopupWindow {
             @Override
             public void onClick(View v) {
                 if (recordFragment != null) {
-                    recordFragment.selectPlanType(Consts.WEEK_TYPE);
                 }
                 dismiss();
             }
@@ -54,8 +51,7 @@ public class SelectPlanTypePopupWindow extends PopupWindow {
         longTermPlanView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(recordFragment!=null){
-                    recordFragment.selectPlanType(Consts.TYPE_IS_VALID);
+                if (recordFragment != null) {
                 }
                 dismiss();
             }
@@ -70,7 +66,7 @@ public class SelectPlanTypePopupWindow extends PopupWindow {
         update();
     }
 
-    public void  showPopupWindow(View anchor){
+    public void showPopupWindow(View anchor) {
         if (!isShowing()) {
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
                 showAsDropDown(anchor, -60, 10);

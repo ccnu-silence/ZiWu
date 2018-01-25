@@ -2,10 +2,14 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="30dp"
-    android:orientation="vertical">
+    android:background="@color/fr_record_month_title_background_color">
 
     <TextView
         android:id="@+id/tv_record_list_item_title"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_marginLeft="@dimen/dimen_dp_25"
+        android:textColor="@color/blackColor"
+        android:textSize="@dimen/text_size_sp_16" />
 </LinearLayout>

@@ -6,6 +6,8 @@ package com.github.tinkerti.ziwu.data;
 
 public class Consts {
 
+    public static final int TYPE_ALL=1001;
+
     public static final int RENAME_PLAN = 0;
     public static final int DELETE_PLAN = 1;
     public static final int TRANSFER_PLAN = 2;
@@ -16,6 +18,18 @@ public class Consts {
     public static final int MONTH_TYPE = 2;
     public static final int YEAR_TYPE = 3;
     public static final int TYPE_IS_VALID = 4;
+    public static final int NOTIFICATION_START_ACTIVITY = 11;
+    public static final int RECORD_STATE_RECORDING = 101;
+    public static final int RECORD_STATE_PAUSE = 102;
+    public static final int RECORD_STATE_STOP = 103;
+
+    public static final int ADD_PLAN_REQUEST = 1000;
+
+    public static final float ONE_DAY_TOTAL_MILLI_SECS = 1 * 24 * 60 * 60 * 1000.0f;
+    public static final float SEVEN_DAY_TOTAL_MILLIS_SECS = 7 * ONE_DAY_TOTAL_MILLI_SECS;
+
+    public static final int RECORD_DATE_TITLE = 0;
+    public static final int RECORD_LIST_ITEM = 1;
 
     public static final String TABLE_NAME_PLAN_DETAIL = "PlanDetail";
     public static final String TABLE_NAME_RECORD_DETAIL = "RecordDetail";
@@ -34,20 +48,6 @@ public class Consts {
 
     public static final String SERVICE_RECORDING_PLAN_INFO_LIST = "planRecordingList";
 
-
-    public static final int NOTIFICATION_START_ACTIVITY = 11;
-
-    public static final int RECORD_STATE_RECORDING = 101;
-    public static final int RECORD_STATE_PAUSE = 102;
-    public static final int RECORD_STATE_STOP = 103;
-
-    public static final int ADD_PLAN_REQUEST = 1000;
-
-    public static final float ONE_DAY_TOTAL_MILLI_SECS = 1 * 24 * 60 * 60 * 1000.0f;
-    public static final float SEVEN_DAY_TOTAL_MILLIS_SECS = 7 * ONE_DAY_TOTAL_MILLI_SECS;
-
-    public static final int RECORD_DATE_TITLE = 0;
-    public static final int RECORD_LIST_ITEM = 1;
 
     public static final String CREATE_PLAN_DETAIL_TABLE = "create table " + TABLE_NAME_PLAN_DETAIL +
             " ( planId text not null primary key, " +

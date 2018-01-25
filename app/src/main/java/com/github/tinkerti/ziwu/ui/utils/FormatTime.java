@@ -53,14 +53,15 @@ public class FormatTime {
             long minutes = timeSeconds / 60;
             long seconds = timeSeconds % 60;
             builder.append(minutes)
-                    .append("min");
+                    .append("min ")
+            .append(seconds).append("s");
         } else if (timeSeconds < 99 * 3600) {
             long hours = timeSeconds / 3600;
             long rest = timeSeconds % 3600;
             long minutes = rest / 60;
             long seconds = rest % 60;
             builder.append(hours)
-                    .append("h")
+                    .append("h ")
                     .append(minutes)
                     .append("min");
         } else {
@@ -71,7 +72,7 @@ public class FormatTime {
             long minutes = rest / 60;
             long seconds = rest % 60;
             builder.append(days)
-                    .append("天")
+                    .append("天 ")
                     .append(hours)
                     .append("h");
         }

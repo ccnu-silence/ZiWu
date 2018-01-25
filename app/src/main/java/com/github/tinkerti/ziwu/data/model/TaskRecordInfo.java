@@ -27,6 +27,7 @@ public class TaskRecordInfo extends PlanBaseInfo implements Parcelable {
     private Runnable refreshUiRunnable;//用于定时刷新计时的ui
     private boolean isExpand = false;
     private NotificationInfo notificationInfo;
+    private String taskNote;
 
     public long getTotalRecordTime() {
         return totalRecordTime;
@@ -82,6 +83,15 @@ public class TaskRecordInfo extends PlanBaseInfo implements Parcelable {
         this.notificationInfo = notificationInfo;
     }
     public TaskRecordInfo() {
+    }
+
+
+    public String getTaskNote() {
+        return taskNote;
+    }
+
+    public void setTaskNote(String taskNote) {
+        this.taskNote = taskNote;
     }
 
     protected TaskRecordInfo(Parcel in) {

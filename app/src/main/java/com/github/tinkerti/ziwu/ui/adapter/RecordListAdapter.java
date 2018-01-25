@@ -10,12 +10,10 @@ import android.widget.TextView;
 import com.github.tinkerti.ziwu.R;
 import com.github.tinkerti.ziwu.data.Consts;
 import com.github.tinkerti.ziwu.ui.utils.DateUtils;
+import com.github.tinkerti.ziwu.ui.utils.FormatTime;
 
 import java.util.List;
 
-/**
- * Created by tiankui on 9/16/17.
- */
 
 public class RecordListAdapter extends RecyclerView.Adapter {
 
@@ -100,12 +98,14 @@ public class RecordListAdapter extends RecyclerView.Adapter {
         TextView nameView;
         TextView timeView;
         View mainView;
+        TextView timeDurationView;
 
         public RecordListItemViewHolder(View itemView) {
             super(itemView);
             mainView = itemView;
-            nameView = (TextView) itemView.findViewById(R.id.tv_record_list_item_plan_name);
-            timeView = (TextView) itemView.findViewById(R.id.tv_record_list_item_plan_time);
+            nameView =  itemView.findViewById(R.id.tv_record_list_item_plan_name);
+            timeView = itemView.findViewById(R.id.tv_record_list_item_plan_time);
+            timeDurationView =itemView.findViewById(R.id.tv_time_duration);
         }
 
         @Override
@@ -113,7 +113,7 @@ public class RecordListAdapter extends RecyclerView.Adapter {
             final RecordListItemModel recordListItemModel = (RecordListItemModel) modelList.get(position);
             nameView.setText(recordListItemModel.getPlanName());
             timeView.setText(DateUtils.getFormatTime(recordListItemModel.getBeginTime(), recordListItemModel.getEndTime()));
-
+            timeDurationView.setText(FormatTime.formatTimeToString(recordListItemModel.getTimeDuration()));
             mainView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -154,6 +154,7 @@ public class RecordListAdapter extends RecyclerView.Adapter {
         private long beginTime;
         private long endTime;
         private String recordId;
+        private long timeDuration;
 
         public String getPlanId() {
             return planId;
@@ -194,6 +195,15 @@ public class RecordListAdapter extends RecyclerView.Adapter {
 
         public void setRecordId(String recordId) {
             this.recordId = recordId;
+        }
+
+
+        public long getTimeDuration() {
+            return timeDuration;
+        }
+
+        public void setTimeDuration(long timeDuration) {
+            this.timeDuration = timeDuration;
         }
 
         @Override

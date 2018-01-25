@@ -98,9 +98,9 @@ public class TaskFragment extends Fragment {
                 }
             } else {
                 //展示暂无计划
-                TaskListAdapter.NoPlanModel noPlanModel = new TaskListAdapter.NoPlanModel();
-                noPlanModel.setNoPlanType(type);
-                itemModelList.add(noPlanModel);
+//                TaskListAdapter.NoPlanModel noPlanModel = new TaskListAdapter.NoPlanModel();
+//                noPlanModel.setNoPlanType(type);
+//                itemModelList.add(noPlanModel);
             }
         }
         //setModelList()中没有进行notifyDateSetChanged的原因，是因为着这样做的话计时会有问题

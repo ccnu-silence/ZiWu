@@ -273,6 +273,12 @@ public class RecordTask extends ITask {
         });
     }
 
+    /**
+     * 查询时间记录表中最近的一条记录
+     *
+     * @param planId
+     * @return
+     */
     public TaskRecordInfo getLatestRecordInfoFromDb(String planId) {
         TaskRecordInfo recordInfo = new TaskRecordInfo();
         String sql = "select recordId, max(beginTime), recordState from "
@@ -284,5 +290,70 @@ public class RecordTask extends ITask {
             recordInfo.setRecordState(cursor.getInt(2));
         }
         return recordInfo;
+    }
+
+    public void getRecordList(final int type, final int offset, final SimpleResultCallback<List<List<TaskRecordInfo>>> callback) {
+        TaskManager.getInstance().getWorkHandler().post(new Runnable() {
+            @Override
+            public void run() {
+                List<List<TaskRecordInfo>> monthRecordList = getRecordListFromDb(type, offset);
+                callback.onSuccess(monthRecordList);
+            }
+        });
+    }
+
+    public List<List<TaskRecordInfo>> getRecordListFromDb(int type, int offset) {
+        List<List<TaskRecordInfo>> monthRecordList = new ArrayList<>();
+        List<TaskRecordInfo> taskRecordList = new ArrayList<>();
+        long beginTime = DateUtils.getMonthStartTime(offset);
+        long endTime = DateUtils.getMonthEndTime(offset);
+        String sql = "select " +
+                "RecordDetail.planId," +
+                "planName," +
+                "planType," +
+                "createTime," +
+                "planPriority," +
+                "planTime," +
+                "planJoinParentId," +
+                "planTag," +
+                "timeDuration," +
+                "beginTime," +
+                "endTime, " +
+                "recordState," +
+                "planNote" +
+                " from " + Consts.TABLE_NAME_RECORD_DETAIL +
+                " left join " + Consts.TABLE_NAME_PLAN_DETAIL +
+                " on RecordDetail.planId=PlanDetail.planId where beginTime> " + beginTime +
+                " and endTime< " + endTime +
+                " order by beginTime desc";
+        Cursor cursor = TaskManager.getDbHelper().getWritableDatabase().rawQuery(sql, null);
+        while (cursor.moveToNext()) {
+            TaskRecordInfo recordInfo = new TaskRecordInfo();
+            recordInfo.setPlanId(cursor.getString(cursor.getColumnIndex("planId")));
+            recordInfo.setPlanName(cursor.getString(cursor.getColumnIndex("planName")));
+            recordInfo.setPlanType(cursor.getInt(cursor.getColumnIndex("planType")));
+            recordInfo.setCreateTime(cursor.getLong(cursor.getColumnIndex("createTime")));
+            recordInfo.setPlanPriority(cursor.getInt(cursor.getColumnIndex("planPriority")));
+            recordInfo.setPlanTime(cursor.getLong(cursor.getColumnIndex("planTime")));
+            recordInfo.setPlanJoinParentId(cursor.getString(cursor.getColumnIndex("planJoinParentId")));
+            recordInfo.setPlanTag(cursor.getString(cursor.getColumnIndex("planTag")));
+            recordInfo.setTimeDuration(cursor.getLong(cursor.getColumnIndex("timeDuration")));
+            recordInfo.setBeginTime(cursor.getLong(cursor.getColumnIndex("beginTime")));
+            recordInfo.setEndTime(cursor.getLong(cursor.getColumnIndex("endTime")));
+            recordInfo.setRecordState(cursor.getInt(cursor.getColumnIndex("recordState")));
+            recordInfo.setTaskNote(cursor.getString(cursor.getColumnIndex("planNote")));
+            taskRecordList.add(recordInfo);
+        }
+        monthRecordList.add(taskRecordList);
+        int totalCount = 0;
+        for (List<TaskRecordInfo> list : monthRecordList) {
+            totalCount += list.size();
+        }
+
+//        if (taskRecordList.size() > 0 || offset < 5 || totalCount < 20) {
+//            monthRecordList.add(getRecordListFromDb(type, offset + 1).get(0));
+//        }
+        cursor.close();
+        return monthRecordList;
     }
 }

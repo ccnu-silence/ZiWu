@@ -8,7 +8,9 @@ import android.support.v4.view.ViewPager;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.github.tinkerti.ziwu.R;
 import com.github.tinkerti.ziwu.ui.fragment.MeFragment;
@@ -28,6 +30,9 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     private TabIndicatorItemView meIndicator;
     private LinearLayout bottomIndicator;
     private ViewPager contentViewPager;
+    private FrameLayout optionImageContainer;
+    private TextView titleView;
+    private ImageView optionImage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,13 +67,13 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 for (int i = 0; i < bottomIndicator.getChildCount(); i++) {
                     bottomIndicator.getChildAt(i).setSelected(i == position);
                     if (position == 1) {
-                        if (fragmentList.get(position) instanceof RecordFragment) {
-                            RecordFragment fragment = (RecordFragment) fragmentList.get(position);
-                            fragment.selectPlanType(fragment.type);
-                        }
+                        titleView.setText(getString(R.string.bottom_indicator_record));
+                        optionImage.setImageResource(R.mipmap.pie_action_icon);
                     }
                     //根据tab item的位置，选择
                     if (position == 0) {
+                        titleView.setText(getString(R.string.app_name));
+                        optionImage.setImageResource(R.mipmap.more_option_icon_2);
                     } else {
                     }
                 }
@@ -89,15 +94,17 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         ZLog.d(TAG, "onCreateTitleBar");
         View view = titleBar.onCreateTitle(R.layout.bar_plan_content_title);
         //task add popup window
-        final FrameLayout optionImage = view.findViewById(R.id.iv_more_option);
-        optionImage.setOnClickListener(new View.OnClickListener() {
+        titleView = view.findViewById(R.id.bar_tv_plan_content_title);
+        optionImageContainer = view.findViewById(R.id.iv_more_option);
+        optionImage = view.findViewById(R.id.iv_option);
+        optionImageContainer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (v.getTag() != null && ((OptionPopupWindow) v.getTag()).isShowing()) {
                     ((OptionPopupWindow) v.getTag()).dismiss();
                 } else {
                     OptionPopupWindow popupWindow = new OptionPopupWindow(v.getContext());
-                    popupWindow.showAsDropDown(optionImage, (int) optionImage.getX(), 0);
+                    popupWindow.showAsDropDown(optionImageContainer, (int) optionImageContainer.getX(), 0);
                     v.setTag(popupWindow);
                 }
             }
@@ -109,9 +116,13 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         switch (v.getId()) {
             case R.id.bottom_indicator_plan:
                 contentViewPager.setCurrentItem(0);
+                titleView.setText(getString(R.string.app_name));
+                optionImage.setImageResource(R.mipmap.more_option_icon_2);
                 break;
             case R.id.bottom_indicator_record:
                 contentViewPager.setCurrentItem(1);
+                titleView.setText(getString(R.string.bottom_indicator_record));
+                optionImage.setImageResource(R.mipmap.pie_action_icon);
                 break;
             case R.id.bottom_indicator_me:
                 contentViewPager.setCurrentItem(2);

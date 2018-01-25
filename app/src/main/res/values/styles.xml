@@ -96,6 +96,18 @@
         <item name="android:background">@color/color_divider_line</item>
     </style>
 
+    <style name="fr_record_sub_title_text" >
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">@dimen/text_size_sp_16</item>
+        <item name="android:textColor">@color/fr_record_text_color</item>
+    </style>
+
+    <style name="fr_record_sub_title_image">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+
     <declare-styleable name="AddImageButton">
         <attr name="AddButtonBackground" format="reference" />
         <attr name="AddButtonImageSrc" format="reference" />

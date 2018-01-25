@@ -21,10 +21,10 @@ import com.github.mikephil.charting.utils.ColorTemplate;
 import com.github.tinkerti.ziwu.R;
 import com.github.tinkerti.ziwu.data.Consts;
 import com.github.tinkerti.ziwu.data.RecordTask;
+import com.github.tinkerti.ziwu.data.SimpleResultCallback;
 import com.github.tinkerti.ziwu.data.model.TaskRecordInfo;
 import com.github.tinkerti.ziwu.ui.activity.ModifyRecordDetailActivity;
 import com.github.tinkerti.ziwu.ui.adapter.RecordListAdapter;
-import com.github.tinkerti.ziwu.ui.utils.DateUtils;
 import com.github.tinkerti.ziwu.ui.widget.SelectPlanTypePopupWindow;
 
 import java.util.ArrayList;
@@ -47,7 +47,7 @@ public class RecordFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        type = Consts.DAY_TYPE;
+        type = Consts.TYPE_ALL;
     }
 
     @Nullable
@@ -63,7 +63,8 @@ public class RecordFragment extends Fragment {
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         recordList.setLayoutManager(layoutManager);
         recordList.setAdapter(recordListAdapter);
-        selectPlanType(type);
+
+        getPlanRecordDetailList(type, 0);
         recordListAdapter.setListItemClickListener(new RecordListAdapter.RecordListItemClickListener() {
             @Override
             public void onClick(RecordListAdapter.RecordListItemModel itemModel) {
@@ -82,67 +83,67 @@ public class RecordFragment extends Fragment {
         return view;
     }
 
-    public void selectPlanType(int recordType) {
-        switch (recordType) {
-            case Consts.DAY_TYPE:
-                type = Consts.DAY_TYPE;
-                planTypeTextView.setText(getString(R.string.plan_today));
-                drawRecordPieChart(type);
-                break;
-            case Consts.WEEK_TYPE:
-                type = Consts.WEEK_TYPE;
-                planTypeTextView.setText(getString(R.string.plan_this_week));
-                drawRecordPieChart(type);
-                break;
-            case Consts.TYPE_IS_VALID:
-                type = Consts.TYPE_IS_VALID;
-                planTypeTextView.setText(getString(R.string.plan_long_time));
-                drawRecordPieChart(type);
-                break;
-        }
-        getPlanRecordDetailList(type);
-    }
-
     @Override
     public void onResume() {
         super.onResume();
-        selectPlanType(type);
     }
 
-
-    private void getPlanRecordDetailList(int recordType) {
-        List<RecordListAdapter.ItemModel> itemModelList = new ArrayList<>();
-        long recordFirstTime = RecordTask.getInstance().getPlanRecordStartTimeByType(recordType);
-        long currentDateTime = DateUtils.getTodayMorning();
-        long recordEndTime = RecordTask.getInstance().getPlanRecordEndTimeByType(recordType);
-        boolean once = false;
-        boolean onceBeforeToday = false;
-        List<TaskRecordInfo> taskRecordInfoList = RecordTask.getInstance().getTaskRecordListByType(
-                recordFirstTime,
-                recordEndTime);
-        for (TaskRecordInfo taskRecordInfo : taskRecordInfoList) {
-            if (taskRecordInfo.getBeginTime() > DateUtils.getTodayMorning() && !once) {
-                RecordListAdapter.RecordDateItemModel recordDateItemModel = new RecordListAdapter.RecordDateItemModel();
-                recordDateItemModel.setDateName(getString(R.string.plan_today));
-                once = true;
-                itemModelList.add(recordDateItemModel);
+    private void getPlanRecordDetailList(final int recordType, int offset) {
+        final List<RecordListAdapter.ItemModel> itemModelList = new ArrayList<>();
+        RecordTask.getInstance().getRecordList(recordType, offset, new SimpleResultCallback<List<List<TaskRecordInfo>>>() {
+            @Override
+            protected void onSuccessOnUIThread(List<List<TaskRecordInfo>> monthRecordList) {
+                for (List<TaskRecordInfo> list : monthRecordList) {
+                    RecordListAdapter.RecordDateItemModel monthTitleModel = new RecordListAdapter.RecordDateItemModel();
+                    monthTitleModel.setDateName("本月");
+                    itemModelList.add(monthTitleModel);
+                    for (TaskRecordInfo recordInfo : list) {
+                        RecordListAdapter.RecordListItemModel recordListItemModel = new RecordListAdapter.RecordListItemModel();
+                        recordListItemModel.setRecordId(recordInfo.getRecordId());
+                        recordListItemModel.setPlanName(recordInfo.getPlanName());
+                        recordListItemModel.setBeginTime(recordInfo.getBeginTime());
+                        recordListItemModel.setEndTime(recordInfo.getEndTime());
+                        recordListItemModel.setTimeDuration(recordInfo.getTimeDuration());
+                        itemModelList.add(recordListItemModel);
+                    }
+                }
+                recordListAdapter.setModelList(itemModelList);
             }
-            if (taskRecordInfo.getBeginTime() < DateUtils.getTodayMorning() && !onceBeforeToday) {
-                RecordListAdapter.RecordDateItemModel recordDateItemModel = new RecordListAdapter.RecordDateItemModel();
-                recordDateItemModel.setDateName(DateUtils.getDateFormat(taskRecordInfo.getBeginTime()));
-                onceBeforeToday = true;
-                itemModelList.add(recordDateItemModel);
-            }
-            RecordListAdapter.RecordListItemModel itemModel = new RecordListAdapter.RecordListItemModel();
-            itemModel.setPlanName(taskRecordInfo.getPlanName());
-            itemModel.setBeginTime(taskRecordInfo.getBeginTime());
-            itemModel.setEndTime(taskRecordInfo.getEndTime());
-            itemModel.setRecordId(taskRecordInfo.getRecordId());
-            itemModelList.add(itemModel);
-        }
-        currentDateTime = currentDateTime - (long) Consts.ONE_DAY_TOTAL_MILLI_SECS;
-        recordListAdapter.setModelList(itemModelList);
+        });
     }
+
+//    private void getPlanRecordDetailList(int recordType, long beginTime, long endTime) {
+//        List<RecordListAdapter.ItemModel> itemModelList = new ArrayList<>();
+//        long recordFirstTime = RecordTask.getInstance().getPlanRecordStartTimeByType(recordType);
+//        long currentDateTime = DateUtils.getTodayMorning();
+//        long recordEndTime = RecordTask.getInstance().getPlanRecordEndTimeByType(recordType);
+//        boolean once = false;
+//        boolean onceBeforeToday = false;
+//        List<TaskRecordInfo> taskRecordInfoList = RecordTask.getInstance().getTaskRecordListByType(
+//                recordFirstTime,
+//                recordEndTime);
+//        for (TaskRecordInfo taskRecordInfo : taskRecordInfoList) {
+//            if (taskRecordInfo.getBeginTime() > DateUtils.getTodayMorning() && !once) {
+//                RecordListAdapter.RecordDateItemModel recordDateItemModel = new RecordListAdapter.RecordDateItemModel();
+//                recordDateItemModel.setDateName(getString(R.string.plan_today));
+//                once = true;
+//                itemModelList.add(recordDateItemModel);
+//            }
+//            if (taskRecordInfo.getBeginTime() < DateUtils.getTodayMorning() && !onceBeforeToday) {
+//                RecordListAdapter.RecordDateItemModel recordDateItemModel = new RecordListAdapter.RecordDateItemModel();
+//                recordDateItemModel.setDateName(DateUtils.getDateFormat(taskRecordInfo.getBeginTime()));
+//                onceBeforeToday = true;
+//                itemModelList.add(recordDateItemModel);
+//            }
+//            RecordListAdapter.RecordListItemModel itemModel = new RecordListAdapter.RecordListItemModel();
+//            itemModel.setPlanName(taskRecordInfo.getPlanName());
+//            itemModel.setBeginTime(taskRecordInfo.getBeginTime());
+//            itemModel.setEndTime(taskRecordInfo.getEndTime());
+//            itemModel.setRecordId(taskRecordInfo.getRecordId());
+//            itemModelList.add(itemModel);
+//        }
+//        recordListAdapter.setModelList(itemModelList);
+//    }
 
     private void drawRecordPieChart(int recordType) {
         List<TaskRecordInfo> taskRecordInfoList = RecordTask.getInstance().getPlanHistoryTime(recordType);
