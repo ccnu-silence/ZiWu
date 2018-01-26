@@ -8,7 +8,7 @@
     <RelativeLayout
         android:id="@+id/ad_rl_plan_summary_view"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/dimen_dp_44">
+        android:layout_height="@dimen/dimen_dp_50">
 
         <TextView
             android:id="@+id/ad_tv_plan_summary_name"

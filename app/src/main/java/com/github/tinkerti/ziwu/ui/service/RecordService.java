@@ -116,11 +116,14 @@ public class RecordService extends Service {
         }
 
         public void stopRecord(TaskRecordInfo recordInfo, boolean isPause) {
-            recordInfo.setEndTime(System.currentTimeMillis());
-            recordInfo.setRealRecordTime(recordInfo.getEndTime() - recordInfo.getBeginTime());
-            recordInfo.setRecordState(isPause ? Consts.RECORD_STATE_PAUSE : Consts.RECORD_STATE_STOP);
-            RecordTask.getInstance().updateTaskRecord(recordInfo);
 
+            if (recordInfo.getRecordState() == Consts.RECORD_STATE_RECORDING) {
+                recordInfo.setEndTime(System.currentTimeMillis());
+                recordInfo.setRealRecordTime(recordInfo.getEndTime() - recordInfo.getBeginTime());
+                recordInfo.setRecordState(isPause ? Consts.RECORD_STATE_PAUSE : Consts.RECORD_STATE_STOP);
+                RecordTask.getInstance().updateTaskRecord(recordInfo);
+            }
+            recordInfo.setRecordState(isPause ? Consts.RECORD_STATE_PAUSE : Consts.RECORD_STATE_STOP);
             ZLog.d(TAG, "stop record:" + recordInfo.getPlanName());
             handler.removeCallbacks(recordInfo.getRecordTimeRunnable());
             ZLog.d(TAG, "remove runnable " + recordInfo.getRecordTimeRunnable());

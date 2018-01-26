@@ -212,7 +212,7 @@ public class TaskListAdapter extends RecyclerView.Adapter {
             planSummaryView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (!planSummaryModel.isShowRecordView()) {
+                    if (!recordInfo.isExpand()) {
                         recordContainer.setVisibility(View.VISIBLE);
                         recordingTimeTextView.setVisibility(View.GONE);
                         if (recordInfo.getRecordState() == Consts.RECORD_STATE_RECORDING
@@ -230,7 +230,6 @@ public class TaskListAdapter extends RecyclerView.Adapter {
                         recordInfo.setExpand(false);
                         arrowImageView.animate().setDuration(300).rotation(0).start();
                     }
-                    planSummaryModel.setShowRecordView(!planSummaryModel.isShowRecordView());
                 }
             });
 

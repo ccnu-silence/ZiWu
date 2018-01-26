@@ -323,8 +323,9 @@ public class RecordTask extends ITask {
                 "planNote" +
                 " from " + Consts.TABLE_NAME_RECORD_DETAIL +
                 " left join " + Consts.TABLE_NAME_PLAN_DETAIL +
-                " on RecordDetail.planId=PlanDetail.planId where beginTime> " + beginTime +
+                " on RecordDetail.planId=PlanDetail.planId where (beginTime> " + beginTime +
                 " and endTime< " + endTime +
+                ") and (recordState = "+Consts.RECORD_STATE_PAUSE+" or recordState = "+Consts.RECORD_STATE_STOP+")"+
                 " order by beginTime desc";
         Cursor cursor = TaskManager.getDbHelper().getWritableDatabase().rawQuery(sql, null);
         while (cursor.moveToNext()) {

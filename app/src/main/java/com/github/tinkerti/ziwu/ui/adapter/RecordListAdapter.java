@@ -9,6 +9,7 @@ import android.widget.TextView;
 
 import com.github.tinkerti.ziwu.R;
 import com.github.tinkerti.ziwu.data.Consts;
+import com.github.tinkerti.ziwu.data.model.TaskRecordInfo;
 import com.github.tinkerti.ziwu.ui.utils.DateUtils;
 import com.github.tinkerti.ziwu.ui.utils.FormatTime;
 
@@ -103,16 +104,16 @@ public class RecordListAdapter extends RecyclerView.Adapter {
         public RecordListItemViewHolder(View itemView) {
             super(itemView);
             mainView = itemView;
-            nameView =  itemView.findViewById(R.id.tv_record_list_item_plan_name);
+            nameView = itemView.findViewById(R.id.tv_record_list_item_plan_name);
             timeView = itemView.findViewById(R.id.tv_record_list_item_plan_time);
-            timeDurationView =itemView.findViewById(R.id.tv_time_duration);
+            timeDurationView = itemView.findViewById(R.id.tv_time_duration);
         }
 
         @Override
         public void update(int position) {
             final RecordListItemModel recordListItemModel = (RecordListItemModel) modelList.get(position);
             nameView.setText(recordListItemModel.getPlanName());
-            timeView.setText(DateUtils.getFormatTime(recordListItemModel.getBeginTime(), recordListItemModel.getEndTime()));
+            timeView.setText(DateUtils.getDateFormat(recordListItemModel.getBeginTime()) + " " + DateUtils.getFormatTime(recordListItemModel.getBeginTime(), recordListItemModel.getEndTime()));
             timeDurationView.setText(FormatTime.formatTimeToString(recordListItemModel.getTimeDuration()));
             mainView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -155,6 +156,25 @@ public class RecordListAdapter extends RecyclerView.Adapter {
         private long endTime;
         private String recordId;
         private long timeDuration;
+        private int recordState;
+
+        public RecordListItemModel(TaskRecordInfo recordInfo) {
+            setRecordId(recordInfo.getRecordId());
+            setPlanName(recordInfo.getPlanName());
+            setBeginTime(recordInfo.getBeginTime());
+            setEndTime(recordInfo.getEndTime());
+            setTimeDuration(recordInfo.getTimeDuration());
+            setRecordState(recordInfo.getRecordState());
+        }
+
+
+        public int getRecordState() {
+            return recordState;
+        }
+
+        public void setRecordState(int recordState) {
+            this.recordState = recordState;
+        }
 
         public String getPlanId() {
             return planId;

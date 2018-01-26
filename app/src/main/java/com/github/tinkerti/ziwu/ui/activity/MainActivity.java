@@ -13,6 +13,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.github.tinkerti.ziwu.R;
+import com.github.tinkerti.ziwu.data.Consts;
 import com.github.tinkerti.ziwu.ui.fragment.MeFragment;
 import com.github.tinkerti.ziwu.ui.fragment.RecordFragment;
 import com.github.tinkerti.ziwu.ui.fragment.TaskFragment;
@@ -69,6 +70,11 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                     if (position == 1) {
                         titleView.setText(getString(R.string.bottom_indicator_record));
                         optionImage.setImageResource(R.mipmap.pie_action_icon);
+                        if (fragmentList.get(position) instanceof RecordFragment) {
+                            RecordFragment fragment = (RecordFragment) fragmentList.get(position);
+                            //TODO 是否需要换成另外一种方式来，及时的刷新UI；
+                            fragment.getPlanRecordDetailList(Consts.TYPE_ALL, 0);
+                        }
                     }
                     //根据tab item的位置，选择
                     if (position == 0) {

@@ -86,9 +86,10 @@ public class RecordFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        getPlanRecordDetailList(type, 0);
     }
 
-    private void getPlanRecordDetailList(final int recordType, int offset) {
+    public void getPlanRecordDetailList(final int recordType, int offset) {
         final List<RecordListAdapter.ItemModel> itemModelList = new ArrayList<>();
         RecordTask.getInstance().getRecordList(recordType, offset, new SimpleResultCallback<List<List<TaskRecordInfo>>>() {
             @Override
@@ -98,12 +99,7 @@ public class RecordFragment extends Fragment {
                     monthTitleModel.setDateName("本月");
                     itemModelList.add(monthTitleModel);
                     for (TaskRecordInfo recordInfo : list) {
-                        RecordListAdapter.RecordListItemModel recordListItemModel = new RecordListAdapter.RecordListItemModel();
-                        recordListItemModel.setRecordId(recordInfo.getRecordId());
-                        recordListItemModel.setPlanName(recordInfo.getPlanName());
-                        recordListItemModel.setBeginTime(recordInfo.getBeginTime());
-                        recordListItemModel.setEndTime(recordInfo.getEndTime());
-                        recordListItemModel.setTimeDuration(recordInfo.getTimeDuration());
+                        RecordListAdapter.RecordListItemModel recordListItemModel = new RecordListAdapter.RecordListItemModel(recordInfo);
                         itemModelList.add(recordListItemModel);
                     }
                 }
@@ -112,38 +108,6 @@ public class RecordFragment extends Fragment {
         });
     }
 
-//    private void getPlanRecordDetailList(int recordType, long beginTime, long endTime) {
-//        List<RecordListAdapter.ItemModel> itemModelList = new ArrayList<>();
-//        long recordFirstTime = RecordTask.getInstance().getPlanRecordStartTimeByType(recordType);
-//        long currentDateTime = DateUtils.getTodayMorning();
-//        long recordEndTime = RecordTask.getInstance().getPlanRecordEndTimeByType(recordType);
-//        boolean once = false;
-//        boolean onceBeforeToday = false;
-//        List<TaskRecordInfo> taskRecordInfoList = RecordTask.getInstance().getTaskRecordListByType(
-//                recordFirstTime,
-//                recordEndTime);
-//        for (TaskRecordInfo taskRecordInfo : taskRecordInfoList) {
-//            if (taskRecordInfo.getBeginTime() > DateUtils.getTodayMorning() && !once) {
-//                RecordListAdapter.RecordDateItemModel recordDateItemModel = new RecordListAdapter.RecordDateItemModel();
-//                recordDateItemModel.setDateName(getString(R.string.plan_today));
-//                once = true;
-//                itemModelList.add(recordDateItemModel);
-//            }
-//            if (taskRecordInfo.getBeginTime() < DateUtils.getTodayMorning() && !onceBeforeToday) {
-//                RecordListAdapter.RecordDateItemModel recordDateItemModel = new RecordListAdapter.RecordDateItemModel();
-//                recordDateItemModel.setDateName(DateUtils.getDateFormat(taskRecordInfo.getBeginTime()));
-//                onceBeforeToday = true;
-//                itemModelList.add(recordDateItemModel);
-//            }
-//            RecordListAdapter.RecordListItemModel itemModel = new RecordListAdapter.RecordListItemModel();
-//            itemModel.setPlanName(taskRecordInfo.getPlanName());
-//            itemModel.setBeginTime(taskRecordInfo.getBeginTime());
-//            itemModel.setEndTime(taskRecordInfo.getEndTime());
-//            itemModel.setRecordId(taskRecordInfo.getRecordId());
-//            itemModelList.add(itemModel);
-//        }
-//        recordListAdapter.setModelList(itemModelList);
-//    }
 
     private void drawRecordPieChart(int recordType) {
         List<TaskRecordInfo> taskRecordInfoList = RecordTask.getInstance().getPlanHistoryTime(recordType);

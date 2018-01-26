@@ -6,10 +6,6 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
-/**
- * Created by tiankui on 5/7/17.
- */
-
 public class DateUtils {
 
     // 获得当天0点时间
@@ -327,7 +323,7 @@ public class DateUtils {
 
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder
-                .append(getFormatTime(monthOfYear + 1)).append(".")
+                .append(getFormatTime(monthOfYear + 1)).append("-")
                 .append(getFormatTime(dayOfMonth)).append(" ");
 
         return stringBuilder.toString();
