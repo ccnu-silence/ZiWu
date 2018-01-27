@@ -145,10 +145,12 @@ public class RecordService extends Service {
         Intent intent = new Intent(getApplicationContext(), MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), Consts.NOTIFICATION_START_ACTIVITY, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         Notification notification = new Notification.Builder(getApplicationContext())
-                .setSmallIcon(R.mipmap.notification_icon)
+                .setSmallIcon(R.mipmap.app_icon_2)
                 .setContent(notificationView)
                 .setContentIntent(pendingIntent)
                 .build();
+        notificationView.setImageViewResource(R.id.iv_notification_icon, R.mipmap.app_icon_2);
+        notificationView.setTextViewText(R.id.tv_notification_record_name, recordInfo.getPlanName());
         NotificationInfo notificationInfo = new NotificationInfo();
         notificationInfo.setId(CommonUtils.getID());
         notificationInfo.setNotification(notification);

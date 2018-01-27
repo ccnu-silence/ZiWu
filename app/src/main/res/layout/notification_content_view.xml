@@ -1,15 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="horizontal"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-    <TextView
-        android:id="@+id/tv_notification_record_time"
+    android:layout_height="match_parent"
+    android:gravity="center_vertical"
+    android:orientation="horizontal">
+
+    <ImageView
+        android:id="@+id/iv_notification_icon"
+        android:layout_width="@dimen/dimen_dp_40"
+        android:layout_height="@dimen/dimen_dp_40"
+        android:layout_gravity="center_vertical"
+        android:src="@mipmap/app_icon_2" />
+
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="@color/greenColor"
-        android:textSize="@dimen/text_size_sp_16"
-        android:text="@string/notification_start_time"
-        android:layout_marginLeft="@dimen/dimen_dp_20"
-        android:layout_gravity="center_vertical"/>
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tv_notification_record_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="@dimen/dimen_dp_30"
+            android:text="@string/dialog_check_plan_detail"
+            android:textColor="@color/blackColor"
+            android:textSize="@dimen/text_size_sp_15" />
+
+        <TextView
+            android:id="@+id/tv_notification_record_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/dimen_dp_30"
+            android:textColor="@color/fr_record_text_color"
+            android:textSize="@dimen/text_size_sp_12"
+            tools:text="11:20" />
+    </LinearLayout>
+
 </LinearLayout>

@@ -83,6 +83,8 @@ public class TaskFragment extends Fragment {
                                 planRecordInfoMap.put(planDetailInfo.getPlanId(), taskRecordInfo);
                             }
                             taskRecordInfo.setTimeDuration(time);
+                            taskRecordInfo.setPlanName(planDetailInfo.getPlanName());
+                            taskRecordInfo.setPlanId(planDetailInfo.getPlanId());
                             planSummaryModel.setPlanName(planDetailInfo.getPlanName());
                             planSummaryModel.setPlanId(planDetailInfo.getPlanId());
                             planSummaryModel.setRecordInfo(taskRecordInfo);

@@ -50,7 +50,7 @@ public class RecordChartActivity extends BaseActivity {
         pieChart.setTransparentCircleAlpha(110);
 
         pieChart.setHoleRadius(58f);              //holeRadius 表示中间空心的半径
-        pieChart.setTransparentCircleRadius(66f);  //transparentCircleRadius 表示透明圆圈的半径
+        pieChart.setTransparentCircleRadius(58f);  //transparentCircleRadius 表示透明圆圈的半径
 
         Legend l = pieChart.getLegend();
         l.setVerticalAlignment(Legend.LegendVerticalAlignment.TOP);
@@ -60,7 +60,6 @@ public class RecordChartActivity extends BaseActivity {
         l.setEnabled(false);  //是否显示legend；
 
         int count = 0;
-
         //添加数据
         List<PieEntry> entries = new ArrayList<>();
         for (TaskRecordInfo recordInfo : taskRecordInfoList) {
@@ -68,21 +67,24 @@ public class RecordChartActivity extends BaseActivity {
             if (percent - 0 > 0.01) {
 //                entries.add(new PieEntry(percent * 100, recordInfo.getPlanName(), count));  //自己计算好百分比
 //                entries.add(new PieEntry(recordInfo.getTimeDuration() / (3600 * 1000f), recordInfo.getPlanName(), count));//传入原始数据，可以通过 setUsePercentValues(true)来进行百分比显示；
-                entries.add(new PieEntry(recordInfo.getTimeDuration() / (3600 * 1000f), recordInfo.getPlanName(), count));
+//                entries.add(new PieEntry(recordInfo.getTimeDuration() / (3600 * 1000f), recordInfo.getPlanName(), count));
+                //通过构造不同的PieEntry，可以来标注和说明pie的扇形区的含义；
+                entries.add(new PieEntry(recordInfo.getTimeDuration() / (3600 * 1000f)));
             }
             count++;
         }
 
         PieDataSet dataSet = new PieDataSet(entries, "");
-        dataSet.setSliceSpace(3f);
-        dataSet.setSelectionShift(5f);
+        dataSet.setSliceSpace(0f);//设置不同扇形区域之间的间隔，0的话没有间隔；
+        dataSet.setSelectionShift(5f);//设置点击扇形时，扇形向外变大的距离；
         dataSet.setColors(ColorTemplate.COLORFUL_COLORS);
+            //设置扇形区域的标签
+//        dataSet.setValueLinePart1OffsetPercentage(80.f);
+//        dataSet.setValueLinePart1Length(0.2f);
+//        dataSet.setValueLinePart2Length(0.4f);
+//        dataSet.setXValuePosition(PieDataSet.ValuePosition.OUTSIDE_SLICE);
+//        dataSet.setYValuePosition(PieDataSet.ValuePosition.INSIDE_SLICE);
 
-        dataSet.setValueLinePart1OffsetPercentage(80.f);
-        dataSet.setValueLinePart1Length(0.2f);
-        dataSet.setValueLinePart2Length(0.4f);
-        dataSet.setXValuePosition(PieDataSet.ValuePosition.OUTSIDE_SLICE);
-        dataSet.setYValuePosition(PieDataSet.ValuePosition.INSIDE_SLICE);
 
         pieChart.setEntryLabelColor(Color.BLACK);
 //        dataSet.setXValuePosition(PieDataSet.ValuePosition.OUTSIDE_SLICE);

@@ -23,4 +23,5 @@
     <color name="fr_record_text_color">#8E8E93</color>
     <color name="fr_record_month_title_background_color">#D8D8D8</color>
     <color name="fr_record_text_time_color">#9B9B9B</color>
+    <color name="notification_title_color">#F5A623</color>
 </resources>
