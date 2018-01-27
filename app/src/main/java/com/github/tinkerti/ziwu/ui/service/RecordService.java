@@ -86,6 +86,7 @@ public class RecordService extends Service {
             final Runnable startRecordRunnable = new Runnable() {
                 @Override
                 public void run() {
+                    //暂停之后，再开始计时，退出界面，在打开，时间总和显示不对；
                     long timeDuration = System.currentTimeMillis() - recordInfo.getBeginTime();//矫正锁屏时计时不准确的问题
                     if (timeDuration > recordInfo.getTimeDuration()) {
                         recordInfo.setTimeDuration(timeDuration);
@@ -116,10 +117,13 @@ public class RecordService extends Service {
         }
 
         public void stopRecord(TaskRecordInfo recordInfo, boolean isPause) {
-
             if (recordInfo.getRecordState() == Consts.RECORD_STATE_RECORDING) {
                 recordInfo.setEndTime(System.currentTimeMillis());
                 recordInfo.setRealRecordTime(recordInfo.getEndTime() - recordInfo.getBeginTime());
+                recordInfo.setRecordState(isPause ? Consts.RECORD_STATE_PAUSE : Consts.RECORD_STATE_STOP);
+                RecordTask.getInstance().updateTaskRecord(recordInfo);
+            }else if(recordInfo.getRecordState()==Consts.RECORD_STATE_PAUSE){
+                //当处于暂停状态时，如果点击stop按钮，需要更新数据库中的记录状态；
                 recordInfo.setRecordState(isPause ? Consts.RECORD_STATE_PAUSE : Consts.RECORD_STATE_STOP);
                 RecordTask.getInstance().updateTaskRecord(recordInfo);
             }

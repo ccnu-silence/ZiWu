@@ -82,7 +82,10 @@ public class TaskFragment extends Fragment {
                                 taskRecordInfo = new TaskRecordInfo();
                                 planRecordInfoMap.put(planDetailInfo.getPlanId(), taskRecordInfo);
                             }
-                            taskRecordInfo.setTimeDuration(time);
+                            //如果是正在计时的状态，不能重置。
+                            if (taskRecordInfo.getRecordState() != Consts.RECORD_STATE_RECORDING) {
+                                taskRecordInfo.setTimeDuration(time);
+                            }
                             taskRecordInfo.setPlanName(planDetailInfo.getPlanName());
                             taskRecordInfo.setPlanId(planDetailInfo.getPlanId());
                             planSummaryModel.setPlanName(planDetailInfo.getPlanName());
