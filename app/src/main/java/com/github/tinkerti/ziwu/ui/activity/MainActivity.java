@@ -26,6 +26,11 @@ import java.util.List;
 
 public class MainActivity extends BaseActivity implements View.OnClickListener {
     private static final String TAG = "MainActivity";
+
+    private static final int TAB_INDEX_TASK = 0;
+    private static final int TAB_INDEX_RECORD = 1;
+    private static final int TAB_INDEX_ME = 2;
+
     private TabIndicatorItemView taskIndicator;
     private TabIndicatorItemView recordIndicator;
     private TabIndicatorItemView meIndicator;
@@ -34,6 +39,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     private FrameLayout optionImageContainer;
     private TextView titleView;
     private ImageView optionImage;
+    private int tabIndex;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,20 +73,13 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             public void onPageSelected(int position) {
                 for (int i = 0; i < bottomIndicator.getChildCount(); i++) {
                     bottomIndicator.getChildAt(i).setSelected(i == position);
+                    onPageChangedAction(position);
                     if (position == 1) {
-                        titleView.setText(getString(R.string.bottom_indicator_record));
-                        optionImage.setImageResource(R.mipmap.pie_action_icon);
                         if (fragmentList.get(position) instanceof RecordFragment) {
                             RecordFragment fragment = (RecordFragment) fragmentList.get(position);
                             //TODO 是否需要换成另外一种方式来，及时的刷新UI；
                             fragment.getPlanRecordDetailList(Consts.TYPE_ALL, 0);
                         }
-                    }
-                    //根据tab item的位置，选择
-                    if (position == 0) {
-                        titleView.setText(getString(R.string.app_name));
-                        optionImage.setImageResource(R.mipmap.more_option_icon_2);
-                    } else {
                     }
                 }
             }
@@ -93,6 +92,28 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         taskIndicator.setOnClickListener(this);
         recordIndicator.setOnClickListener(this);
         meIndicator.setOnClickListener(this);
+    }
+
+    private void onPageChangedAction(int index) {
+        switch (index) {
+            case TAB_INDEX_TASK:
+                titleView.setText(getString(R.string.app_name));
+                optionImage.setImageResource(R.mipmap.more_option_icon_2);
+                optionImage.setVisibility(View.VISIBLE);
+                tabIndex = TAB_INDEX_TASK;
+                break;
+            case TAB_INDEX_RECORD:
+                titleView.setText(getString(R.string.bottom_indicator_record));
+                optionImage.setImageResource(R.mipmap.pie_action_icon);
+                optionImage.setVisibility(View.VISIBLE);
+                tabIndex = TAB_INDEX_RECORD;
+                break;
+            case TAB_INDEX_ME:
+                tabIndex = TAB_INDEX_ME;
+                titleView.setText(getString(R.string.bottom_indicator_me));
+                optionImage.setVisibility(View.GONE);
+                break;
+        }
     }
 
     @Override
@@ -122,13 +143,9 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         switch (v.getId()) {
             case R.id.bottom_indicator_plan:
                 contentViewPager.setCurrentItem(0);
-                titleView.setText(getString(R.string.app_name));
-                optionImage.setImageResource(R.mipmap.more_option_icon_2);
                 break;
             case R.id.bottom_indicator_record:
                 contentViewPager.setCurrentItem(1);
-                titleView.setText(getString(R.string.bottom_indicator_record));
-                optionImage.setImageResource(R.mipmap.pie_action_icon);
                 break;
             case R.id.bottom_indicator_me:
                 contentViewPager.setCurrentItem(2);

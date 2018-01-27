@@ -176,7 +176,9 @@ public class TaskListAdapter extends RecyclerView.Adapter {
             recordInfo.setPlanId(planSummaryModel.getPlanId());//这里为什么要设置planId?
             //设置recordView是否显示；
             recordContainer.setVisibility(recordInfo.isExpand() ? View.VISIBLE : View.GONE);
-
+            if(recordInfo.isExpand()){
+                arrowImageView.animate().setDuration(0).rotation(90).start();
+            }
             //这个地方有点问题，需要优化下，这样做没有多大必要；
             final Runnable recordRunnable = new Runnable() {
                 @Override
@@ -220,7 +222,7 @@ public class TaskListAdapter extends RecyclerView.Adapter {
                             expandedRecordingTimeView.setVisibility(View.VISIBLE);
                         }
                         recordInfo.setExpand(true);
-                        arrowImageView.animate().setDuration(300).rotation(90).start();
+                        arrowImageView.animate().setDuration(200).rotation(90).start();
                     } else {
                         recordContainer.setVisibility(View.GONE);
                         if (recordInfo.getRecordState() == Consts.RECORD_STATE_RECORDING
@@ -228,7 +230,7 @@ public class TaskListAdapter extends RecyclerView.Adapter {
                             recordingTimeTextView.setVisibility(View.VISIBLE);
                         }
                         recordInfo.setExpand(false);
-                        arrowImageView.animate().setDuration(300).rotation(0).start();
+                        arrowImageView.animate().setDuration(200).rotation(0).start();
                     }
                 }
             });
@@ -272,6 +274,9 @@ public class TaskListAdapter extends RecyclerView.Adapter {
                         startButton.setImageDrawable(planSummaryView.getContext().getResources().getDrawable(R.mipmap.start_button));
                         recordingTimeTextView.setVisibility(View.GONE);
                         expandedRecordingTimeView.setVisibility(View.GONE);
+                        recordContainer.setVisibility(View.GONE);
+                        recordInfo.setExpand(false);
+                        arrowImageView.animate().setDuration(200).rotation(0).start();
                     }
                 }
             });
