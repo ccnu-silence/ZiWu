@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/bar_rl_title_bar"
     android:layout_width="match_parent"
     android:layout_height="45dp"
-    android:background="@color/activity_title_bar_color"
-    android:id="@+id/bar_rl_title_bar">
+    android:background="@color/activity_title_bar_color">
     <!--标题栏，显示-->
     <ImageView
         android:id="@+id/bar_iv_navigate_back"
@@ -12,15 +12,30 @@
         android:layout_alignParentLeft="true"
         android:layout_centerVertical="true"
         android:layout_marginLeft="10dp"
-        android:src="@mipmap/nav_back"/>
+        android:src="@mipmap/back_arrow" />
+
+    <View
+        android:id="@+id/divider_line"
+        android:layout_width="@dimen/dimen_dp_1"
+        android:layout_height="match_parent"
+        android:layout_centerVertical="true"
+        android:layout_marginBottom="@dimen/dimen_dp_10"
+        android:layout_marginLeft="@dimen/dimen_dp_10"
+        android:layout_marginRight="@dimen/dimen_dp_10"
+        android:layout_marginTop="@dimen/dimen_dp_10"
+        android:layout_toRightOf="@id/bar_iv_navigate_back"
+        android:background="@color/blackColor" />
+
     <TextView
         android:id="@+id/bar_tv_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/app_name"
-        android:layout_marginLeft="5dp"
         android:layout_centerVertical="true"
-        android:layout_toRightOf="@id/bar_iv_navigate_back"/>
+        android:layout_toRightOf="@id/divider_line"
+        android:text="@string/app_name"
+        android:textColor="@color/blackColor"
+        android:textSize="@dimen/text_size_sp_19" />
+
     <ImageView
         android:id="@+id/bar_iv_search_button"
         android:layout_width="wrap_content"

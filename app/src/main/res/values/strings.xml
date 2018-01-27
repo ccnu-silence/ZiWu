@@ -1,7 +1,6 @@
 <resources>
     <string name="app_name">子午</string>
 
-
     <string name="plan_today">今天</string>
     <string name="plan_this_week">近七天</string>
     <string name="plan_long_time">长期计划</string>
@@ -11,12 +10,6 @@
     <string name="ad_item_plan_record_start">开始</string>
     <string name="ad_item_plan_record_stop">停止</string>
     <string name="ad_item_plan_record_finish">完成</string>
-
-
-
-    <string name="add_plan_today">每日计划</string>
-    <string name="add_plan_this_week">每周计划</string>
-    <string name="add_plan_long_time">长期计划</string>
 
     <string name="bottom_indicator_task">任务</string>
     <string name="bottom_indicator_record">记录</string>
@@ -62,4 +55,7 @@
     <string name="record_category_all">全部分类</string>
     <string name="record_time_duration_select">时长</string>
     <string name="record_search">搜索</string>
+    <string name="record_week_chart_title">周记录</string>
+    <string name="record_time_duration_name">时长</string>
+    <string name="record_this_week">本周</string>
 </resources>

@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dimen_dp_40"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:id="@+id/tv_time_stamp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/dimen_dp_25"
+            android:textColor="@color/blackColor"
+            android:textSize="@dimen/text_size_sp_16"
+            android:text="@string/record_this_week" />
+
+        <ImageView
+            android:id="@+id/iv_check_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="@dimen/dimen_dp_25"
+            android:src="@mipmap/check_time_icon" />
+    </RelativeLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dimen_dp_3"
+        android:layout_marginLeft="@dimen/dimen_dp_10"
+        android:layout_marginRight="@dimen/dimen_dp_10"
+        android:background="@color/blackColor" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dimen_dp_1"
+        android:layout_marginLeft="@dimen/dimen_dp_10"
+        android:layout_marginRight="@dimen/dimen_dp_10"
+        android:layout_marginTop="@dimen/dimen_dp_2"
+        android:background="@color/blackColor" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dimen_dp_40"
+        android:gravity="center_vertical">
+
+        <View
+            android:id="@+id/left_line"
+            android:layout_width="@dimen/dimen_dp_3"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="@dimen/dimen_dp_10"
+            android:layout_marginLeft="@dimen/dimen_dp_25"
+            android:layout_marginTop="@dimen/dimen_dp_10"
+            android:background="@color/blackColor" />
+
+        <TextView
+            android:id="@+id/tv_record_time_duration"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="@dimen/dimen_dp_5"
+            android:layout_toRightOf="@id/left_line"
+            android:text="@string/record_time_duration_name"
+            android:textColor="@color/blackColor"
+            android:textSize="@dimen/text_size_sp_16"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="@dimen/dimen_dp_15"
+            android:textColor="@color/blackColor"
+            android:textSize="@dimen/text_size_sp_16"
+            tools:text="11:00" />
+    </RelativeLayout>
+
+    <com.github.mikephil.charting.charts.PieChart
+        android:id="@+id/pc_plan_record_pie"
+        android:layout_width="@dimen/dimen_dp_200"
+        android:layout_height="@dimen/dimen_dp_200"
+        android:layout_marginLeft="@dimen/dimen_dp_40" />
+
+    <android.support.v7.widget.RecyclerView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+</LinearLayout>

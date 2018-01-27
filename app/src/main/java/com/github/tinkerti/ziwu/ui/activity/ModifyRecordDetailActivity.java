@@ -7,10 +7,6 @@ import android.widget.TextView;
 
 import com.github.tinkerti.ziwu.R;
 
-/**
- * Created by tiankui on 9/17/17.
- */
-
 public class ModifyRecordDetailActivity extends BaseActivity {
 
     @Override

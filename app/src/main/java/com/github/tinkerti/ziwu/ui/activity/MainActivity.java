@@ -1,5 +1,6 @@
 package com.github.tinkerti.ziwu.ui.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -95,21 +96,19 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     }
 
     private void onPageChangedAction(int index) {
+        tabIndex = index;
         switch (index) {
             case TAB_INDEX_TASK:
                 titleView.setText(getString(R.string.app_name));
                 optionImage.setImageResource(R.mipmap.more_option_icon_2);
                 optionImage.setVisibility(View.VISIBLE);
-                tabIndex = TAB_INDEX_TASK;
                 break;
             case TAB_INDEX_RECORD:
                 titleView.setText(getString(R.string.bottom_indicator_record));
                 optionImage.setImageResource(R.mipmap.pie_action_icon);
                 optionImage.setVisibility(View.VISIBLE);
-                tabIndex = TAB_INDEX_RECORD;
                 break;
             case TAB_INDEX_ME:
-                tabIndex = TAB_INDEX_ME;
                 titleView.setText(getString(R.string.bottom_indicator_me));
                 optionImage.setVisibility(View.GONE);
                 break;
@@ -127,12 +126,22 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         optionImageContainer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (v.getTag() != null && ((OptionPopupWindow) v.getTag()).isShowing()) {
-                    ((OptionPopupWindow) v.getTag()).dismiss();
-                } else {
-                    OptionPopupWindow popupWindow = new OptionPopupWindow(v.getContext());
-                    popupWindow.showAsDropDown(optionImageContainer, (int) optionImageContainer.getX(), 0);
-                    v.setTag(popupWindow);
+                switch (tabIndex) {
+                    case TAB_INDEX_TASK:
+                        if (v.getTag() != null && ((OptionPopupWindow) v.getTag()).isShowing()) {
+                            ((OptionPopupWindow) v.getTag()).dismiss();
+                        } else {
+                            OptionPopupWindow popupWindow = new OptionPopupWindow(v.getContext());
+                            popupWindow.showAsDropDown(optionImageContainer, (int) optionImageContainer.getX(), 0);
+                            v.setTag(popupWindow);
+                        }
+                        break;
+                    case TAB_INDEX_RECORD:
+                        Intent intent = new Intent(MainActivity.this, RecordChartActivity.class);
+                        startActivity(intent);
+                        break;
+                    case TAB_INDEX_ME:
+                        break;
                 }
             }
         });
