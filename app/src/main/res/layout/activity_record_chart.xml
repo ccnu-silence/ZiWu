@@ -15,9 +15,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="@dimen/dimen_dp_25"
+            android:text="@string/record_this_week"
             android:textColor="@color/blackColor"
-            android:textSize="@dimen/text_size_sp_16"
-            android:text="@string/record_this_week" />
+            android:textSize="@dimen/text_size_sp_16" />
 
         <ImageView
             android:id="@+id/iv_check_icon"
@@ -82,9 +82,9 @@
 
     <com.github.mikephil.charting.charts.PieChart
         android:id="@+id/pc_plan_record_pie"
-        android:layout_width="@dimen/dimen_dp_200"
+        android:layout_width="match_parent"
         android:layout_height="@dimen/dimen_dp_200"
-        android:layout_marginLeft="@dimen/dimen_dp_40" />
+        android:layout_marginLeft="@dimen/dimen_dp_25" />
 
     <android.support.v7.widget.RecyclerView
         android:layout_width="match_parent"

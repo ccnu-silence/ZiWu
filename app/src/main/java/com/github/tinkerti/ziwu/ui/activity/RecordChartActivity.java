@@ -50,7 +50,7 @@ public class RecordChartActivity extends BaseActivity {
         pieChart.setTransparentCircleAlpha(110);
 
         pieChart.setHoleRadius(58f);              //holeRadius 表示中间空心的半径
-        pieChart.setTransparentCircleRadius(61f);  //transparentCircleRadius 表示透明圆圈的半径
+        pieChart.setTransparentCircleRadius(66f);  //transparentCircleRadius 表示透明圆圈的半径
 
         Legend l = pieChart.getLegend();
         l.setVerticalAlignment(Legend.LegendVerticalAlignment.TOP);
@@ -84,16 +84,12 @@ public class RecordChartActivity extends BaseActivity {
         dataSet.setXValuePosition(PieDataSet.ValuePosition.OUTSIDE_SLICE);
         dataSet.setYValuePosition(PieDataSet.ValuePosition.INSIDE_SLICE);
 
-
         pieChart.setEntryLabelColor(Color.BLACK);
 //        dataSet.setXValuePosition(PieDataSet.ValuePosition.OUTSIDE_SLICE);
 
         PieData data = new PieData(dataSet);
 //        data.setValueTextColor(Color.BLUE); //设置slice中的y值的字体颜色
-
-
         pieChart.setData(data);
-
         pieChart.invalidate();
     }
 }

@@ -38,6 +38,12 @@ public class BaseActivity extends FragmentActivity {
         searchImageView = (ImageView) findViewById(R.id.bar_iv_search_button);
 
         onCreateTitleBar(new TitleBar());
+        navigationImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onBackPress();
+            }
+        });
     }
 
     @Override
@@ -53,6 +59,10 @@ public class BaseActivity extends FragmentActivity {
 
     public void setNameText(String text) {
         nameTextView.setText(text);
+    }
+
+    public void onBackPress() {
+        finish();
     }
 
     public void onCreateTitleBar(TitleBar titleBar) {
