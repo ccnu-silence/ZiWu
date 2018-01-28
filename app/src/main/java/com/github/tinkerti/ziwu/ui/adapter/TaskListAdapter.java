@@ -74,7 +74,7 @@ public class TaskListAdapter extends RecyclerView.Adapter {
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         ItemModel itemModel = modelList.get(position);
-        if (itemModel instanceof PlanSummaryModel) {
+        if (itemModel instanceof TaskSummaryModel) {
             ((PlanSummaryItemViewHolder) holder).update(position);
         }
         if (itemModel instanceof PlanCategoryModel) {
@@ -97,7 +97,7 @@ public class TaskListAdapter extends RecyclerView.Adapter {
     @Override
     public int getItemViewType(int position) {
         ItemModel itemModel = modelList.get(position);
-        if (itemModel instanceof PlanSummaryModel) {
+        if (itemModel instanceof TaskSummaryModel) {
             return PLAN_SUMMARY_TYPE;
         }
         if (itemModel instanceof PlanCategoryModel) {
@@ -152,16 +152,18 @@ public class TaskListAdapter extends RecyclerView.Adapter {
 
         @Override
         public void update(final int position) {
-            final PlanSummaryModel planSummaryModel = (PlanSummaryModel) modelList.get(position);
-            taskNameTextView.setText(planSummaryModel.getPlanName());
-            String recordingTime = FormatTime.calculateTimeString(planSummaryModel.getRecordInfo().getTimeDuration());
+            final TaskSummaryModel taskSummaryModel = (TaskSummaryModel) modelList.get(position);
+            taskNameTextView.setText(taskSummaryModel.recordInfo.getPlanName());
+
+            String recordingTime = FormatTime.calculateTimeString(taskSummaryModel.recordInfo.getTimeDuration());
             recordingTimeTextView.setText(recordingTime);
             expandedRecordingTimeView.setText(recordingTime);
-            ZLog.d(TAG, planSummaryModel.getPlanName() + " recording time:" + recordingTime);
+            ZLog.d(TAG, taskSummaryModel.recordInfo.getPlanName() + " recording time:" + recordingTime);
 
             //planRecordInfo对象，用来保存计划进行时间
-            final TaskRecordInfo recordInfo = planSummaryModel.getRecordInfo();
-            if (recordInfo.getRecordState() == Consts.RECORD_STATE_PAUSE) {
+            final TaskRecordInfo recordInfo = taskSummaryModel.recordInfo;
+            if (recordInfo.getRecordState() == Consts.RECORD_STATE_PAUSE
+                    || recordInfo.getRecordState() == Consts.RECORD_STATE_RECORDING) {
                 if (recordInfo.isExpand()) {
                     expandedRecordingTimeView.setVisibility(View.VISIBLE);
                     recordingTimeTextView.setVisibility(View.GONE);
@@ -173,10 +175,9 @@ public class TaskListAdapter extends RecyclerView.Adapter {
             if (recordInfo.getRecordState() == Consts.RECORD_STATE_RECORDING) {
                 startButton.setImageDrawable(planSummaryView.getContext().getResources().getDrawable(R.mipmap.pause_record_icon));
             }
-            recordInfo.setPlanId(planSummaryModel.getPlanId());//这里为什么要设置planId?
             //设置recordView是否显示；
             recordContainer.setVisibility(recordInfo.isExpand() ? View.VISIBLE : View.GONE);
-            if(recordInfo.isExpand()){
+            if (recordInfo.isExpand()) {
                 arrowImageView.animate().setDuration(0).rotation(90).start();
             }
             //这个地方有点问题，需要优化下，这样做没有多大必要；
@@ -184,11 +185,11 @@ public class TaskListAdapter extends RecyclerView.Adapter {
                 @Override
                 public void run() {
                     if (recordInfo != null) {
-                        expandedRecordingTimeView.setVisibility(recordInfo.isExpand() ? View.VISIBLE : View.GONE);
-                        recordingTimeTextView.setVisibility(recordInfo.isExpand() ? View.GONE : View.VISIBLE);
+//                        expandedRecordingTimeView.setVisibility(recordInfo.isExpand() ? View.VISIBLE : View.GONE);
+//                        recordingTimeTextView.setVisibility(recordInfo.isExpand() ? View.GONE : View.VISIBLE);
                         recordingTimeTextView.setText(FormatTime.calculateTimeString(recordInfo.getTimeDuration()));
                         expandedRecordingTimeView.setText(FormatTime.calculateTimeString(recordInfo.getTimeDuration()));
-                        ZLog.d(TAG, planSummaryModel.getPlanName() + " (runnable)" + this + " recording time:" + FormatTime.calculateTimeString(recordInfo.getTimeDuration()));
+                        ZLog.d(TAG, taskSummaryModel.recordInfo.getPlanName() + " (runnable)" + this + " recording time:" + FormatTime.calculateTimeString(recordInfo.getTimeDuration()));
                     }
                     handler.postDelayed(this, 1000);
                 }
@@ -209,8 +210,8 @@ public class TaskListAdapter extends RecyclerView.Adapter {
         }
 
         private void setListener(final int pos) {
-            final PlanSummaryModel planSummaryModel = (PlanSummaryModel) modelList.get(pos);
-            final TaskRecordInfo recordInfo = planSummaryModel.getRecordInfo();
+            final TaskSummaryModel taskSummaryModel = (TaskSummaryModel) modelList.get(pos);
+            final TaskRecordInfo recordInfo = taskSummaryModel.recordInfo;
             planSummaryView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -222,6 +223,7 @@ public class TaskListAdapter extends RecyclerView.Adapter {
                             expandedRecordingTimeView.setVisibility(View.VISIBLE);
                         }
                         recordInfo.setExpand(true);
+                        RecordTask.getInstance().updateExpandState(recordInfo);
                         arrowImageView.animate().setDuration(200).rotation(90).start();
                     } else {
                         recordContainer.setVisibility(View.GONE);
@@ -230,6 +232,7 @@ public class TaskListAdapter extends RecyclerView.Adapter {
                             recordingTimeTextView.setVisibility(View.VISIBLE);
                         }
                         recordInfo.setExpand(false);
+                        RecordTask.getInstance().updateExpandState(recordInfo);
                         arrowImageView.animate().setDuration(200).rotation(0).start();
                     }
                 }
@@ -276,6 +279,7 @@ public class TaskListAdapter extends RecyclerView.Adapter {
                         expandedRecordingTimeView.setVisibility(View.GONE);
                         recordContainer.setVisibility(View.GONE);
                         recordInfo.setExpand(false);
+                        RecordTask.getInstance().updateExpandState(recordInfo);
                         arrowImageView.animate().setDuration(200).rotation(0).start();
                     }
                 }
@@ -297,10 +301,10 @@ public class TaskListAdapter extends RecyclerView.Adapter {
                                         public void onOKClick(String planName) {
                                             if (!TextUtils.isEmpty(planName)) {
                                                 TaskDetailInfo info = new TaskDetailInfo();
-                                                info.setPlanId(planSummaryModel.getPlanId());
+                                                info.setPlanId(taskSummaryModel.recordInfo.getPlanId());
                                                 info.setPlanName(planName);
                                                 PlanTask.getInstance().renamePlan(info);
-                                                ((PlanSummaryModel) modelList.get(pos)).setPlanName(planName);
+                                                ((TaskSummaryModel) modelList.get(pos)).recordInfo.setPlanName(planName);
                                                 //注意需要更新adapter中的pos位置的数据，这样调用notifyItemChange才会刷新
                                                 //之前不刷新是因为更改的不是modelList中的数据；
                                                 notifyItemChanged(pos);
@@ -308,21 +312,21 @@ public class TaskListAdapter extends RecyclerView.Adapter {
                                         }
                                     });
                                     renameDialog.show();
-                                    renameDialog.setTextContent(planSummaryModel.getPlanName());
+                                    renameDialog.setTextContent(taskSummaryModel.recordInfo.getPlanName());
                                     break;
                                 case Consts.DELETE_PLAN:
                                     DeleteConfirmDialog deleteConfirmDialog = new DeleteConfirmDialog(context);
                                     deleteConfirmDialog.setListener(new DeleteConfirmDialog.DialogClickListener() {
                                         @Override
                                         public void onDeleteClick() {
-                                            PlanTask.getInstance().deletePlanDetailInfoById(planSummaryModel.getPlanId());
-                                            RecordTask.getInstance().deleteRecordInfoByPlanId(planSummaryModel.getPlanId());
+                                            PlanTask.getInstance().deletePlanDetailInfoById(taskSummaryModel.recordInfo.getPlanId());
+                                            RecordTask.getInstance().deleteRecordInfoByPlanId(taskSummaryModel.recordInfo.getPlanId());
                                             modelList.remove(pos);
                                             notifyDataSetChanged();
                                         }
                                     });
                                     deleteConfirmDialog.show();
-                                    deleteConfirmDialog.setTitleView(planSummaryModel.getPlanName());
+                                    deleteConfirmDialog.setTitleView(taskSummaryModel.recordInfo.getPlanName());
                                     break;
                                 case Consts.TRANSFER_PLAN:
                                     break;
@@ -441,60 +445,21 @@ public class TaskListAdapter extends RecyclerView.Adapter {
         }
     }
 
-    public static class PlanSummaryModel extends ItemModel {
+    public static class TaskSummaryModel extends ItemModel {
 
-        private String planId;
-        private String planName;
-        private int planType;
-        private boolean isShowRecordView = false;
-        private TaskRecordInfo recordInfo;
+        public boolean isShowRecordView = false;
+        public TaskRecordInfo recordInfo;
+
+        public TaskSummaryModel() {
+        }
+
+        public TaskSummaryModel(TaskRecordInfo taskRecordInfo) {
+            this.recordInfo = taskRecordInfo;
+        }
 
         @Override
         public int getType() {
             return PLAN_SUMMARY_TYPE;
-        }
-
-        public String getPlanName() {
-            return planName;
-        }
-
-        public void setPlanName(String planName) {
-            this.planName = planName;
-        }
-
-        public int getPlanType() {
-            return planType;
-        }
-
-        public void setPlanType(int planType) {
-            this.planType = planType;
-        }
-
-        public boolean isShowRecordView() {
-            return isShowRecordView;
-        }
-
-        public void setShowRecordView(boolean showRecordView) {
-            isShowRecordView = showRecordView;
-        }
-
-        @Override
-        public String getPlanId() {
-            return planId;
-        }
-
-        @Override
-        public void setPlanId(String planId) {
-            this.planId = planId;
-        }
-
-
-        public TaskRecordInfo getRecordInfo() {
-            return recordInfo;
-        }
-
-        public void setRecordInfo(TaskRecordInfo recordInfo) {
-            this.recordInfo = recordInfo;
         }
     }
 

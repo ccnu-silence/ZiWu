@@ -38,6 +38,7 @@ public class RecordTask extends ITask {
     }
 
     public void addTaskRecord(TaskRecordInfo recordInfo) {
+        int isExpand = recordInfo.isExpand() ? 1 : 0;
         String sql = "insert into " +
                 Consts.TABLE_NAME_RECORD_DETAIL +
                 " values('" +
@@ -46,7 +47,8 @@ public class RecordTask extends ITask {
                 recordInfo.getBeginTime() + "," +
                 recordInfo.getEndTime() + "," +
                 recordInfo.getRealRecordTime() + "," +
-                recordInfo.getRecordState() + ")";
+                recordInfo.getRecordState() + "," +
+                isExpand + ")";
         TaskManager.getDbHelper().getWritableDatabase().execSQL(sql);
     }
 
@@ -60,6 +62,13 @@ public class RecordTask extends ITask {
         TaskManager.getDbHelper().getWritableDatabase().execSQL(sql);
     }
 
+    public void updateExpandState(TaskRecordInfo recordInfo) {
+        int isExpand = recordInfo.isExpand() ? 1 : 0;
+        String updateSql = "update " + Consts.TABLE_NAME_RECORD_DETAIL +
+                " set isExpand = " + isExpand + " where recordId = '" + recordInfo.getRecordId() + "'";
+        TaskManager.getInstance().getDb().execSQL(updateSql);
+
+    }
 
     public long getPlanRecordStartTimeByType(int type) {
         long beginTime = 0;
@@ -220,7 +229,7 @@ public class RecordTask extends ITask {
         TaskManager.getInstance().getInstance().getWorkHandler().post(new Runnable() {
             @Override
             public void run() {
-                TaskRecordInfo taskRecordInfo = getLatestRecordInfoFromDb(planId);
+                TaskRecordInfo taskRecordInfo = getLatestRecordInfoFromDb(planId, -1);
                 TaskRecordInfo stopRecordInfo = getLatestRecordInStopStateFromDb(planId);
                 long timeDuration = 0;
                 if (taskRecordInfo.getRecordId() == null
@@ -229,14 +238,30 @@ public class RecordTask extends ITask {
                     return;
                 }
                 if (!taskRecordInfo.getRecordId().equals(stopRecordInfo.getRecordId())) {
-                    timeDuration = getRecordDurationFromDb(planId, stopRecordInfo.getBeginTime(), taskRecordInfo.getBeginTime());
+                    timeDuration = getTimeDurationInPauseStateFromDb(planId, stopRecordInfo.getBeginTime(), taskRecordInfo.getBeginTime());
                 }
                 callback.onSuccess(timeDuration);
             }
         });
     }
 
-    public long getRecordDurationFromDb(String planId, long begin, long stop) {
+    public long getRecordTimeFromDb(String planId) {
+        TaskRecordInfo lastRecordInfo = getLatestRecordInfoFromDb(planId, -1);
+        TaskRecordInfo lastStopStateRecordInfo = getLatestRecordInStopStateFromDb(planId);
+        long timeDuration = 0;
+        if (lastRecordInfo.getRecordState() == Consts.RECORD_STATE_RECORDING) {
+            TaskRecordInfo lastSecondRecordInfo = getLatestRecordInfoFromDb(planId, lastRecordInfo.getBeginTime());
+            if (lastSecondRecordInfo.getRecordState() == Consts.RECORD_STATE_PAUSE) {
+                timeDuration += getTimeDurationInPauseStateFromDb(planId, lastStopStateRecordInfo.getBeginTime(), lastSecondRecordInfo.getBeginTime());
+            }
+            timeDuration += System.currentTimeMillis() - lastRecordInfo.getBeginTime();
+        } else if (lastRecordInfo.getRecordState() == Consts.RECORD_STATE_PAUSE) {
+            timeDuration = getTimeDurationInPauseStateFromDb(planId, lastStopStateRecordInfo.getBeginTime(), lastRecordInfo.getBeginTime());
+        }
+        return timeDuration;
+    }
+
+    public long getTimeDurationInPauseStateFromDb(String planId, long begin, long stop) {
         String sql = "select sum(timeDuration) from " + Consts.TABLE_NAME_RECORD_DETAIL
                 + " where planId = '" + planId + "' and beginTime > " + begin + " and beginTime <= " + stop;
         Cursor cursor = TaskManager.getInstance().getDb().rawQuery(sql, null);
@@ -267,7 +292,7 @@ public class RecordTask extends ITask {
         TaskManager.getInstance().getWorkHandler().post(new Runnable() {
             @Override
             public void run() {
-                TaskRecordInfo recordInfo = getLatestRecordInfoFromDb(planId);
+                TaskRecordInfo recordInfo = getLatestRecordInfoFromDb(planId, -1);
                 callback.onSuccess(recordInfo);
             }
         });
@@ -279,10 +304,15 @@ public class RecordTask extends ITask {
      * @param planId
      * @return
      */
-    public TaskRecordInfo getLatestRecordInfoFromDb(String planId) {
+    public TaskRecordInfo getLatestRecordInfoFromDb(String planId, long beginTime) {
         TaskRecordInfo recordInfo = new TaskRecordInfo();
+        String partSql = "";
+        if (beginTime != -1) {
+            partSql = " and beginTime < " + beginTime;
+        }
         String sql = "select recordId, max(beginTime), recordState from "
-                + Consts.TABLE_NAME_RECORD_DETAIL + " where planId = '" + planId + "'";
+                + Consts.TABLE_NAME_RECORD_DETAIL + " where planId = '" + planId + "'"
+                + partSql;
         Cursor cursor = TaskManager.getInstance().getDb().rawQuery(sql, null);
         while (cursor.moveToNext()) {
             recordInfo.setRecordId(cursor.getString(0));
@@ -325,7 +355,7 @@ public class RecordTask extends ITask {
                 " left join " + Consts.TABLE_NAME_PLAN_DETAIL +
                 " on RecordDetail.planId=PlanDetail.planId where (beginTime> " + beginTime +
                 " and endTime< " + endTime +
-                ") and (recordState = "+Consts.RECORD_STATE_PAUSE+" or recordState = "+Consts.RECORD_STATE_STOP+")"+
+                ") and (recordState = " + Consts.RECORD_STATE_PAUSE + " or recordState = " + Consts.RECORD_STATE_STOP + ")" +
                 " order by beginTime desc";
         Cursor cursor = TaskManager.getDbHelper().getWritableDatabase().rawQuery(sql, null);
         while (cursor.moveToNext()) {

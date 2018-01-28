@@ -4,6 +4,7 @@ import android.database.Cursor;
 
 import com.github.tinkerti.ziwu.data.model.AddTaskDetailInfo;
 import com.github.tinkerti.ziwu.data.model.TaskDetailInfo;
+import com.github.tinkerti.ziwu.data.model.TaskRecordInfo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,33 +33,71 @@ public class PlanTask extends ITask {
         return SingleTonHolder.sIns;
     }
 
-    public List<TaskDetailInfo> getPlanDetailInfoByType(int type) {
-        List<TaskDetailInfo> planDetailInfoList = new ArrayList<>();
+    public void getPlanDetailInfoByType(final int type, final SimpleResultCallback<List<TaskRecordInfo>> resultCallback) {
+        TaskManager.getInstance().getWorkHandler().post(new Runnable() {
+            @Override
+            public void run() {
+                List<TaskRecordInfo> taskRecordInfoList = getPlanDetailInfoByTypeFromDb(type);
+                if (resultCallback != null) {
+                    resultCallback.onSuccess(taskRecordInfoList);
+                }
+            }
+        });
+    }
+
+    public List<TaskRecordInfo> getPlanDetailInfoByTypeFromDb(int type) {
+        List<TaskRecordInfo> planDetailInfoList = new ArrayList<>();
         long beginTime = 0;
-        long endTime = System.currentTimeMillis();
         switch (type) {
             case Consts.TYPE_IS_VALID:
                 beginTime = 0;
-                endTime = System.currentTimeMillis();
                 break;
         }
-        String sql = "select * from " +
-                Consts.TABLE_NAME_PLAN_DETAIL
+        String sql = "select PlanDetail.planId," +
+                "PlanDetail.planName," +
+                "PlanDetail.planType," +
+                "PlanDetail.createTime," +
+                "PlanDetail.planPriority," +
+                "PlanDetail.planTime," +
+                "PlanDetail.planJoinParentId," +
+                "PlanDetail.planTag," +
+                "PlanDetail.planNote," +
+                "RecordDetail.recordId," +
+                "max(RecordDetail.beginTime) as beginTime," +
+                "RecordDetail.endTime," +
+                "RecordDetail.timeDuration," +
+                "RecordDetail.recordState," +
+                "isExpand from " +
+                Consts.TABLE_NAME_PLAN_DETAIL +
+                " left join " + Consts.TABLE_NAME_RECORD_DETAIL + " on RecordDetail.planId = PlanDetail.planId "
                 + " where " + Consts.PLAN_DETAIL_TABLE_COLUMN_PLAN_TYPE
-                + " = " + type + " and createTime>" + beginTime;
+                + " = " + type + " and createTime>" + beginTime + " GROUP BY PlanDetail.planId ORDER BY PlanDetail.createTime desc";
         Cursor cursor = TaskManager.getInstance().getDb().rawQuery(sql, null);
+
         while (cursor.moveToNext()) {
-            TaskDetailInfo planDetailInfo = new TaskDetailInfo();
-            planDetailInfo.setPlanId(cursor.getString(cursor.getColumnIndex(Consts.PLAN_DETAIL_TABLE_COLUMN_PLAN_ID)));
-            planDetailInfo.setPlanName(cursor.getString(cursor.getColumnIndex(Consts.PLAN_DETAIL_TABLE_COLUMN_PLAN_NAME)));
-            planDetailInfo.setPlanType(cursor.getInt(cursor.getColumnIndex(Consts.PLAN_DETAIL_TABLE_COLUMN_PLAN_TYPE)));
-            planDetailInfo.setCreateTime(cursor.getLong(cursor.getColumnIndex(Consts.PLAN_DETAIL_TABLE_COLUMN_PLAN_CREATE_TIME)));
-            planDetailInfo.setPlanPriority(cursor.getInt(cursor.getColumnIndex(Consts.PLAN_DETAIL_TABLE_COLUMN_PLAN_PRIORITY)));
-            planDetailInfo.setPlanTime(cursor.getLong(cursor.getColumnIndex(Consts.PLAN_DETAIL_TABLE_COLUMN_PLAN_TIME)));
-            planDetailInfo.setPlanJoinParentId(cursor.getString(cursor.getColumnIndex(Consts.PLAN_DETAIL_TABLE_COLUMN_PLAN_JOIN_PARENT_ID)));
-            planDetailInfo.setPlanTag(cursor.getString(cursor.getColumnIndex(Consts.PLAN_DETAIL_TABLE_COLUMN_PLAN_TAG)));
-            planDetailInfo.setPlanNote(cursor.getString(cursor.getColumnIndex(Consts.PLAN_DETAIL_TABLE_COLUMN_PLAN_NOTE)));
-            planDetailInfoList.add(planDetailInfo);
+            TaskRecordInfo taskRecordInfo = new TaskRecordInfo();
+            taskRecordInfo.setPlanId(cursor.getString(cursor.getColumnIndex(Consts.PLAN_DETAIL_TABLE_COLUMN_PLAN_ID)));
+            taskRecordInfo.setPlanName(cursor.getString(cursor.getColumnIndex(Consts.PLAN_DETAIL_TABLE_COLUMN_PLAN_NAME)));
+            taskRecordInfo.setPlanType(cursor.getInt(cursor.getColumnIndex(Consts.PLAN_DETAIL_TABLE_COLUMN_PLAN_TYPE)));
+            taskRecordInfo.setCreateTime(cursor.getLong(cursor.getColumnIndex(Consts.PLAN_DETAIL_TABLE_COLUMN_PLAN_CREATE_TIME)));
+            taskRecordInfo.setPlanPriority(cursor.getInt(cursor.getColumnIndex(Consts.PLAN_DETAIL_TABLE_COLUMN_PLAN_PRIORITY)));
+            taskRecordInfo.setPlanTime(cursor.getLong(cursor.getColumnIndex(Consts.PLAN_DETAIL_TABLE_COLUMN_PLAN_TIME)));
+            taskRecordInfo.setPlanJoinParentId(cursor.getString(cursor.getColumnIndex(Consts.PLAN_DETAIL_TABLE_COLUMN_PLAN_JOIN_PARENT_ID)));
+            taskRecordInfo.setPlanTag(cursor.getString(cursor.getColumnIndex(Consts.PLAN_DETAIL_TABLE_COLUMN_PLAN_TAG)));
+            taskRecordInfo.setPlanNote(cursor.getString(cursor.getColumnIndex(Consts.PLAN_DETAIL_TABLE_COLUMN_PLAN_NOTE)));
+
+            taskRecordInfo.setRecordId(cursor.getString(cursor.getColumnIndex(Consts.RECORD_DETAIL_TABLE_COLUMN_RECORD_ID)));
+            taskRecordInfo.setBeginTime(cursor.getLong(cursor.getColumnIndex(Consts.RECORD_DETAIL_TABLE_COLUMN_BEGIN_TIME)));
+            taskRecordInfo.setEndTime(cursor.getLong(cursor.getColumnIndex(Consts.RECORD_DETAIL_TABLE_COLUMN_END_TIME)));
+            taskRecordInfo.setTimeDuration(cursor.getLong(cursor.getColumnIndex(Consts.RECORD_DETAIL_TABLE_COLUMN_TIME_DURATION)));
+            taskRecordInfo.setRecordState(cursor.getInt(cursor.getColumnIndex(Consts.RECORD_DETAIL_TABLE_COLUMN_RECORD_STATE)) == 0
+                    ? Consts.RECORD_STATE_STOP : cursor.getInt(cursor.getColumnIndex(Consts.RECORD_DETAIL_TABLE_COLUMN_RECORD_STATE)));
+            taskRecordInfo.setExpand(cursor.getInt(cursor.getColumnIndex(Consts.RECORD_DETAIL_TABLE_COLUMN_IS_EXPAND)) != 0);
+
+            long timeDuration = RecordTask.getInstance().getRecordTimeFromDb(taskRecordInfo.getPlanId());
+            taskRecordInfo.setTimeDuration(timeDuration);
+            planDetailInfoList.add(taskRecordInfo);
+
         }
         cursor.close();
         return planDetailInfoList;

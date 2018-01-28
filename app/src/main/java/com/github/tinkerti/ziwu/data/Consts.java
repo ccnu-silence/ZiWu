@@ -6,7 +6,7 @@ package com.github.tinkerti.ziwu.data;
 
 public class Consts {
 
-    public static final int TYPE_ALL=1001;
+    public static final int TYPE_ALL = 1001;
 
     public static final int RENAME_PLAN = 0;
     public static final int DELETE_PLAN = 1;
@@ -39,12 +39,19 @@ public class Consts {
     public static final String PLAN_DETAIL_TABLE_COLUMN_PLAN_NAME = "planName";
     public static final String PLAN_DETAIL_TABLE_COLUMN_PLAN_CREATE_TIME = "createTime";
     public static final String PLAN_DETAIL_TABLE_COLUMN_PLAN_PRIORITY = "planPriority";
-
     public static final String PLAN_DETAIL_TABLE_COLUMN_PLAN_TIME = "planTime";
-
     public static final String PLAN_DETAIL_TABLE_COLUMN_PLAN_JOIN_PARENT_ID = "planJoinParentId";
     public static final String PLAN_DETAIL_TABLE_COLUMN_PLAN_TAG = "planTag";
     public static final String PLAN_DETAIL_TABLE_COLUMN_PLAN_NOTE = "planNote";
+
+    public static final String RECORD_DETAIL_TABLE_COLUMN_RECORD_ID = "recordId";
+    public static final String RECORD_DETAIL_TABLE_COLUMN_PLAN_ID = "planId";
+    public static final String RECORD_DETAIL_TABLE_COLUMN_BEGIN_TIME = "beginTime";
+    public static final String RECORD_DETAIL_TABLE_COLUMN_END_TIME = "endTime";
+    public static final String RECORD_DETAIL_TABLE_COLUMN_TIME_DURATION = "timeDuration";
+    public static final String RECORD_DETAIL_TABLE_COLUMN_RECORD_STATE = "recordState";
+    public static final String RECORD_DETAIL_TABLE_COLUMN_IS_EXPAND = "isExpand";
+
 
     public static final String SERVICE_RECORDING_PLAN_INFO_LIST = "planRecordingList";
 
@@ -66,5 +73,6 @@ public class Consts {
             " beginTime integer ," +
             " endTime integer ," +
             " timeDuration integer," +
-            " recordState integer )";
+            " recordState integer," +
+            " isExpand integer )";
 }

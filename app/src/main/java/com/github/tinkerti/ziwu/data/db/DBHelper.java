@@ -15,7 +15,7 @@ import java.io.File;
 
 public class DBHelper extends SQLiteOpenHelper {
     private static String DBPath;
-    private static final int DB_VERSION = 2;
+    private static final int DB_VERSION = 3;
 
     public DBHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
         super(new AppContext(context, DBPath), name, factory, DB_VERSION);
@@ -40,11 +40,20 @@ public class DBHelper extends SQLiteOpenHelper {
             case 1:
                 updateDb1TO2(db);
                 break;
+            case 2:
+                updateDb2TO3(db);
+                break;
         }
     }
+
 
     private void updateDb1TO2(SQLiteDatabase database) {
         String sql = "ALTER TABLE " + Consts.TABLE_NAME_PLAN_DETAIL + " ADD COLUMN planNote text";
         database.execSQL(sql);
+    }
+
+    private void updateDb2TO3(SQLiteDatabase database) {
+        String addColumnSql = "ALTER TABLE " + Consts.TABLE_NAME_RECORD_DETAIL + " ADD COLUMN isExpand integer";
+        database.execSQL(addColumnSql);
     }
 }

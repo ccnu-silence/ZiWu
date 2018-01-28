@@ -19,9 +19,7 @@ import android.view.ViewGroup;
 import com.github.tinkerti.ziwu.R;
 import com.github.tinkerti.ziwu.data.Consts;
 import com.github.tinkerti.ziwu.data.PlanTask;
-import com.github.tinkerti.ziwu.data.RecordTask;
 import com.github.tinkerti.ziwu.data.SimpleResultCallback;
-import com.github.tinkerti.ziwu.data.model.TaskDetailInfo;
 import com.github.tinkerti.ziwu.data.model.TaskRecordInfo;
 import com.github.tinkerti.ziwu.ui.adapter.TaskListAdapter;
 import com.github.tinkerti.ziwu.ui.service.RecordService;
@@ -44,7 +42,7 @@ public class TaskFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ZLog.d(TAG, "onCreate");
+        ZLog.e(TAG, "onCreate");
         planRecordInfoMap = new HashMap<>();
         taskListAdapter = new TaskListAdapter();
         handler = new Handler(Looper.getMainLooper());
@@ -55,7 +53,7 @@ public class TaskFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        ZLog.d(TAG, "onCreateView");
+        ZLog.e(TAG, "onCreateView");
         View view = inflater.inflate(R.layout.fragment_plan_list, container, false);
         recyclerView = view.findViewById(R.id.fr_rv_plan_summary_list);
         types = new int[]{Consts.TYPE_IS_VALID};
@@ -67,63 +65,35 @@ public class TaskFragment extends Fragment {
     private void getPlanListByType(int[] types) {
         final List<TaskListAdapter.ItemModel> itemModelList = new ArrayList<>();
         for (final int type : types) {
-            //todo:需要查询recordInfo的状态，查询出record_state 为recording的计划，再次启动界面之后需要恢复计时状态
-            List<TaskDetailInfo> planList = PlanTask.getInstance().getPlanDetailInfoByType(type);
-            if (planList.size() > 0) {
-                for (final TaskDetailInfo planDetailInfo : planList) {
-                    final TaskListAdapter.PlanSummaryModel planSummaryModel = new TaskListAdapter.PlanSummaryModel();
-                    //从数据库中查询该任务最后一条记录的状态，若是RECORD_STATE_PAUSE，那么需要加上前面连续都是RECORD_STATE_PAUSE的时间
-                    RecordTask.getInstance().getRecordTime(planDetailInfo.getPlanId(), new SimpleResultCallback<Long>() {
-                        @Override
-                        protected void onSuccessOnUIThread(Long time) {
-                            TaskRecordInfo taskRecordInfo = planRecordInfoMap.get(planDetailInfo.getPlanId());
-                            if (taskRecordInfo == null) {
-                                taskRecordInfo = new TaskRecordInfo();
-                                planRecordInfoMap.put(planDetailInfo.getPlanId(), taskRecordInfo);
-                            }
-                            //如果是正在计时的状态，不能重置。
-                            if (taskRecordInfo.getRecordState() != Consts.RECORD_STATE_RECORDING) {
-                                taskRecordInfo.setTimeDuration(time);
-                            }
-                            taskRecordInfo.setPlanName(planDetailInfo.getPlanName());
-                            taskRecordInfo.setPlanId(planDetailInfo.getPlanId());
-                            planSummaryModel.setPlanName(planDetailInfo.getPlanName());
-                            planSummaryModel.setPlanId(planDetailInfo.getPlanId());
-                            planSummaryModel.setRecordInfo(taskRecordInfo);
-                            planSummaryModel.setPlanType(type);
-                            itemModelList.add(planSummaryModel);
-
-                            //setModelList()中没有进行notifyDateSetChanged的原因，是因为着这样做的话计时会有问题
-                            taskListAdapter.setModelList(itemModelList);
-                            //加上这一句代码，来刷新ui，否则的话，第一次进入app，添加计划，planList界面不刷新；
-                            recyclerView.setAdapter(taskListAdapter);
-                        }
-                    });
+            PlanTask.getInstance().getPlanDetailInfoByType(type, new SimpleResultCallback<List<TaskRecordInfo>>() {
+                @Override
+                protected void onSuccessOnUIThread(List<TaskRecordInfo> taskRecordInfoList) {
+                    for (TaskRecordInfo taskRecordInfo : taskRecordInfoList) {
+                        TaskListAdapter.TaskSummaryModel taskSummaryModel = new TaskListAdapter.TaskSummaryModel(taskRecordInfo);
+                        itemModelList.add(taskSummaryModel);
+                        //setModelList()中没有进行notifyDateSetChanged的原因，是因为着这样做的话计时会有问题
+                        taskListAdapter.setModelList(itemModelList);
+                        //加上这一句代码，来刷新ui，否则的话，第一次进入app，添加计划，planList界面不刷新；
+                        recyclerView.setAdapter(taskListAdapter);
+                    }
                 }
-            } else {
-                //展示暂无计划
-//                TaskListAdapter.NoPlanModel noPlanModel = new TaskListAdapter.NoPlanModel();
-//                noPlanModel.setNoPlanType(type);
-//                itemModelList.add(noPlanModel);
-            }
+            });
+
         }
-        //setModelList()中没有进行notifyDateSetChanged的原因，是因为着这样做的话计时会有问题
-        taskListAdapter.setModelList(itemModelList);
-        //加上这一句代码，来刷新ui，否则的话，第一次进入app，添加计划，planList界面不刷新；
-        recyclerView.setAdapter(taskListAdapter);
+        //TODO :如果没有task时，空白页面；
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        ZLog.d(TAG, "onResume");
+        ZLog.e(TAG, "onResume");
         //在这调用这个方法的目的是当添加新的plan之后，会回到主界面，
         // 当前fragment的生命周期不会走onCreate()和onCreateView（）,实时更新planList就需要在这添加这个方法
         getPlanListByType(types);
     }
 
     private void initBindService() {
-        ZLog.d(TAG, "initBindService");
+        ZLog.e(TAG, "initBindService");
         Intent intent = new Intent(getContext(), RecordService.class);
         serviceConnection = new RecordServiceConnection();
         getContext().startService(intent);
@@ -134,11 +104,10 @@ public class TaskFragment extends Fragment {
 
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
-            ZLog.d(TAG, "onServiceConnected: record service connected");
+            ZLog.e(TAG, "onServiceConnected: record service connected");
             RecordService.RecordServiceBinder binder = (RecordService.RecordServiceBinder) service;
             taskListAdapter.setBinder(binder);
             planRecordInfoMap = binder.getRecordInfoHashMap();
-//            getPlanListByType(types);
         }
 
         @Override
