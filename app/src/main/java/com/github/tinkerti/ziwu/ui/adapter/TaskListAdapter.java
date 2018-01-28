@@ -211,6 +211,8 @@ public class TaskListAdapter extends RecyclerView.Adapter {
             //如果是正在记录则需要去更新界面，而处于idle或者stop的状态，则不去更新
             if (recordInfo.getRecordState() == Consts.RECORD_STATE_RECORDING) {
                 handler.postDelayed(recordInfo.getRefreshUiRunnable(), 1000);
+                //同时需要调用service方法来开启计时；
+                
             } else if (recordInfo.getRecordState() == Consts.RECORD_STATE_STOP
                     || recordInfo.getRecordState() == Consts.RECORD_STATE_PAUSE) {
                 handler.removeCallbacks(recordInfo.getRefreshUiRunnable());
@@ -252,7 +254,6 @@ public class TaskListAdapter extends RecyclerView.Adapter {
                 public void onClick(View v) {
                     if (binder != null) {
                         if (recordInfo.getRecordState() == Consts.RECORD_STATE_STOP) {
-                            recordInfo.setTimeDuration(0);//为了解决，锁屏之后，结束计时，然后再开始计时，记录详情时间记录问题；
                             binder.startNewRecord(recordInfo);
                             handler.postDelayed(recordInfo.getRefreshUiRunnable(), 1000);//点击开始更新计时view；
                             startButton.setImageDrawable(planSummaryView.getContext().getResources().getDrawable(R.mipmap.pause_record_icon));
@@ -456,7 +457,7 @@ public class TaskListAdapter extends RecyclerView.Adapter {
     public static class TaskSummaryModel extends ItemModel {
 
         public TaskRecordInfo recordInfo;
-        public boolean isFirstTime=true;
+        public boolean isFirstTime = true;
 
         public TaskSummaryModel(TaskRecordInfo taskRecordInfo) {
             setPlanId(taskRecordInfo.getPlanId());

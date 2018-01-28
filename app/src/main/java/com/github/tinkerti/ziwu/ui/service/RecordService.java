@@ -26,18 +26,13 @@ import com.github.tinkerti.ziwu.ui.utils.ZLog;
 
 import org.greenrobot.eventbus.EventBus;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-
-import static com.github.tinkerti.ziwu.data.Consts.SERVICE_RECORDING_PLAN_INFO_LIST;
 
 public class RecordService extends Service {
 
     private static final String TAG = "RecordService";
     private Handler handler;
-    private ArrayList<TaskRecordInfo> recordInfoArrayList;
-
 
     @Override
     public void onCreate() {
@@ -47,7 +42,6 @@ public class RecordService extends Service {
         //不要忘了调用start();
         handlerThread.start();
         handler = new Handler(handlerThread.getLooper());
-        recordInfoArrayList = new ArrayList<>();
     }
 
     @Override
@@ -72,16 +66,10 @@ public class RecordService extends Service {
 
         public void startNewRecord(final TaskRecordInfo recordInfo) {
             ZLog.d(TAG, "start record:" + recordInfo.getPlanName());
-            recordInfoArrayList.add(recordInfo);
             showNotification(recordInfo);
             final Runnable startRecordRunnable = new Runnable() {
                 @Override
                 public void run() {
-                    //暂停之后，再开始计时，退出界面，在打开，时间总和显示不对；
-                    long timeDuration = System.currentTimeMillis() - recordInfo.getBeginTime();//矫正锁屏时计时不准确的问题
-                    if (timeDuration > recordInfo.getTimeDuration()) {
-                        recordInfo.setTimeDuration(timeDuration);
-                    }
                     recordInfo.setTimeDuration(recordInfo.getTimeDuration() + 1000);
 
                     //用于更新通知栏的计时状态
@@ -105,14 +93,13 @@ public class RecordService extends Service {
             recordInfo.setRecordId(UUID.randomUUID().toString());
             recordInfo.setRecordState(Consts.RECORD_STATE_RECORDING);
             recordInfo.setEndTime(System.currentTimeMillis());
-            recordInfo.setRealRecordTime(0);
             RecordTask.getInstance().addTaskRecord(recordInfo);
         }
 
         public void stopRecord(TaskRecordInfo recordInfo, boolean isPause) {
             if (recordInfo.getRecordState() == Consts.RECORD_STATE_RECORDING) {
                 recordInfo.setEndTime(System.currentTimeMillis());
-                recordInfo.setRealRecordTime(recordInfo.getEndTime() - recordInfo.getBeginTime());
+                recordInfo.setTimeDurationPerRecord(recordInfo.getEndTime() - recordInfo.getBeginTime());
                 recordInfo.setRecordState(isPause ? Consts.RECORD_STATE_PAUSE : Consts.RECORD_STATE_STOP);
                 RecordTask.getInstance().updateTaskRecord(recordInfo);
             } else if (recordInfo.getRecordState() == Consts.RECORD_STATE_PAUSE) {
@@ -125,6 +112,7 @@ public class RecordService extends Service {
             handler.removeCallbacks(recordInfo.getRecordTimeRunnable());
             ZLog.d(TAG, "remove runnable " + recordInfo.getRecordTimeRunnable());
             if (!isPause) {
+                //不是暂停的话，需要
                 recordInfo.setTimeDuration(0l);
             }
             NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
@@ -132,7 +120,6 @@ public class RecordService extends Service {
                 notificationManager.cancel(recordInfo.getNotificationInfo().getId());
                 stopForeground(true);
             }
-            recordInfoArrayList.remove(recordInfo);
         }
     }
 
@@ -162,8 +149,5 @@ public class RecordService extends Service {
     @Override
     public void onDestroy() {
         ZLog.e(TAG, "onDestroy");
-        Intent intent = new Intent(this, RecordService.class);
-        intent.putParcelableArrayListExtra(SERVICE_RECORDING_PLAN_INFO_LIST, recordInfoArrayList);
-        startService(intent);
     }
 }

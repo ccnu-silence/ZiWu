@@ -25,25 +25,15 @@ public class TaskRecordInfo extends TaskBaseInfo implements Parcelable {
     private NotificationInfo notificationInfo;
     private String taskNote;
 
-    public long getTotalRecordTime() {
-        return totalRecordTime;
+    public long getTimeDurationPerRecord() {
+        return timeDurationPerRecord;
     }
 
-    public void setTotalRecordTime(long totalRecordTime) {
-        this.totalRecordTime = totalRecordTime;
+    public void setTimeDurationPerRecord(long timeDurationPerRecord) {
+        this.timeDurationPerRecord = timeDurationPerRecord;
     }
 
-    private long totalRecordTime = 0;
-
-    public long getRealRecordTime() {
-        return realRecordTime;
-    }
-
-    public void setRealRecordTime(long realRecordTime) {
-        this.realRecordTime = realRecordTime;
-    }
-
-    private long realRecordTime;
+    private long timeDurationPerRecord;
 
     public boolean isExpand() {
         return isExpand;
@@ -78,6 +68,7 @@ public class TaskRecordInfo extends TaskBaseInfo implements Parcelable {
     public void setNotificationInfo(NotificationInfo notificationInfo) {
         this.notificationInfo = notificationInfo;
     }
+
     public TaskRecordInfo() {
     }
 
@@ -96,8 +87,7 @@ public class TaskRecordInfo extends TaskBaseInfo implements Parcelable {
         timeDuration = in.readLong();
         recordState = in.readInt();
         recordId = in.readString();
-        totalRecordTime = in.readLong();
-        notificationInfo=in.readParcelable(Thread.currentThread().getContextClassLoader()) ;
+        notificationInfo = in.readParcelable(Thread.currentThread().getContextClassLoader());
     }
 
     public static final Creator<TaskRecordInfo> CREATOR = new Creator<TaskRecordInfo>() {
@@ -156,7 +146,6 @@ public class TaskRecordInfo extends TaskBaseInfo implements Parcelable {
         dest.writeLong(timeDuration);
         dest.writeInt(recordState);
         dest.writeString(recordId);
-        dest.writeLong(totalRecordTime);
-        dest.writeParcelable(notificationInfo,0);
+        dest.writeParcelable(notificationInfo, 0);
     }
 }

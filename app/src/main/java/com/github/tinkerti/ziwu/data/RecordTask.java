@@ -46,7 +46,7 @@ public class RecordTask extends ITask {
                 recordInfo.getPlanId() + "'," +
                 recordInfo.getBeginTime() + "," +
                 recordInfo.getEndTime() + "," +
-                recordInfo.getRealRecordTime() + "," +
+                recordInfo.getTimeDuration() + "," +
                 recordInfo.getRecordState() + "," +
                 isExpand + ")";
         TaskManager.getDbHelper().getWritableDatabase().execSQL(sql);
@@ -55,7 +55,7 @@ public class RecordTask extends ITask {
     public void updateTaskRecord(TaskRecordInfo recordInfo) {
         String sql = "update " + Consts.TABLE_NAME_RECORD_DETAIL +
                 " set endTime= " + recordInfo.getEndTime() +
-                ",timeDuration=" + recordInfo.getRealRecordTime() +
+                ",timeDuration=" + recordInfo.getTimeDurationPerRecord() +
                 ",recordState=" + recordInfo.getRecordState() +
                 " where recordId='" + recordInfo.getRecordId() +
                 "'";
