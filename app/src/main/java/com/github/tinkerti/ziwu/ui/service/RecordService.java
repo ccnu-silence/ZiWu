@@ -15,6 +15,7 @@ import android.widget.RemoteViews;
 
 import com.github.tinkerti.ziwu.R;
 import com.github.tinkerti.ziwu.data.Consts;
+import com.github.tinkerti.ziwu.data.Event;
 import com.github.tinkerti.ziwu.data.RecordTask;
 import com.github.tinkerti.ziwu.data.model.NotificationInfo;
 import com.github.tinkerti.ziwu.data.model.TaskRecordInfo;
@@ -23,22 +24,18 @@ import com.github.tinkerti.ziwu.ui.utils.CommonUtils;
 import com.github.tinkerti.ziwu.ui.utils.FormatTime;
 import com.github.tinkerti.ziwu.ui.utils.ZLog;
 
+import org.greenrobot.eventbus.EventBus;
+
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
 import static com.github.tinkerti.ziwu.data.Consts.SERVICE_RECORDING_PLAN_INFO_LIST;
 
-/**
- * Created by tiankui on 4/30/17.
- */
-
 public class RecordService extends Service {
 
     private static final String TAG = "RecordService";
     private Handler handler;
-    private HashMap<String, TaskRecordInfo> recordInfoHashMap;
     private ArrayList<TaskRecordInfo> recordInfoArrayList;
 
 
@@ -50,7 +47,6 @@ public class RecordService extends Service {
         //不要忘了调用start();
         handlerThread.start();
         handler = new Handler(handlerThread.getLooper());
-        recordInfoHashMap = new HashMap<>();
         recordInfoArrayList = new ArrayList<>();
     }
 
@@ -60,7 +56,6 @@ public class RecordService extends Service {
             List<TaskRecordInfo> recordInfoList = intent.getParcelableArrayListExtra(Consts.SERVICE_RECORDING_PLAN_INFO_LIST);
             if (recordInfoList != null) {
                 for (TaskRecordInfo info : recordInfoList) {
-                    recordInfoHashMap.put(info.getPlanId(), info);
                 }
             }
         }
@@ -74,13 +69,9 @@ public class RecordService extends Service {
     }
 
     public class RecordServiceBinder extends Binder {
-        public HashMap<String, TaskRecordInfo> getRecordInfoHashMap() {
-            return recordInfoHashMap;
-        }
 
         public void startNewRecord(final TaskRecordInfo recordInfo) {
             ZLog.d(TAG, "start record:" + recordInfo.getPlanName());
-            recordInfoHashMap.put(recordInfo.getPlanId(), recordInfo);
             recordInfoArrayList.add(recordInfo);
             showNotification(recordInfo);
             final Runnable startRecordRunnable = new Runnable() {
@@ -105,6 +96,8 @@ public class RecordService extends Service {
                     recordInfo.setRecordState(Consts.RECORD_STATE_RECORDING);
                     handler.postDelayed(this, 1000);
                     recordInfo.setRecordTimeRunnable(this);
+
+                    EventBus.getDefault().post(new Event.RecordEvent(recordInfo));
                 }
             };
             handler.postDelayed(startRecordRunnable, 1000);
@@ -122,7 +115,7 @@ public class RecordService extends Service {
                 recordInfo.setRealRecordTime(recordInfo.getEndTime() - recordInfo.getBeginTime());
                 recordInfo.setRecordState(isPause ? Consts.RECORD_STATE_PAUSE : Consts.RECORD_STATE_STOP);
                 RecordTask.getInstance().updateTaskRecord(recordInfo);
-            }else if(recordInfo.getRecordState()==Consts.RECORD_STATE_PAUSE){
+            } else if (recordInfo.getRecordState() == Consts.RECORD_STATE_PAUSE) {
                 //当处于暂停状态时，如果点击stop按钮，需要更新数据库中的记录状态；
                 recordInfo.setRecordState(isPause ? Consts.RECORD_STATE_PAUSE : Consts.RECORD_STATE_STOP);
                 RecordTask.getInstance().updateTaskRecord(recordInfo);

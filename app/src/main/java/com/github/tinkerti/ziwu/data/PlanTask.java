@@ -9,10 +9,6 @@ import com.github.tinkerti.ziwu.data.model.TaskRecordInfo;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by tiankui on 4/23/17.
- */
-
 public class PlanTask extends ITask {
 
     private static class SingleTonHolder {

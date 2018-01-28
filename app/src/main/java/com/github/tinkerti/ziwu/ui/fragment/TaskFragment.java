@@ -18,6 +18,7 @@ import android.view.ViewGroup;
 
 import com.github.tinkerti.ziwu.R;
 import com.github.tinkerti.ziwu.data.Consts;
+import com.github.tinkerti.ziwu.data.Event;
 import com.github.tinkerti.ziwu.data.PlanTask;
 import com.github.tinkerti.ziwu.data.SimpleResultCallback;
 import com.github.tinkerti.ziwu.data.model.TaskRecordInfo;
@@ -25,17 +26,18 @@ import com.github.tinkerti.ziwu.ui.adapter.TaskListAdapter;
 import com.github.tinkerti.ziwu.ui.service.RecordService;
 import com.github.tinkerti.ziwu.ui.utils.ZLog;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class TaskFragment extends Fragment {
     private static final String TAG = "TaskFragment";
     TaskListAdapter taskListAdapter;
     int[] types;
     private RecordServiceConnection serviceConnection;
-    private Map<String, TaskRecordInfo> planRecordInfoMap;
     private RecyclerView recyclerView;
     private Handler handler;
 
@@ -43,10 +45,10 @@ public class TaskFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ZLog.e(TAG, "onCreate");
-        planRecordInfoMap = new HashMap<>();
         taskListAdapter = new TaskListAdapter();
         handler = new Handler(Looper.getMainLooper());
         taskListAdapter.setHandler(handler);
+        EventBus.getDefault().register(this);
         initBindService();
     }
 
@@ -83,6 +85,24 @@ public class TaskFragment extends Fragment {
         //TODO :如果没有task时，空白页面；
     }
 
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onRecordEvnet(Event.RecordEvent recordEvent) {
+        TaskRecordInfo recordInfo = recordEvent.recordInfo;
+        ZLog.e(TAG, "receive event:" + recordInfo.getRecordId());
+        int position = taskListAdapter.findPosition(recordInfo);
+        if (position >= 0) {
+            TaskListAdapter.ItemModel itemModel = taskListAdapter.getModelList().get(position);
+            if (itemModel instanceof TaskListAdapter.TaskSummaryModel) {
+                TaskListAdapter.TaskSummaryModel taskSummaryModel = (TaskListAdapter.TaskSummaryModel) itemModel;
+                if (taskSummaryModel.isFirstTime) {
+                    taskSummaryModel.recordInfo = recordInfo;
+                    taskSummaryModel.isFirstTime = false;
+                    taskListAdapter.notifyItemChanged(position);
+                }
+            }
+        }
+    }
+
     @Override
     public void onResume() {
         super.onResume();
@@ -107,7 +127,6 @@ public class TaskFragment extends Fragment {
             ZLog.e(TAG, "onServiceConnected: record service connected");
             RecordService.RecordServiceBinder binder = (RecordService.RecordServiceBinder) service;
             taskListAdapter.setBinder(binder);
-            planRecordInfoMap = binder.getRecordInfoHashMap();
         }
 
         @Override
@@ -124,14 +143,16 @@ public class TaskFragment extends Fragment {
     }
 
     @Override
-    public void onStop() {
-        super.onStop();
-    }
-
-    @Override
     public void onDestroy() {
         super.onDestroy();
         ZLog.e(TAG, "onDestroy");
+        for (TaskListAdapter.ItemModel itemModel : taskListAdapter.getModelList()) {
+            if (itemModel instanceof TaskListAdapter.TaskSummaryModel) {
+                TaskListAdapter.TaskSummaryModel taskSummaryModel = (TaskListAdapter.TaskSummaryModel) itemModel;
+                taskListAdapter.getHandler().removeCallbacks(taskSummaryModel.recordInfo.getRefreshUiRunnable());
+            }
+        }
         getContext().unbindService(serviceConnection);
+        EventBus.getDefault().unregister(this);
     }
 }

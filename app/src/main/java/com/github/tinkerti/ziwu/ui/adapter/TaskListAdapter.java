@@ -36,8 +36,18 @@ public class TaskListAdapter extends RecyclerView.Adapter {
     private static final int PLAN_CATEGORY_TYPE = 1;
     private static final int PLAN_SUMMARY_TYPE = 2;
     private static final int NO_PLAN_TYPE = 4;
+
+    public List<ItemModel> getModelList() {
+        return modelList;
+    }
+
     List<ItemModel> modelList;
     private RecordService.RecordServiceBinder binder;
+
+    public Handler getHandler() {
+        return handler;
+    }
+
     private Handler handler;//更新界面用；
 
     public TaskListAdapter() {
@@ -185,8 +195,6 @@ public class TaskListAdapter extends RecyclerView.Adapter {
                 @Override
                 public void run() {
                     if (recordInfo != null) {
-//                        expandedRecordingTimeView.setVisibility(recordInfo.isExpand() ? View.VISIBLE : View.GONE);
-//                        recordingTimeTextView.setVisibility(recordInfo.isExpand() ? View.GONE : View.VISIBLE);
                         recordingTimeTextView.setText(FormatTime.calculateTimeString(recordInfo.getTimeDuration()));
                         expandedRecordingTimeView.setText(FormatTime.calculateTimeString(recordInfo.getTimeDuration()));
                         ZLog.d(TAG, taskSummaryModel.recordInfo.getPlanName() + " (runnable)" + this + " recording time:" + FormatTime.calculateTimeString(recordInfo.getTimeDuration()));
@@ -447,13 +455,11 @@ public class TaskListAdapter extends RecyclerView.Adapter {
 
     public static class TaskSummaryModel extends ItemModel {
 
-        public boolean isShowRecordView = false;
         public TaskRecordInfo recordInfo;
-
-        public TaskSummaryModel() {
-        }
+        public boolean isFirstTime=true;
 
         public TaskSummaryModel(TaskRecordInfo taskRecordInfo) {
+            setPlanId(taskRecordInfo.getPlanId());
             this.recordInfo = taskRecordInfo;
         }
 
@@ -469,5 +475,16 @@ public class TaskListAdapter extends RecyclerView.Adapter {
 
     public void setBinder(RecordService.RecordServiceBinder binder) {
         this.binder = binder;
+    }
+
+    public int findPosition(TaskRecordInfo recordInfo) {
+        int position = -1;
+        for (ItemModel itemModel : modelList) {
+            position++;
+            if (recordInfo.getPlanId().equals(itemModel.getPlanId())) {
+                return position;
+            }
+        }
+        return position;
     }
 }
