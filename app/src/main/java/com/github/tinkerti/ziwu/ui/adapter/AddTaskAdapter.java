@@ -12,7 +12,7 @@ import android.widget.EditText;
 import com.github.tinkerti.ziwu.R;
 import com.github.tinkerti.ziwu.data.Consts;
 import com.github.tinkerti.ziwu.data.PlanTask;
-import com.github.tinkerti.ziwu.data.model.AddPlanDetailInfo;
+import com.github.tinkerti.ziwu.data.model.AddTaskDetailInfo;
 import com.github.tinkerti.ziwu.ui.activity.AddTaskActivity;
 import com.github.tinkerti.ziwu.ui.widget.AddTaskItemLayout;
 
@@ -102,7 +102,7 @@ public class AddTaskAdapter extends RecyclerView.Adapter {
                 addTaskActivity.setSaveTaskInfoListener(new AddTaskActivity.SaveTaskInfoListener() {
                     @Override
                     public void saveTaskInfo() {
-                        AddPlanDetailInfo addPlanDetailInfo = new AddPlanDetailInfo();
+                        AddTaskDetailInfo addPlanDetailInfo = new AddTaskDetailInfo();
                         addPlanDetailInfo.setPlanId(UUID.randomUUID().toString());
                         addPlanDetailInfo.setPlanType(Consts.TYPE_IS_VALID);
                         addPlanDetailInfo.setPlanName(nameItemView.getItemContent());

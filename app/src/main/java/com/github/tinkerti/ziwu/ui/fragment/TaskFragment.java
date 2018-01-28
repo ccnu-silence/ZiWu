@@ -21,7 +21,7 @@ import com.github.tinkerti.ziwu.data.Consts;
 import com.github.tinkerti.ziwu.data.PlanTask;
 import com.github.tinkerti.ziwu.data.RecordTask;
 import com.github.tinkerti.ziwu.data.SimpleResultCallback;
-import com.github.tinkerti.ziwu.data.model.PlanDetailInfo;
+import com.github.tinkerti.ziwu.data.model.TaskDetailInfo;
 import com.github.tinkerti.ziwu.data.model.TaskRecordInfo;
 import com.github.tinkerti.ziwu.ui.adapter.TaskListAdapter;
 import com.github.tinkerti.ziwu.ui.service.RecordService;
@@ -59,7 +59,6 @@ public class TaskFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_plan_list, container, false);
         recyclerView = view.findViewById(R.id.fr_rv_plan_summary_list);
         types = new int[]{Consts.TYPE_IS_VALID};
-        getPlanListByType(types);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(taskListAdapter);
         return view;
@@ -69,9 +68,9 @@ public class TaskFragment extends Fragment {
         final List<TaskListAdapter.ItemModel> itemModelList = new ArrayList<>();
         for (final int type : types) {
             //todo:需要查询recordInfo的状态，查询出record_state 为recording的计划，再次启动界面之后需要恢复计时状态
-            List<PlanDetailInfo> planList = PlanTask.getInstance().getPlanDetailInfoByType(type);
+            List<TaskDetailInfo> planList = PlanTask.getInstance().getPlanDetailInfoByType(type);
             if (planList.size() > 0) {
-                for (final PlanDetailInfo planDetailInfo : planList) {
+                for (final TaskDetailInfo planDetailInfo : planList) {
                     final TaskListAdapter.PlanSummaryModel planSummaryModel = new TaskListAdapter.PlanSummaryModel();
                     //从数据库中查询该任务最后一条记录的状态，若是RECORD_STATE_PAUSE，那么需要加上前面连续都是RECORD_STATE_PAUSE的时间
                     RecordTask.getInstance().getRecordTime(planDetailInfo.getPlanId(), new SimpleResultCallback<Long>() {
@@ -139,7 +138,7 @@ public class TaskFragment extends Fragment {
             RecordService.RecordServiceBinder binder = (RecordService.RecordServiceBinder) service;
             taskListAdapter.setBinder(binder);
             planRecordInfoMap = binder.getRecordInfoHashMap();
-            getPlanListByType(types);
+//            getPlanListByType(types);
         }
 
         @Override

@@ -7,7 +7,7 @@ import android.os.Parcelable;
  * Created by tiankui on 4/23/17.
  */
 
-public class PlanBaseInfo implements Parcelable{
+public class TaskBaseInfo implements Parcelable{
     private String planId;
     private String planName;
     private int planType;
@@ -28,9 +28,9 @@ public class PlanBaseInfo implements Parcelable{
 
     private String planNote;
 
-    public PlanBaseInfo(){}
+    public TaskBaseInfo(){}
 
-    protected PlanBaseInfo(Parcel in) {
+    protected TaskBaseInfo(Parcel in) {
         planId=in.readString();
         planName = in.readString();
         planType=in.readInt();
@@ -42,15 +42,15 @@ public class PlanBaseInfo implements Parcelable{
         planDuration = in.readString();
     }
 
-    public static final Creator<PlanBaseInfo> CREATOR = new Creator<PlanBaseInfo>() {
+    public static final Creator<TaskBaseInfo> CREATOR = new Creator<TaskBaseInfo>() {
         @Override
-        public PlanBaseInfo createFromParcel(Parcel in) {
-            return new PlanBaseInfo(in);
+        public TaskBaseInfo createFromParcel(Parcel in) {
+            return new TaskBaseInfo(in);
         }
 
         @Override
-        public PlanBaseInfo[] newArray(int size) {
-            return new PlanBaseInfo[size];
+        public TaskBaseInfo[] newArray(int size) {
+            return new TaskBaseInfo[size];
         }
     };
 

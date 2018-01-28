@@ -31,11 +31,11 @@ public class BaseActivity extends FragmentActivity {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         super.setContentView(R.layout.activity_base);
-        planContentFrameLayout = (FrameLayout) findViewById(R.id.ac_fl_base_container);
-        nameTextView = (TextView) findViewById(R.id.bar_tv_title);
-        titleBar = (ViewGroup) findViewById(R.id.bar_rl_title_bar);
-        navigationImageView = (ImageView) findViewById(R.id.bar_iv_navigate_back);
-        searchImageView = (ImageView) findViewById(R.id.bar_iv_search_button);
+        planContentFrameLayout = findViewById(R.id.ac_fl_base_container);
+        nameTextView = findViewById(R.id.bar_tv_title);
+        titleBar = findViewById(R.id.bar_rl_title_bar);
+        navigationImageView = findViewById(R.id.bar_iv_navigate_back);
+        searchImageView = findViewById(R.id.bar_iv_search_button);
 
         onCreateTitleBar(new TitleBar());
         navigationImageView.setOnClickListener(new View.OnClickListener() {
@@ -76,8 +76,5 @@ public class BaseActivity extends FragmentActivity {
             View view = View.inflate(getBaseContext(), resId, titleBar);
             return view;
         }
-    }
-
-    public void onOptionClick() {
     }
 }

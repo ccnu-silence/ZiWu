@@ -11,10 +11,6 @@ import com.github.tinkerti.ziwu.stetho.TMDatabaseDriver;
 import com.github.tinkerti.ziwu.stetho.TMDatabaseFilesProvider;
 import com.github.tinkerti.ziwu.stetho.TMDbFilesDumperPlugin;
 
-/**
- * Created by tiankui on 4/9/17.
- */
-
 public class App extends Application{
 
     @Override

@@ -9,7 +9,7 @@ import com.github.tinkerti.ziwu.data.Consts;
  * Created by tiankui on 4/30/17.
  */
 
-public class TaskRecordInfo extends PlanBaseInfo implements Parcelable {
+public class TaskRecordInfo extends TaskBaseInfo implements Parcelable {
 
     public String getRecordId() {
         return recordId;

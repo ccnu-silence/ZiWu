@@ -17,7 +17,7 @@ import com.github.tinkerti.ziwu.R;
 import com.github.tinkerti.ziwu.data.Consts;
 import com.github.tinkerti.ziwu.data.PlanTask;
 import com.github.tinkerti.ziwu.data.RecordTask;
-import com.github.tinkerti.ziwu.data.model.PlanDetailInfo;
+import com.github.tinkerti.ziwu.data.model.TaskDetailInfo;
 import com.github.tinkerti.ziwu.data.model.TaskRecordInfo;
 import com.github.tinkerti.ziwu.ui.activity.AddTaskActivity;
 import com.github.tinkerti.ziwu.ui.service.RecordService;
@@ -296,7 +296,7 @@ public class TaskListAdapter extends RecyclerView.Adapter {
                                         @Override
                                         public void onOKClick(String planName) {
                                             if (!TextUtils.isEmpty(planName)) {
-                                                PlanDetailInfo info = new PlanDetailInfo();
+                                                TaskDetailInfo info = new TaskDetailInfo();
                                                 info.setPlanId(planSummaryModel.getPlanId());
                                                 info.setPlanName(planName);
                                                 PlanTask.getInstance().renamePlan(info);

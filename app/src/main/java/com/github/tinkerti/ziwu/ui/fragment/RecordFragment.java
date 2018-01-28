@@ -60,9 +60,6 @@ public class RecordFragment extends Fragment {
         recordListAdapter.setListItemClickListener(new RecordListAdapter.RecordListItemClickListener() {
             @Override
             public void onClick(RecordListAdapter.RecordListItemModel itemModel) {
-//                Intent intent = new Intent(getActivity(), ModifyRecordDetailActivity.class);
-//                intent.putExtra("recordId", itemModel.getRecordId());
-//                startActivity(intent);
             }
         });
         planTypeTextView.setOnClickListener(new View.OnClickListener() {

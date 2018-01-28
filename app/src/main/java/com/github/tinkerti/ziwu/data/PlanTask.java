@@ -2,8 +2,8 @@ package com.github.tinkerti.ziwu.data;
 
 import android.database.Cursor;
 
-import com.github.tinkerti.ziwu.data.model.AddPlanDetailInfo;
-import com.github.tinkerti.ziwu.data.model.PlanDetailInfo;
+import com.github.tinkerti.ziwu.data.model.AddTaskDetailInfo;
+import com.github.tinkerti.ziwu.data.model.TaskDetailInfo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,8 +32,8 @@ public class PlanTask extends ITask {
         return SingleTonHolder.sIns;
     }
 
-    public List<PlanDetailInfo> getPlanDetailInfoByType(int type) {
-        List<PlanDetailInfo> planDetailInfoList = new ArrayList<>();
+    public List<TaskDetailInfo> getPlanDetailInfoByType(int type) {
+        List<TaskDetailInfo> planDetailInfoList = new ArrayList<>();
         long beginTime = 0;
         long endTime = System.currentTimeMillis();
         switch (type) {
@@ -48,7 +48,7 @@ public class PlanTask extends ITask {
                 + " = " + type + " and createTime>" + beginTime;
         Cursor cursor = TaskManager.getInstance().getDb().rawQuery(sql, null);
         while (cursor.moveToNext()) {
-            PlanDetailInfo planDetailInfo = new PlanDetailInfo();
+            TaskDetailInfo planDetailInfo = new TaskDetailInfo();
             planDetailInfo.setPlanId(cursor.getString(cursor.getColumnIndex(Consts.PLAN_DETAIL_TABLE_COLUMN_PLAN_ID)));
             planDetailInfo.setPlanName(cursor.getString(cursor.getColumnIndex(Consts.PLAN_DETAIL_TABLE_COLUMN_PLAN_NAME)));
             planDetailInfo.setPlanType(cursor.getInt(cursor.getColumnIndex(Consts.PLAN_DETAIL_TABLE_COLUMN_PLAN_TYPE)));
@@ -64,7 +64,7 @@ public class PlanTask extends ITask {
         return planDetailInfoList;
     }
 
-    public void addPlanToDb(AddPlanDetailInfo info) {
+    public void addPlanToDb(AddTaskDetailInfo info) {
         //在插入的时候书写sql语句出现了问题，text类型的数据需要额外添加''引号来表示；
         String sql = "insert or replace into " + Consts.TABLE_NAME_PLAN_DETAIL +
                 " values ( '" +
@@ -87,7 +87,7 @@ public class PlanTask extends ITask {
     }
 
 
-    public void renamePlan(PlanDetailInfo info) {
+    public void renamePlan(TaskDetailInfo info) {
         String sql = "update " + Consts.TABLE_NAME_PLAN_DETAIL +
                 " set planName= '" + info.getPlanName() +
                 "' where planId='" + info.getPlanId() +
