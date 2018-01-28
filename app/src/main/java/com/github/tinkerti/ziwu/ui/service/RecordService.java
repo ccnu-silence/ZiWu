@@ -105,7 +105,7 @@ public class RecordService extends Service {
             } else if (recordInfo.getRecordState() == Consts.RECORD_STATE_PAUSE) {
                 //当处于暂停状态时，如果点击stop按钮，需要更新数据库中的记录状态；
                 recordInfo.setRecordState(isPause ? Consts.RECORD_STATE_PAUSE : Consts.RECORD_STATE_STOP);
-                RecordTask.getInstance().updateTaskRecord(recordInfo);
+                RecordTask.getInstance().updateRecordState(recordInfo);
             }
             recordInfo.setRecordState(isPause ? Consts.RECORD_STATE_PAUSE : Consts.RECORD_STATE_STOP);
             ZLog.d(TAG, "stop record:" + recordInfo.getPlanName());

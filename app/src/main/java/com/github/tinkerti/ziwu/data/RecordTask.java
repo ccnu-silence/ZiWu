@@ -62,6 +62,14 @@ public class RecordTask extends ITask {
         TaskManager.getDbHelper().getWritableDatabase().execSQL(sql);
     }
 
+    public void updateRecordState(TaskRecordInfo recordInfo) {
+        String sql = "update " + Consts.TABLE_NAME_RECORD_DETAIL +
+                " set recordState= " + recordInfo.getRecordState() +
+                " where recordId='" + recordInfo.getRecordId() +
+                "'";
+        TaskManager.getDbHelper().getWritableDatabase().execSQL(sql);
+    }
+
     public void updateExpandState(TaskRecordInfo recordInfo) {
         int isExpand = recordInfo.isExpand() ? 1 : 0;
         String updateSql = "update " + Consts.TABLE_NAME_RECORD_DETAIL +
