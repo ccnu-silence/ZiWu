@@ -24,8 +24,6 @@
         <activity android:name=".ui.activity.BaseActivity" />
         <activity android:name=".ui.activity.AddTaskActivity" />
 
-        <service android:name=".ui.service.RecordService" />
-
         <activity android:name=".ui.activity.ModifyRecordDetailActivity" />
         <activity android:name=".ui.activity.RecordChartActivity" />
     </application>

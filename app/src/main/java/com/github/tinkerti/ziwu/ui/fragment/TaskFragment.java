@@ -2,8 +2,6 @@ package com.github.tinkerti.ziwu.ui.fragment;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -33,15 +31,13 @@ public class TaskFragment extends Fragment {
     TaskListAdapter taskListAdapter;
     int[] types;
     private RecyclerView recyclerView;
-    private Handler handler;
+
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ZLog.e(TAG, "onCreate");
         taskListAdapter = new TaskListAdapter();
-        handler = new Handler(Looper.getMainLooper());
-        taskListAdapter.setHandler(handler);
         EventBus.getDefault().register(this);
     }
 
@@ -119,7 +115,7 @@ public class TaskFragment extends Fragment {
         for (TaskListAdapter.ItemModel itemModel : taskListAdapter.getModelList()) {
             if (itemModel instanceof TaskListAdapter.TaskSummaryModel) {
                 TaskListAdapter.TaskSummaryModel taskSummaryModel = (TaskListAdapter.TaskSummaryModel) itemModel;
-                taskListAdapter.getHandler().removeCallbacks(taskSummaryModel.recordInfo.getRefreshUiRunnable());
+                taskListAdapter.getUiHandler().removeCallbacks(taskSummaryModel.recordInfo.getRefreshUiRunnable());
                 taskListAdapter.getWorkHandler().removeCallbacks(taskSummaryModel.recordInfo.getRecordTimeRunnable());
             }
         }
