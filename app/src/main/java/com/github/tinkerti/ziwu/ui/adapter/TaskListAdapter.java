@@ -223,9 +223,9 @@ public class TaskListAdapter extends RecyclerView.Adapter {
 
             //如果是正在记录则需要去更新界面，而处于idle或者stop的状态，则不去更新
             if (recordInfo.getRecordState() == Consts.RECORD_STATE_RECORDING) {
-                uiHandler.postDelayed(recordInfo.getRefreshUiRunnable(), 1000);
+                uiHandler.postDelayed(recordInfo.getRefreshUiRunnable(), 0);
                 //同时需要调用service方法来开启计时；
-                startRecord(recordInfo);
+                startRecord(recordInfo, false);
             } else if (recordInfo.getRecordState() == Consts.RECORD_STATE_STOP
                     || recordInfo.getRecordState() == Consts.RECORD_STATE_PAUSE) {
                 uiHandler.removeCallbacks(recordInfo.getRefreshUiRunnable());
@@ -266,11 +266,11 @@ public class TaskListAdapter extends RecyclerView.Adapter {
                 @Override
                 public void onClick(View v) {
                     if (recordInfo.getRecordState() == Consts.RECORD_STATE_STOP) {
-                        startRecord(recordInfo);
+                        startRecord(recordInfo, true);
                         uiHandler.postDelayed(recordInfo.getRefreshUiRunnable(), 1000);//点击开始更新计时view；
                         startButton.setImageDrawable(planSummaryView.getContext().getResources().getDrawable(R.mipmap.pause_record_icon));
                     } else if (recordInfo.getRecordState() == Consts.RECORD_STATE_PAUSE) {
-                        startRecord(recordInfo);
+                        startRecord(recordInfo, true);
                         uiHandler.postDelayed(recordInfo.getRefreshUiRunnable(), 1000);//点击开始更新计时view；
                         startButton.setImageDrawable(planSummaryView.getContext().getResources().getDrawable(R.mipmap.pause_record_icon));
                     } else if (recordInfo.getRecordState() == Consts.RECORD_STATE_RECORDING) {
@@ -361,7 +361,7 @@ public class TaskListAdapter extends RecyclerView.Adapter {
     }
 
 
-    private void startRecord(final TaskRecordInfo recordInfo) {
+    private void startRecord(final TaskRecordInfo recordInfo, boolean isNew) {
         ZLog.d(TAG, "start record:" + recordInfo.getPlanName());
         final Runnable startRecordRunnable = new Runnable() {
             @Override
@@ -374,11 +374,13 @@ public class TaskListAdapter extends RecyclerView.Adapter {
             }
         };
         workHandler.postDelayed(startRecordRunnable, 1000);
-        recordInfo.setBeginTime(System.currentTimeMillis());
-        recordInfo.setRecordId(UUID.randomUUID().toString());
-        recordInfo.setRecordState(Consts.RECORD_STATE_RECORDING);
-        recordInfo.setEndTime(System.currentTimeMillis());
-        RecordTask.getInstance().addTaskRecord(recordInfo);
+        if (isNew) {
+            recordInfo.setBeginTime(System.currentTimeMillis());
+            recordInfo.setRecordId(UUID.randomUUID().toString());
+            recordInfo.setRecordState(Consts.RECORD_STATE_RECORDING);
+            recordInfo.setEndTime(System.currentTimeMillis());
+            RecordTask.getInstance().addTaskRecord(recordInfo);
+        }
     }
 
     public void stopRecord(TaskRecordInfo recordInfo, boolean isPause) {

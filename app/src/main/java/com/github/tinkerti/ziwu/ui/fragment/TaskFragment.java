@@ -12,7 +12,6 @@ import android.view.ViewGroup;
 
 import com.github.tinkerti.ziwu.R;
 import com.github.tinkerti.ziwu.data.Consts;
-import com.github.tinkerti.ziwu.data.Event;
 import com.github.tinkerti.ziwu.data.PlanTask;
 import com.github.tinkerti.ziwu.data.SimpleResultCallback;
 import com.github.tinkerti.ziwu.data.model.TaskRecordInfo;
@@ -20,8 +19,6 @@ import com.github.tinkerti.ziwu.ui.adapter.TaskListAdapter;
 import com.github.tinkerti.ziwu.ui.utils.ZLog;
 
 import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +35,6 @@ public class TaskFragment extends Fragment {
         super.onCreate(savedInstanceState);
         ZLog.e(TAG, "onCreate");
         taskListAdapter = new TaskListAdapter();
-        EventBus.getDefault().register(this);
     }
 
     @Nullable
@@ -62,34 +58,15 @@ public class TaskFragment extends Fragment {
                     for (TaskRecordInfo taskRecordInfo : taskRecordInfoList) {
                         TaskListAdapter.TaskSummaryModel taskSummaryModel = new TaskListAdapter.TaskSummaryModel(taskRecordInfo);
                         itemModelList.add(taskSummaryModel);
-                        //setModelList()中没有进行notifyDateSetChanged的原因，是因为着这样做的话计时会有问题
-                        taskListAdapter.setModelList(itemModelList);
-                        //加上这一句代码，来刷新ui，否则的话，第一次进入app，添加计划，planList界面不刷新；
-                        recyclerView.setAdapter(taskListAdapter);
                     }
+                    taskListAdapter.setModelList(itemModelList);
+                    //加上这一句代码，来刷新ui，否则的话，第一次进入app，添加计划，planList界面不刷新；
+                    recyclerView.setAdapter(taskListAdapter);
                 }
             });
 
         }
         //TODO :如果没有task时，空白页面；
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onRecordEvnet(Event.RecordEvent recordEvent) {
-        TaskRecordInfo recordInfo = recordEvent.recordInfo;
-        ZLog.e(TAG, "receive event:" + recordInfo.getRecordId());
-        int position = taskListAdapter.findPosition(recordInfo);
-        if (position >= 0) {
-            TaskListAdapter.ItemModel itemModel = taskListAdapter.getModelList().get(position);
-            if (itemModel instanceof TaskListAdapter.TaskSummaryModel) {
-                TaskListAdapter.TaskSummaryModel taskSummaryModel = (TaskListAdapter.TaskSummaryModel) itemModel;
-                if (taskSummaryModel.isFirstTime) {
-                    taskSummaryModel.recordInfo = recordInfo;
-                    taskSummaryModel.isFirstTime = false;
-                    taskListAdapter.notifyItemChanged(position);
-                }
-            }
-        }
     }
 
     @Override

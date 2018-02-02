@@ -14,13 +14,15 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.github.tinkerti.ziwu.R;
-import com.github.tinkerti.ziwu.data.Consts;
+import com.github.tinkerti.ziwu.ui.event.RefreshRecordEvent;
 import com.github.tinkerti.ziwu.ui.fragment.MeFragment;
 import com.github.tinkerti.ziwu.ui.fragment.RecordFragment;
 import com.github.tinkerti.ziwu.ui.fragment.TaskFragment;
 import com.github.tinkerti.ziwu.ui.utils.ZLog;
 import com.github.tinkerti.ziwu.ui.widget.OptionPopupWindow;
 import com.github.tinkerti.ziwu.ui.widget.TabIndicatorItemView;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,9 +34,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     private static final int TAB_INDEX_RECORD = 1;
     private static final int TAB_INDEX_ME = 2;
 
-    private TabIndicatorItemView taskIndicator;
-    private TabIndicatorItemView recordIndicator;
-    private TabIndicatorItemView meIndicator;
     private LinearLayout bottomIndicator;
     private ViewPager contentViewPager;
     private FrameLayout optionImageContainer;
@@ -51,9 +50,9 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
     private void initView() {
         setContentView(R.layout.activity_main);
-        taskIndicator = findViewById(R.id.bottom_indicator_plan);
-        recordIndicator = findViewById(R.id.bottom_indicator_record);
-        meIndicator = findViewById(R.id.bottom_indicator_me);
+        TabIndicatorItemView taskIndicator = findViewById(R.id.bottom_indicator_plan);
+        TabIndicatorItemView recordIndicator = findViewById(R.id.bottom_indicator_record);
+        TabIndicatorItemView meIndicator = findViewById(R.id.bottom_indicator_me);
         bottomIndicator = findViewById(R.id.ac_ll_bottom_indicator);
         contentViewPager = findViewById(R.id.ac_view_pager);
         final List<Fragment> fragmentList = new ArrayList<>();
@@ -76,11 +75,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                     bottomIndicator.getChildAt(i).setSelected(i == position);
                     onPageChangedAction(position);
                     if (position == 1) {
-                        if (fragmentList.get(position) instanceof RecordFragment) {
-                            RecordFragment fragment = (RecordFragment) fragmentList.get(position);
-                            //TODO 是否需要换成另外一种方式来，及时的刷新UI；
-                            fragment.getPlanRecordDetailList(Consts.TYPE_ALL, 0);
-                        }
+                        EventBus.getDefault().post(new RefreshRecordEvent());
                     }
                 }
             }
@@ -166,7 +161,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
         private List<Fragment> fragmentList;
 
-        public ContentPagerAdapter(FragmentManager fm) {
+        ContentPagerAdapter(FragmentManager fm) {
             super(fm);
             fragmentList = new ArrayList<>();
         }
@@ -193,7 +188,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
         }
 
-        public void setFragmentList(List<Fragment> fragmentList) {
+        void setFragmentList(List<Fragment> fragmentList) {
             this.fragmentList = fragmentList;
         }
     }
