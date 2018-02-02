@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.os.Looper;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -64,6 +65,7 @@ public class TaskListAdapter extends RecyclerView.Adapter {
         //不要忘了调用start();
         handlerThread.start();
         workHandler = new Handler(handlerThread.getLooper());
+        uiHandler = new Handler(Looper.getMainLooper());
     }
 
     public void setUiHandler(Handler uiHandler) {
