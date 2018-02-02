@@ -1,12 +1,8 @@
 package com.github.tinkerti.ziwu.ui.fragment;
 
-import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.IBinder;
 import android.os.Looper;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -23,7 +19,6 @@ import com.github.tinkerti.ziwu.data.PlanTask;
 import com.github.tinkerti.ziwu.data.SimpleResultCallback;
 import com.github.tinkerti.ziwu.data.model.TaskRecordInfo;
 import com.github.tinkerti.ziwu.ui.adapter.TaskListAdapter;
-import com.github.tinkerti.ziwu.ui.service.RecordService;
 import com.github.tinkerti.ziwu.ui.utils.ZLog;
 
 import org.greenrobot.eventbus.EventBus;
@@ -37,7 +32,6 @@ public class TaskFragment extends Fragment {
     private static final String TAG = "TaskFragment";
     TaskListAdapter taskListAdapter;
     int[] types;
-    private RecordServiceConnection serviceConnection;
     private RecyclerView recyclerView;
     private Handler handler;
 
@@ -49,7 +43,6 @@ public class TaskFragment extends Fragment {
         handler = new Handler(Looper.getMainLooper());
         taskListAdapter.setHandler(handler);
         EventBus.getDefault().register(this);
-        initBindService();
     }
 
     @Nullable
@@ -112,29 +105,6 @@ public class TaskFragment extends Fragment {
         getPlanListByType(types);
     }
 
-    private void initBindService() {
-        ZLog.e(TAG, "initBindService");
-        Intent intent = new Intent(getContext(), RecordService.class);
-        serviceConnection = new RecordServiceConnection();
-        getContext().startService(intent);
-        getContext().bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
-    }
-
-    public class RecordServiceConnection implements ServiceConnection {
-
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            ZLog.e(TAG, "onServiceConnected: record service connected");
-            RecordService.RecordServiceBinder binder = (RecordService.RecordServiceBinder) service;
-            taskListAdapter.setBinder(binder);
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-            ZLog.d(TAG, "onServiceDisconnected: record service disconnected");
-        }
-    }
-
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == Consts.ADD_PLAN_REQUEST) {
@@ -150,9 +120,9 @@ public class TaskFragment extends Fragment {
             if (itemModel instanceof TaskListAdapter.TaskSummaryModel) {
                 TaskListAdapter.TaskSummaryModel taskSummaryModel = (TaskListAdapter.TaskSummaryModel) itemModel;
                 taskListAdapter.getHandler().removeCallbacks(taskSummaryModel.recordInfo.getRefreshUiRunnable());
+                taskListAdapter.getWorkHandler().removeCallbacks(taskSummaryModel.recordInfo.getRecordTimeRunnable());
             }
         }
-        getContext().unbindService(serviceConnection);
         EventBus.getDefault().unregister(this);
     }
 }
