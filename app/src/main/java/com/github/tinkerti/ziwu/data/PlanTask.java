@@ -42,7 +42,7 @@ public class PlanTask extends ITask {
     }
 
     public List<TaskRecordInfo> getPlanDetailInfoByTypeFromDb(int type) {
-        List<TaskRecordInfo> planDetailInfoList = new ArrayList<>();
+        List<TaskRecordInfo> taskRecordInfoList = new ArrayList<>();
         long beginTime = 0;
         switch (type) {
             case Consts.TYPE_IS_VALID:
@@ -92,11 +92,11 @@ public class PlanTask extends ITask {
 
             long timeDuration = RecordTask.getInstance().getRecordTimeFromDb(taskRecordInfo.getPlanId());
             taskRecordInfo.setTimeDuration(timeDuration);
-            planDetailInfoList.add(taskRecordInfo);
+            taskRecordInfoList.add(taskRecordInfo);
 
         }
         cursor.close();
-        return planDetailInfoList;
+        return taskRecordInfoList;
     }
 
     public void addPlanToDb(AddTaskDetailInfo info) {

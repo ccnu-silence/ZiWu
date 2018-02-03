@@ -17,12 +17,7 @@ import com.github.tinkerti.ziwu.data.RecordTask;
 import com.github.tinkerti.ziwu.data.SimpleResultCallback;
 import com.github.tinkerti.ziwu.data.model.TaskRecordInfo;
 import com.github.tinkerti.ziwu.ui.adapter.RecordListAdapter;
-import com.github.tinkerti.ziwu.ui.event.RefreshRecordEvent;
 import com.github.tinkerti.ziwu.ui.widget.SelectPlanTypePopupWindow;
-
-import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,7 +40,6 @@ public class RecordFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         type = Consts.TYPE_ALL;
-        EventBus.getDefault().register(this);
     }
 
     @Nullable
@@ -84,11 +78,6 @@ public class RecordFragment extends Fragment {
         getPlanRecordDetailList(type, 0);
     }
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onRefreshRecordEvent(RefreshRecordEvent refreshRecordEvent) {
-        getPlanRecordDetailList(type, 0);
-    }
-
 
     public void getPlanRecordDetailList(final int recordType, int offset) {
         final List<RecordListAdapter.ItemModel> itemModelList = new ArrayList<>();
@@ -111,7 +100,6 @@ public class RecordFragment extends Fragment {
 
     @Override
     public void onDestroy() {
-        EventBus.getDefault().unregister(this);
         super.onDestroy();
     }
 }

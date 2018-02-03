@@ -2,6 +2,8 @@ package com.github.tinkerti.ziwu.ui.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -14,15 +16,13 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.github.tinkerti.ziwu.R;
-import com.github.tinkerti.ziwu.ui.event.RefreshRecordEvent;
+import com.github.tinkerti.ziwu.data.Consts;
 import com.github.tinkerti.ziwu.ui.fragment.MeFragment;
 import com.github.tinkerti.ziwu.ui.fragment.RecordFragment;
 import com.github.tinkerti.ziwu.ui.fragment.TaskFragment;
 import com.github.tinkerti.ziwu.ui.utils.ZLog;
 import com.github.tinkerti.ziwu.ui.widget.OptionPopupWindow;
 import com.github.tinkerti.ziwu.ui.widget.TabIndicatorItemView;
-
-import org.greenrobot.eventbus.EventBus;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -75,7 +75,15 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                     bottomIndicator.getChildAt(i).setSelected(i == position);
                     onPageChangedAction(position);
                     if (position == 1) {
-                        EventBus.getDefault().post(new RefreshRecordEvent());
+                        if (fragmentList.get(position) instanceof RecordFragment) {
+                            final RecordFragment fragment = (RecordFragment) fragmentList.get(position);
+                            new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    fragment.getPlanRecordDetailList(Consts.TYPE_ALL, 0);
+                                }
+                            }, 200);
+                        }
                     }
                 }
             }
