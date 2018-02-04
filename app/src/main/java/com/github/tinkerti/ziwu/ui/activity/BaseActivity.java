@@ -25,6 +25,7 @@ public class BaseActivity extends FragmentActivity {
     private ViewGroup titleBar;
     private ImageView navigationImageView;
     private ImageView searchImageView;
+    private View dividerView;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -34,6 +35,7 @@ public class BaseActivity extends FragmentActivity {
         planContentFrameLayout = findViewById(R.id.ac_fl_base_container);
         nameTextView = findViewById(R.id.bar_tv_title);
         titleBar = findViewById(R.id.bar_rl_title_bar);
+        dividerView = findViewById(R.id.divider_line);
         navigationImageView = findViewById(R.id.bar_iv_navigate_back);
         searchImageView = findViewById(R.id.bar_iv_search_button);
 
@@ -73,6 +75,7 @@ public class BaseActivity extends FragmentActivity {
             nameTextView.setVisibility(View.GONE);
             navigationImageView.setVisibility(View.GONE);
             searchImageView.setVisibility(View.GONE);
+            dividerView.setVisibility(View.GONE);
             View view = View.inflate(getBaseContext(), resId, titleBar);
             return view;
         }

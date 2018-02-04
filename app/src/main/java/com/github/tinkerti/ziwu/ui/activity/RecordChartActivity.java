@@ -47,10 +47,10 @@ public class RecordChartActivity extends BaseActivity {
             return;
         }
         pieChart.setVisibility(View.VISIBLE);
-        pieChart.setUsePercentValues(false);
+        pieChart.setUsePercentValues(false);//是否百分比显示
         pieChart.setRotationEnabled(false);//控制是否旋转
         pieChart.getDescription().setEnabled(false);//不显示description；
-//        pieChart.setExtraOffsets(35, 35, 35, 35);//控制pieChart与屏幕边框的举例？；
+        pieChart.setDrawEntryLabels(false);//不显示图形上的label
 
         pieChart.setTransparentCircleColor(Color.WHITE);
         pieChart.setTransparentCircleAlpha(110);
@@ -58,12 +58,13 @@ public class RecordChartActivity extends BaseActivity {
         pieChart.setHoleRadius(58f);              //holeRadius 表示中间空心的半径
         pieChart.setTransparentCircleRadius(58f);  //transparentCircleRadius 表示透明圆圈的半径
 
+
         Legend l = pieChart.getLegend();
-        l.setVerticalAlignment(Legend.LegendVerticalAlignment.TOP);
+        l.setVerticalAlignment(Legend.LegendVerticalAlignment.CENTER); //垂直居中显示
         l.setHorizontalAlignment(Legend.LegendHorizontalAlignment.RIGHT);
         l.setOrientation(Legend.LegendOrientation.VERTICAL);
         l.setDrawInside(false);
-        l.setEnabled(false);  //是否显示legend；
+        l.setEnabled(true);  //是否显示legend；
 
         int count = 0;
         //添加数据
@@ -73,9 +74,9 @@ public class RecordChartActivity extends BaseActivity {
             if (percent - 0 > 0.01) {
 //                entries.add(new PieEntry(percent * 100, recordInfo.getPlanName(), count));  //自己计算好百分比
 //                entries.add(new PieEntry(recordInfo.getTimeDuration() / (3600 * 1000f), recordInfo.getPlanName(), count));//传入原始数据，可以通过 setUsePercentValues(true)来进行百分比显示；
-//                entries.add(new PieEntry(recordInfo.getTimeDuration() / (3600 * 1000f), recordInfo.getPlanName(), count));
+                entries.add(new PieEntry(recordInfo.getTimeDuration() / (3600 * 1000f), recordInfo.getPlanName(), count));
                 //通过构造不同的PieEntry，可以来标注和说明pie的扇形区的含义；
-                entries.add(new PieEntry(recordInfo.getTimeDuration() / (3600 * 1000f)));
+//                entries.add(new PieEntry(recordInfo.getTimeDuration() / (3600 * 1000f)));
             }
             count++;
         }
