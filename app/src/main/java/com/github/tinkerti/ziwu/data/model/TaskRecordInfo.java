@@ -2,6 +2,8 @@ package com.github.tinkerti.ziwu.data.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.github.tinkerti.ziwu.data.Consts;
 
@@ -24,6 +26,20 @@ public class TaskRecordInfo extends TaskBaseInfo implements Parcelable {
     private boolean isExpand = false;
     private NotificationInfo notificationInfo;
     private String taskNote;
+
+    public boolean isShouldStart() {
+        return shouldStart;
+    }
+
+    public void setShouldStart(boolean shouldStart) {
+        this.shouldStart = shouldStart;
+    }
+
+    private boolean shouldStart = true;
+    public ImageView startButton;
+    public ImageView stopButton;
+    public TextView recordingTimeTextView;
+    public TextView expandedRecordingTimeView;
 
     public long getTimeDurationPerRecord() {
         return timeDurationPerRecord;

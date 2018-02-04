@@ -52,11 +52,6 @@ public class TaskListAdapter extends RecyclerView.Adapter {
 
     private Handler uiHandler;//更新界面用；
 
-    public Handler getWorkHandler() {
-        return workHandler;
-    }
-
-    private Handler workHandler;
 
     public TaskListAdapter() {
         ZLog.d(TAG, "new TaskListAdapter");
@@ -64,7 +59,6 @@ public class TaskListAdapter extends RecyclerView.Adapter {
         HandlerThread handlerThread = new HandlerThread("ServiceWorkThread");
         //不要忘了调用start();
         handlerThread.start();
-        workHandler = new Handler(handlerThread.getLooper());
         uiHandler = new Handler(Looper.getMainLooper());
     }
 
@@ -182,6 +176,10 @@ public class TaskListAdapter extends RecyclerView.Adapter {
             taskNameTextView.setText(recordInfo.getPlanName());
             recordingTimeTextView.setText(recordingTime);
             expandedRecordingTimeView.setText(recordingTime);
+            recordInfo.startButton = startButton;
+            recordInfo.stopButton = stopButton;
+            recordInfo.recordingTimeTextView = recordingTimeTextView;
+            recordInfo.expandedRecordingTimeView = expandedRecordingTimeView;
 
             if (recordInfo.getRecordState() == Consts.RECORD_STATE_PAUSE
                     || recordInfo.getRecordState() == Consts.RECORD_STATE_RECORDING) {
@@ -206,27 +204,11 @@ public class TaskListAdapter extends RecyclerView.Adapter {
                     arrowImageView.animate().setDuration(0).rotation(0).start();
                 }
             }
-            //这个地方有点问题，需要优化下，这样做没有多大必要；
-            final Runnable recordRunnable = new Runnable() {
-                @Override
-                public void run() {
-                    if (recordInfo != null) {
-                        recordingTimeTextView.setText(FormatTime.calculateTimeString(recordInfo.getTimeDuration()));
-                        expandedRecordingTimeView.setText(FormatTime.calculateTimeString(recordInfo.getTimeDuration()));
-                        ZLog.d(TAG, taskSummaryModel.recordInfo.getPlanName() + " (runnable)" + this + " recording time:" + FormatTime.calculateTimeString(recordInfo.getTimeDuration()));
-                    }
-                    uiHandler.postDelayed(this, 1000);
-                }
-            };
-            uiHandler.removeCallbacks(recordInfo.getRefreshUiRunnable());
-            ZLog.d(TAG, "remove runnable " + recordInfo.getRefreshUiRunnable());
-            recordInfo.setRefreshUiRunnable(recordRunnable);
-            ZLog.d(TAG, "set runnable " + recordInfo.getRefreshUiRunnable());
             setListener(position);
             //如果是正在记录则需要去更新界面，而处于idle或者stop的状态，则不去更新
-            if (recordInfo.getRecordState() == Consts.RECORD_STATE_RECORDING) {
+            if (recordInfo.getRecordState() == Consts.RECORD_STATE_RECORDING && recordInfo.isShouldStart()) {
                 //同时需要调用service方法来开启计时；
-                startRecord(startButton, recordInfo, false);
+                startRecord(recordInfo, false);
             } else if (recordInfo.getRecordState() == Consts.RECORD_STATE_STOP
                     || recordInfo.getRecordState() == Consts.RECORD_STATE_PAUSE) {
                 uiHandler.removeCallbacks(recordInfo.getRefreshUiRunnable());
@@ -269,14 +251,14 @@ public class TaskListAdapter extends RecyclerView.Adapter {
                 @Override
                 public void onClick(View v) {
                     if (recordInfo.getRecordState() == Consts.RECORD_STATE_STOP) {
-                        startRecord(startButton, recordInfo, true);
+                        startRecord(recordInfo, true);
                     } else if (recordInfo.getRecordState() == Consts.RECORD_STATE_PAUSE) {
-                        startRecord(startButton, recordInfo, true);
+                        startRecord(recordInfo, true);
                     } else if (recordInfo.getRecordState() == Consts.RECORD_STATE_RECORDING) {
                         pauseRecord(startButton, recordInfo);
                     }
                     //刷新adapter中的数据
-                    notifyItemChanged(pos);
+                    notifyDataSetChanged();
                 }
             });
 
@@ -287,7 +269,7 @@ public class TaskListAdapter extends RecyclerView.Adapter {
                     //需要判断下记录状态，否则的话，点击stopButton会一致进行增加计时的操作；
                     stopRecord(startButton, recordInfo);
                     //刷新下UI
-                    notifyItemChanged(pos);
+                    notifyDataSetChanged();
                 }
             });
 
@@ -349,22 +331,23 @@ public class TaskListAdapter extends RecyclerView.Adapter {
     }
 
 
-    private void startRecord(ImageView startButton, final TaskRecordInfo recordInfo, boolean isNew) {
-        startButton.setImageDrawable(startButton.getContext().getResources().getDrawable(R.mipmap.pause_record_icon));
-        uiHandler.postDelayed(recordInfo.getRefreshUiRunnable(), 0);
-        workHandler.removeCallbacks(recordInfo.getRecordTimeRunnable());
-        ZLog.d(TAG, "start record:" + recordInfo.getPlanName());
-        final Runnable startRecordRunnable = new Runnable() {
+    private void startRecord(final TaskRecordInfo recordInfo, boolean isNew) {
+        recordInfo.startButton.setImageDrawable(recordInfo.startButton.getContext().getResources().getDrawable(R.mipmap.pause_record_icon));
+        //这个地方有点问题，需要优化下，这样做没有多大必要；
+        final Runnable recordRunnable = new Runnable() {
             @Override
             public void run() {
-                recordInfo.setTimeDuration(recordInfo.getTimeDuration() + 1000);
-                ZLog.d(TAG, recordInfo.getPlanName() + "(runnable)" + this + " time duration:" + recordInfo.getTimeDuration());
-                workHandler.postDelayed(this, 1000);
-
+                if (recordInfo != null) {
+                    recordInfo.setTimeDuration(recordInfo.getTimeDuration() + 1000);
+                    recordInfo.recordingTimeTextView.setText(FormatTime.calculateTimeString(recordInfo.getTimeDuration()));
+                    recordInfo.expandedRecordingTimeView.setText(FormatTime.calculateTimeString(recordInfo.getTimeDuration()));
+                }
+                uiHandler.postDelayed(this, 1000);
             }
         };
-        recordInfo.setRecordTimeRunnable(startRecordRunnable);
-        workHandler.postDelayed(startRecordRunnable, 1000);
+        uiHandler.removeCallbacks(recordInfo.getRefreshUiRunnable());
+        recordInfo.setRefreshUiRunnable(recordRunnable);
+        uiHandler.postDelayed(recordInfo.getRefreshUiRunnable(), 0);
         recordInfo.setRecordState(Consts.RECORD_STATE_RECORDING);
         if (isNew) {
             recordInfo.setBeginTime(System.currentTimeMillis());

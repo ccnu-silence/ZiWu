@@ -18,8 +18,6 @@ import com.github.tinkerti.ziwu.data.model.TaskRecordInfo;
 import com.github.tinkerti.ziwu.ui.adapter.TaskListAdapter;
 import com.github.tinkerti.ziwu.ui.utils.ZLog;
 
-import org.greenrobot.eventbus.EventBus;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -93,9 +91,7 @@ public class TaskFragment extends Fragment {
             if (itemModel instanceof TaskListAdapter.TaskSummaryModel) {
                 TaskListAdapter.TaskSummaryModel taskSummaryModel = (TaskListAdapter.TaskSummaryModel) itemModel;
                 taskListAdapter.getUiHandler().removeCallbacks(taskSummaryModel.recordInfo.getRefreshUiRunnable());
-                taskListAdapter.getWorkHandler().removeCallbacks(taskSummaryModel.recordInfo.getRecordTimeRunnable());
             }
         }
-        EventBus.getDefault().unregister(this);
     }
 }
