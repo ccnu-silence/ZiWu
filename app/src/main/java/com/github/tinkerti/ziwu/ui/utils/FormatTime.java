@@ -2,7 +2,7 @@ package com.github.tinkerti.ziwu.ui.utils;
 
 public class FormatTime {
 
-    public static String calculateTimeString(long timeMillis) {
+    public static String formatTimeToNumberString(long timeMillis) {
         long timeSeconds = timeMillis / 1000;
         StringBuilder builder = new StringBuilder();
         if (timeSeconds < 60) {
@@ -43,18 +43,18 @@ public class FormatTime {
         return builder.toString();
     }
 
-    public static String formatTimeToString(long timeMillis) {
+    public static String formatTimeToUnitString(long timeMillis) {
         long timeSeconds = timeMillis / 1000;
         StringBuilder builder = new StringBuilder();
         if (timeSeconds < 60) {
             builder.append(timeSeconds)
-                    .append("s");
+                    .append("s ");
         } else if (timeSeconds < 60 * 60) {
             long minutes = timeSeconds / 60;
             long seconds = timeSeconds % 60;
             builder.append(minutes)
                     .append("min ")
-            .append(seconds).append("s");
+                    .append(seconds).append("s ");
         } else if (timeSeconds < 99 * 3600) {
             long hours = timeSeconds / 3600;
             long rest = timeSeconds % 3600;
@@ -72,9 +72,9 @@ public class FormatTime {
             long minutes = rest / 60;
             long seconds = rest % 60;
             builder.append(days)
-                    .append("天 ")
+                    .append("day ")
                     .append(hours)
-                    .append("h");
+                    .append("h ");
         }
         return builder.toString();
     }

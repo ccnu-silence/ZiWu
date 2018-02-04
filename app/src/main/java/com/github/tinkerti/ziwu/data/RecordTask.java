@@ -9,10 +9,6 @@ import com.github.tinkerti.ziwu.ui.utils.DateUtils;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by tiankui on 5/7/17.
- */
-
 public class RecordTask extends ITask {
 
     public RecordTask() {
@@ -78,84 +74,6 @@ public class RecordTask extends ITask {
 
     }
 
-    public long getPlanRecordStartTimeByType(int type) {
-        long beginTime = 0;
-        switch (type) {
-            case Consts.DAY_TYPE:
-                beginTime = DateUtils.getTodayMorning();
-                break;
-            case Consts.WEEK_TYPE:
-                beginTime = DateUtils.getCurrentWeekMorning();
-                break;
-            case Consts.TYPE_IS_VALID:
-                beginTime = 0;
-                break;
-        }
-        return beginTime;
-    }
-
-    public long getPlanRecordEndTimeByType(int type) {
-        long endTime = System.currentTimeMillis();
-        switch (type) {
-            case Consts.DAY_TYPE:
-                endTime = DateUtils.getTodayNight();
-                break;
-            case Consts.WEEK_TYPE:
-                endTime = DateUtils.getCurrentWeekNight();
-                break;
-            case Consts.TYPE_IS_VALID:
-                endTime = System.currentTimeMillis();
-                break;
-        }
-        return endTime;
-    }
-
-    public List<TaskRecordInfo> getTaskRecordListByType(long beginTime, long endTime) {
-        List<TaskRecordInfo> taskRecordInfoList = new ArrayList<>();
-        String sql = "select " +
-                "RecordDetail.planId," +
-                "planName," +
-                "planType," +
-                "createTime," +
-                "planPriority," +
-                "planTime," +
-                "planJoinParentId," +
-                "planTag," +
-                "timeDuration," +
-                "beginTime," +
-                "endTime, " +
-                "recordState" +
-                " from " + Consts.TABLE_NAME_RECORD_DETAIL +
-                " inner join " + Consts.TABLE_NAME_PLAN_DETAIL +
-                " on RecordDetail.planId=PlanDetail.planId where beginTime> " + beginTime +
-                " and endTime< " + endTime +
-                " order by beginTime desc";
-        Cursor cursor = TaskManager.getDbHelper().getWritableDatabase().rawQuery(sql, null);
-        try {
-            while (cursor.moveToNext()) {
-                TaskRecordInfo recordInfo = new TaskRecordInfo();
-                recordInfo.setPlanId(cursor.getString(cursor.getColumnIndex("planId")));
-                recordInfo.setPlanName(cursor.getString(cursor.getColumnIndex("planName")));
-                recordInfo.setPlanType(cursor.getInt(cursor.getColumnIndex("planType")));
-                recordInfo.setCreateTime(cursor.getLong(cursor.getColumnIndex("createTime")));
-                recordInfo.setPlanPriority(cursor.getInt(cursor.getColumnIndex("planPriority")));
-                recordInfo.setPlanTime(cursor.getLong(cursor.getColumnIndex("planTime")));
-                recordInfo.setPlanJoinParentId(cursor.getString(cursor.getColumnIndex("planJoinParentId")));
-                recordInfo.setPlanTag(cursor.getString(cursor.getColumnIndex("planTag")));
-                recordInfo.setTimeDuration(cursor.getLong(cursor.getColumnIndex("timeDuration")));
-                recordInfo.setBeginTime(cursor.getLong(cursor.getColumnIndex("beginTime")));
-                recordInfo.setEndTime(cursor.getLong(cursor.getColumnIndex("endTime")));
-                recordInfo.setRecordState(cursor.getInt(cursor.getColumnIndex("recordState")));
-
-                taskRecordInfoList.add(recordInfo);
-            }
-        } finally {
-            cursor.close();
-        }
-
-        return taskRecordInfoList;
-    }
-
     public List<TaskRecordInfo> getPlanHistoryTime(int type) {
         List<TaskRecordInfo> taskRecordInfoList = new ArrayList<>();
         long beginTime = 0;
@@ -165,7 +83,7 @@ public class RecordTask extends ITask {
                 beginTime = DateUtils.getTodayMorning();
                 endTime = DateUtils.getTodayNight();
                 break;
-            case Consts.MONTH_TYPE:
+            case Consts.WEEK_TYPE:
                 beginTime = DateUtils.getCurrentWeekMorning();
                 endTime = DateUtils.getCurrentWeekNight();
                 break;
@@ -206,7 +124,7 @@ public class RecordTask extends ITask {
                 beginTime = DateUtils.getTodayMorning();
                 endTime = DateUtils.getTodayNight();
                 break;
-            case Consts.MONTH_TYPE:
+            case Consts.WEEK_TYPE:
                 beginTime = DateUtils.getCurrentWeekMorning();
                 endTime = DateUtils.getCurrentWeekNight();
                 break;
@@ -394,5 +312,84 @@ public class RecordTask extends ITask {
 //        }
         cursor.close();
         return monthRecordList;
+    }
+
+
+    public long getPlanRecordStartTimeByType(int type) {
+        long beginTime = 0;
+        switch (type) {
+            case Consts.DAY_TYPE:
+                beginTime = DateUtils.getTodayMorning();
+                break;
+            case Consts.WEEK_TYPE:
+                beginTime = DateUtils.getCurrentWeekMorning();
+                break;
+            case Consts.TYPE_IS_VALID:
+                beginTime = 0;
+                break;
+        }
+        return beginTime;
+    }
+
+    public long getPlanRecordEndTimeByType(int type) {
+        long endTime = System.currentTimeMillis();
+        switch (type) {
+            case Consts.DAY_TYPE:
+                endTime = DateUtils.getTodayNight();
+                break;
+            case Consts.WEEK_TYPE:
+                endTime = DateUtils.getCurrentWeekNight();
+                break;
+            case Consts.TYPE_IS_VALID:
+                endTime = System.currentTimeMillis();
+                break;
+        }
+        return endTime;
+    }
+
+    public List<TaskRecordInfo> getTaskRecordListByType(long beginTime, long endTime) {
+        List<TaskRecordInfo> taskRecordInfoList = new ArrayList<>();
+        String sql = "select " +
+                "RecordDetail.planId," +
+                "planName," +
+                "planType," +
+                "createTime," +
+                "planPriority," +
+                "planTime," +
+                "planJoinParentId," +
+                "planTag," +
+                "timeDuration," +
+                "beginTime," +
+                "endTime, " +
+                "recordState" +
+                " from " + Consts.TABLE_NAME_RECORD_DETAIL +
+                " inner join " + Consts.TABLE_NAME_PLAN_DETAIL +
+                " on RecordDetail.planId=PlanDetail.planId where beginTime> " + beginTime +
+                " and endTime< " + endTime +
+                " order by beginTime desc";
+        Cursor cursor = TaskManager.getDbHelper().getWritableDatabase().rawQuery(sql, null);
+        try {
+            while (cursor.moveToNext()) {
+                TaskRecordInfo recordInfo = new TaskRecordInfo();
+                recordInfo.setPlanId(cursor.getString(cursor.getColumnIndex("planId")));
+                recordInfo.setPlanName(cursor.getString(cursor.getColumnIndex("planName")));
+                recordInfo.setPlanType(cursor.getInt(cursor.getColumnIndex("planType")));
+                recordInfo.setCreateTime(cursor.getLong(cursor.getColumnIndex("createTime")));
+                recordInfo.setPlanPriority(cursor.getInt(cursor.getColumnIndex("planPriority")));
+                recordInfo.setPlanTime(cursor.getLong(cursor.getColumnIndex("planTime")));
+                recordInfo.setPlanJoinParentId(cursor.getString(cursor.getColumnIndex("planJoinParentId")));
+                recordInfo.setPlanTag(cursor.getString(cursor.getColumnIndex("planTag")));
+                recordInfo.setTimeDuration(cursor.getLong(cursor.getColumnIndex("timeDuration")));
+                recordInfo.setBeginTime(cursor.getLong(cursor.getColumnIndex("beginTime")));
+                recordInfo.setEndTime(cursor.getLong(cursor.getColumnIndex("endTime")));
+                recordInfo.setRecordState(cursor.getInt(cursor.getColumnIndex("recordState")));
+
+                taskRecordInfoList.add(recordInfo);
+            }
+        } finally {
+            cursor.close();
+        }
+
+        return taskRecordInfoList;
     }
 }

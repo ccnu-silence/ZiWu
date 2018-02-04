@@ -114,7 +114,7 @@ public class RecordListAdapter extends RecyclerView.Adapter {
             final RecordListItemModel recordListItemModel = (RecordListItemModel) modelList.get(position);
             nameView.setText(recordListItemModel.getPlanName());
             timeView.setText(DateUtils.getDateFormat(recordListItemModel.getBeginTime()) + " " + DateUtils.getFormatTime(recordListItemModel.getBeginTime(), recordListItemModel.getEndTime()));
-            timeDurationView.setText(FormatTime.formatTimeToString(recordListItemModel.getTimeDuration()));
+            timeDurationView.setText(FormatTime.formatTimeToUnitString(recordListItemModel.getTimeDuration()));
             mainView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

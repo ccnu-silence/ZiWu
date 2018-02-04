@@ -4,6 +4,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.View;
+import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.components.Legend;
@@ -15,6 +16,7 @@ import com.github.tinkerti.ziwu.R;
 import com.github.tinkerti.ziwu.data.Consts;
 import com.github.tinkerti.ziwu.data.RecordTask;
 import com.github.tinkerti.ziwu.data.model.TaskRecordInfo;
+import com.github.tinkerti.ziwu.ui.utils.FormatTime;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +24,7 @@ import java.util.List;
 public class RecordChartActivity extends BaseActivity {
 
     private PieChart pieChart;
+    private TextView totalRecordTimeView;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -30,13 +33,16 @@ public class RecordChartActivity extends BaseActivity {
         setContentView(R.layout.activity_record_chart);
 
         pieChart = findViewById(R.id.pc_plan_record_pie);
-        drawRecordPieChart(Consts.TYPE_IS_VALID);
+        totalRecordTimeView = findViewById(R.id.tv_total_record_time);
+        drawRecordPieChart(Consts.WEEK_TYPE);
     }
 
     private void drawRecordPieChart(int recordType) {
         List<TaskRecordInfo> taskRecordInfoList = RecordTask.getInstance().getPlanHistoryTime(recordType);
-        float totalRecordTime = RecordTask.getInstance().getPlanTotalRecordedTimeByType(recordType);
-        if (totalRecordTime - 0.0 < 0.0000000001) {
+        long totalRecordTime = RecordTask.getInstance().getPlanTotalRecordedTimeByType(recordType);
+        totalRecordTimeView.setText(FormatTime.formatTimeToUnitString(totalRecordTime));
+        float floatTotalRecordTime = totalRecordTime;
+        if (floatTotalRecordTime - 0.0 < 0.0000000001) {
             pieChart.setVisibility(View.GONE);
             return;
         }
@@ -63,7 +69,7 @@ public class RecordChartActivity extends BaseActivity {
         //添加数据
         List<PieEntry> entries = new ArrayList<>();
         for (TaskRecordInfo recordInfo : taskRecordInfoList) {
-            float percent = recordInfo.getTimeDuration() / totalRecordTime;
+            float percent = recordInfo.getTimeDuration() / floatTotalRecordTime;
             if (percent - 0 > 0.01) {
 //                entries.add(new PieEntry(percent * 100, recordInfo.getPlanName(), count));  //自己计算好百分比
 //                entries.add(new PieEntry(recordInfo.getTimeDuration() / (3600 * 1000f), recordInfo.getPlanName(), count));//传入原始数据，可以通过 setUsePercentValues(true)来进行百分比显示；
@@ -78,7 +84,7 @@ public class RecordChartActivity extends BaseActivity {
         dataSet.setSliceSpace(0f);//设置不同扇形区域之间的间隔，0的话没有间隔；
         dataSet.setSelectionShift(5f);//设置点击扇形时，扇形向外变大的距离；
         dataSet.setColors(ColorTemplate.COLORFUL_COLORS);
-            //设置扇形区域的标签
+        //设置扇形区域的标签
 //        dataSet.setValueLinePart1OffsetPercentage(80.f);
 //        dataSet.setValueLinePart1Length(0.2f);
 //        dataSet.setValueLinePart2Length(0.4f);

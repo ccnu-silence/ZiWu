@@ -171,7 +171,7 @@ public class TaskListAdapter extends RecyclerView.Adapter {
         public void update(final int position) {
             final TaskSummaryModel taskSummaryModel = (TaskSummaryModel) modelList.get(position);
             final TaskRecordInfo recordInfo = taskSummaryModel.recordInfo;
-            String recordingTime = FormatTime.calculateTimeString(recordInfo.getTimeDuration());
+            String recordingTime = FormatTime.formatTimeToNumberString(recordInfo.getTimeDuration());
 
             taskNameTextView.setText(recordInfo.getPlanName());
             recordingTimeTextView.setText(recordingTime);
@@ -339,8 +339,8 @@ public class TaskListAdapter extends RecyclerView.Adapter {
             public void run() {
                 if (recordInfo != null) {
                     recordInfo.setTimeDuration(recordInfo.getTimeDuration() + 1000);
-                    recordInfo.recordingTimeTextView.setText(FormatTime.calculateTimeString(recordInfo.getTimeDuration()));
-                    recordInfo.expandedRecordingTimeView.setText(FormatTime.calculateTimeString(recordInfo.getTimeDuration()));
+                    recordInfo.recordingTimeTextView.setText(FormatTime.formatTimeToNumberString(recordInfo.getTimeDuration()));
+                    recordInfo.expandedRecordingTimeView.setText(FormatTime.formatTimeToNumberString(recordInfo.getTimeDuration()));
                 }
                 uiHandler.postDelayed(this, 1000);
             }
