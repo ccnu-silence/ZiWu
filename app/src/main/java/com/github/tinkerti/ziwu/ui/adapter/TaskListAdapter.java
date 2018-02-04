@@ -206,7 +206,7 @@ public class TaskListAdapter extends RecyclerView.Adapter {
             }
             setListener(position);
             //如果是正在记录则需要去更新界面，而处于idle或者stop的状态，则不去更新
-            if (recordInfo.getRecordState() == Consts.RECORD_STATE_RECORDING && recordInfo.isShouldStart()) {
+            if (recordInfo.getRecordState() == Consts.RECORD_STATE_RECORDING ) {
                 //同时需要调用service方法来开启计时；
                 startRecord(recordInfo, false);
             } else if (recordInfo.getRecordState() == Consts.RECORD_STATE_STOP
@@ -331,7 +331,7 @@ public class TaskListAdapter extends RecyclerView.Adapter {
     }
 
 
-    private void startRecord(final TaskRecordInfo recordInfo, boolean isNew) {
+    private void startRecord(final TaskRecordInfo recordInfo, boolean isNewRecord) {
         recordInfo.startButton.setImageDrawable(recordInfo.startButton.getContext().getResources().getDrawable(R.mipmap.pause_record_icon));
         //这个地方有点问题，需要优化下，这样做没有多大必要；
         final Runnable recordRunnable = new Runnable() {
@@ -349,7 +349,7 @@ public class TaskListAdapter extends RecyclerView.Adapter {
         recordInfo.setRefreshUiRunnable(recordRunnable);
         uiHandler.postDelayed(recordInfo.getRefreshUiRunnable(), 0);
         recordInfo.setRecordState(Consts.RECORD_STATE_RECORDING);
-        if (isNew) {
+        if (isNewRecord) {
             recordInfo.setBeginTime(System.currentTimeMillis());
             recordInfo.setRecordId(UUID.randomUUID().toString());
             recordInfo.setRecordState(Consts.RECORD_STATE_RECORDING);

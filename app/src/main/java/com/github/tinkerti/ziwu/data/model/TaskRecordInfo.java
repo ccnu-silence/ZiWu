@@ -27,15 +27,6 @@ public class TaskRecordInfo extends TaskBaseInfo implements Parcelable {
     private NotificationInfo notificationInfo;
     private String taskNote;
 
-    public boolean isShouldStart() {
-        return shouldStart;
-    }
-
-    public void setShouldStart(boolean shouldStart) {
-        this.shouldStart = shouldStart;
-    }
-
-    private boolean shouldStart = true;
     public ImageView startButton;
     public ImageView stopButton;
     public TextView recordingTimeTextView;
