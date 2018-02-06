@@ -87,8 +87,16 @@
         android:layout_height="@dimen/dimen_dp_200"
         android:layout_marginLeft="@dimen/dimen_dp_25" />
 
-    <android.support.v7.widget.RecyclerView
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:id="@+id/ll_record_summary_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
+    </ScrollView>
+
 
 </LinearLayout>

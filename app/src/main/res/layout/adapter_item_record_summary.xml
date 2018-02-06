@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <ImageView
+        android:id="@+id/iv_order_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="@dimen/dimen_dp_25"
+        android:src="@mipmap/order_icon" />
+
+    <TextView
+        android:id="@+id/tv_record_name"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/dimen_dp_40"
+        android:layout_marginLeft="@dimen/dimen_dp_25"
+        android:layout_toRightOf="@id/iv_order_icon"
+        android:gravity="center_vertical"
+        android:textColor="@color/fr_record_text_time_color"
+        android:textSize="@dimen/text_size_sp_16" />
+
+    <TextView
+        android:id="@+id/tv_record_time_duration"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:layout_marginRight="@dimen/dimen_dp_20"
+        android:textColor="@color/fr_record_text_time_color"
+        android:textSize="@dimen/text_size_sp_16" />
+</RelativeLayout>

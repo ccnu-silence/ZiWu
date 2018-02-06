@@ -33,6 +33,11 @@ public class RecordTask extends ITask {
         return SingletonHolder.sIns;
     }
 
+    /**
+     * 添加新的记录
+     *
+     * @param recordInfo
+     */
     public void addTaskRecord(TaskRecordInfo recordInfo) {
         int isExpand = recordInfo.isExpand() ? 1 : 0;
         String sql = "insert into " +
@@ -48,6 +53,11 @@ public class RecordTask extends ITask {
         TaskManager.getDbHelper().getWritableDatabase().execSQL(sql);
     }
 
+    /**
+     * 更新记录
+     *
+     * @param recordInfo
+     */
     public void updateTaskRecord(TaskRecordInfo recordInfo) {
         String sql = "update " + Consts.TABLE_NAME_RECORD_DETAIL +
                 " set endTime= " + recordInfo.getEndTime() +
@@ -74,30 +84,30 @@ public class RecordTask extends ITask {
 
     }
 
-    public List<TaskRecordInfo> getPlanHistoryTime(int type) {
+    /**
+     * 根据时间类型获取记录列表
+     *
+     * @param type 可以为天、周、月、年、所有的记录
+     * @return
+     */
+    public List<TaskRecordInfo> getRecordListByType(int type) {
         List<TaskRecordInfo> taskRecordInfoList = new ArrayList<>();
-        long beginTime = 0;
-        long endTime = System.currentTimeMillis();
-        switch (type) {
-            case Consts.DAY_TYPE:
-                beginTime = DateUtils.getTodayMorning();
-                endTime = DateUtils.getTodayNight();
-                break;
-            case Consts.WEEK_TYPE:
-                beginTime = DateUtils.getCurrentWeekMorning();
-                endTime = DateUtils.getCurrentWeekNight();
-                break;
-            case Consts.TYPE_IS_VALID:
-                beginTime = 0;
-                endTime = System.currentTimeMillis();
-                break;
-        }
-        String sql = "select RecordDetail.planId,planName,planType,createTime,planPriority,planTime,planJoinParentId,planTag,sum(timeDuration) as sumTime " +
+        long beginTime = getRecordBeginTime(type);
+        long endTime = getRecordEndTime(type);
+        String sql = "select RecordDetail.planId," +
+                "planName," +
+                "planType," +
+                "createTime," +
+                "planPriority," +
+                "planTime," +
+                "planJoinParentId," +
+                "planTag," +
+                "sum(timeDuration) as sumTime " +
                 "from " + Consts.TABLE_NAME_RECORD_DETAIL +
                 " inner join " + Consts.TABLE_NAME_PLAN_DETAIL +
                 " on RecordDetail.planId=PlanDetail.planId where beginTime> " + beginTime +
                 " and endTime< " + endTime +
-                " group by RecordDetail.planId";
+                " group by RecordDetail.planId order by sumTime desc";
         Cursor cursor = TaskManager.getDbHelper().getWritableDatabase().rawQuery(sql, null);
         while (cursor.moveToNext()) {
             TaskRecordInfo recordInfo = new TaskRecordInfo();
@@ -116,138 +126,13 @@ public class RecordTask extends ITask {
         return taskRecordInfoList;
     }
 
-    public long getPlanTotalRecordedTimeByType(int type) {
-        long beginTime = 0;
-        long endTime = System.currentTimeMillis();
-        switch (type) {
-            case Consts.DAY_TYPE:
-                beginTime = DateUtils.getTodayMorning();
-                endTime = DateUtils.getTodayNight();
-                break;
-            case Consts.WEEK_TYPE:
-                beginTime = DateUtils.getCurrentWeekMorning();
-                endTime = DateUtils.getCurrentWeekNight();
-                break;
-            case Consts.TYPE_IS_VALID:
-                beginTime = 0;
-                endTime = System.currentTimeMillis();
-                break;
-        }
-        String sql = "select sum(timeDuration) from " + Consts.TABLE_NAME_RECORD_DETAIL +
-                " where beginTime>" + beginTime +
-                " and endTime<" + endTime;
-        Cursor cursor = TaskManager.getDbHelper().getWritableDatabase().rawQuery(sql, null);
-        while (cursor.moveToNext()) {
-            return cursor.getLong(0);
-        }
-        return 0l;
-    }
-
-    public void deleteRecordInfoByPlanId(String planId) {
-        String deleteSql = "delete from " + Consts.TABLE_NAME_RECORD_DETAIL + " where " + Consts.PLAN_DETAIL_TABLE_COLUMN_PLAN_ID + "= '" + planId + "'";
-        TaskManager.getDbHelper().getWritableDatabase().execSQL(deleteSql);
-    }
-
-    public void getRecordTime(final String planId, final SimpleResultCallback<Long> callback) {
-        if (TextUtils.isEmpty(planId)) {
-            return;
-        }
-        TaskManager.getInstance().getInstance().getWorkHandler().post(new Runnable() {
-            @Override
-            public void run() {
-                TaskRecordInfo taskRecordInfo = getLatestRecordInfoFromDb(planId, -1);
-                TaskRecordInfo stopRecordInfo = getLatestRecordInStopStateFromDb(planId);
-                long timeDuration = 0;
-                if (taskRecordInfo.getRecordId() == null
-                        || taskRecordInfo.getRecordId() == null) {
-                    callback.onSuccess(timeDuration);
-                    return;
-                }
-                if (!taskRecordInfo.getRecordId().equals(stopRecordInfo.getRecordId())) {
-                    timeDuration = getTimeDurationInPauseStateFromDb(planId, stopRecordInfo.getBeginTime(), taskRecordInfo.getBeginTime());
-                }
-                callback.onSuccess(timeDuration);
-            }
-        });
-    }
-
-    public long getRecordTimeFromDb(String planId) {
-        TaskRecordInfo lastRecordInfo = getLatestRecordInfoFromDb(planId, -1);
-        TaskRecordInfo lastStopStateRecordInfo = getLatestRecordInStopStateFromDb(planId);
-        long timeDuration = 0;
-        if (lastRecordInfo.getRecordState() == Consts.RECORD_STATE_RECORDING) {
-            TaskRecordInfo lastSecondRecordInfo = getLatestRecordInfoFromDb(planId, lastRecordInfo.getBeginTime());
-            if (lastSecondRecordInfo.getRecordState() == Consts.RECORD_STATE_PAUSE) {
-                timeDuration += getTimeDurationInPauseStateFromDb(planId, lastStopStateRecordInfo.getBeginTime(), lastSecondRecordInfo.getBeginTime());
-            }
-            timeDuration += System.currentTimeMillis() - lastRecordInfo.getBeginTime();
-        } else if (lastRecordInfo.getRecordState() == Consts.RECORD_STATE_PAUSE) {
-            timeDuration = getTimeDurationInPauseStateFromDb(planId, lastStopStateRecordInfo.getBeginTime(), lastRecordInfo.getBeginTime());
-        }
-        return timeDuration;
-    }
-
-    public long getTimeDurationInPauseStateFromDb(String planId, long begin, long stop) {
-        String sql = "select sum(timeDuration) from " + Consts.TABLE_NAME_RECORD_DETAIL
-                + " where planId = '" + planId + "' and beginTime > " + begin + " and beginTime <= " + stop;
-        Cursor cursor = TaskManager.getInstance().getDb().rawQuery(sql, null);
-        long timeDuration = 0;
-        while (cursor.moveToNext()) {
-            timeDuration = cursor.getLong(0);
-        }
-        return timeDuration;
-    }
-
-    public TaskRecordInfo getLatestRecordInStopStateFromDb(String planId) {
-        String sql = "select recordId, max(beginTime), recordState from "
-                + Consts.TABLE_NAME_RECORD_DETAIL + " where planId = '" + planId + "' and recordState = " + Consts.RECORD_STATE_STOP;
-        TaskRecordInfo recordInfo = new TaskRecordInfo();
-        Cursor cursor = TaskManager.getInstance().getDb().rawQuery(sql, null);
-        while (cursor.moveToNext()) {
-            recordInfo.setRecordId(cursor.getString(0));
-            recordInfo.setBeginTime(cursor.getLong(1));
-            recordInfo.setRecordState(cursor.getInt(2));
-        }
-        return recordInfo;
-    }
-
-    public void getLatestOneRecordInfo(final String planId, final SimpleResultCallback<TaskRecordInfo> callback) {
-        if (TextUtils.isEmpty(planId)) {
-            return;
-        }
-        TaskManager.getInstance().getWorkHandler().post(new Runnable() {
-            @Override
-            public void run() {
-                TaskRecordInfo recordInfo = getLatestRecordInfoFromDb(planId, -1);
-                callback.onSuccess(recordInfo);
-            }
-        });
-    }
-
     /**
-     * 查询时间记录表中最近的一条记录
+     * 根据类型获取记录列表
      *
-     * @param planId
-     * @return
+     * @param type
+     * @param offset
+     * @param callback
      */
-    public TaskRecordInfo getLatestRecordInfoFromDb(String planId, long beginTime) {
-        TaskRecordInfo recordInfo = new TaskRecordInfo();
-        String partSql = "";
-        if (beginTime != -1) {
-            partSql = " and beginTime < " + beginTime;
-        }
-        String sql = "select recordId, max(beginTime), recordState from "
-                + Consts.TABLE_NAME_RECORD_DETAIL + " where planId = '" + planId + "'"
-                + partSql;
-        Cursor cursor = TaskManager.getInstance().getDb().rawQuery(sql, null);
-        while (cursor.moveToNext()) {
-            recordInfo.setRecordId(cursor.getString(0));
-            recordInfo.setBeginTime(cursor.getLong(1));
-            recordInfo.setRecordState(cursor.getInt(2));
-        }
-        return recordInfo;
-    }
-
     public void getRecordList(final int type, final int offset, final SimpleResultCallback<List<List<TaskRecordInfo>>> callback) {
         TaskManager.getInstance().getWorkHandler().post(new Runnable() {
             @Override
@@ -314,8 +199,120 @@ public class RecordTask extends ITask {
         return monthRecordList;
     }
 
+    /**
+     * 根据时间类型类获取总的记录时间
+     *
+     * @param type 可以为天、周、月、年、所有的记录
+     * @return
+     */
+    public long getPlanTotalRecordedTimeByType(int type) {
+        long beginTime = getRecordBeginTime(type);
+        long endTime = getRecordEndTime(type);
+        String sql = "select sum(timeDuration) from " + Consts.TABLE_NAME_RECORD_DETAIL +
+                " where beginTime>" + beginTime +
+                " and endTime<" + endTime;
+        Cursor cursor = TaskManager.getDbHelper().getWritableDatabase().rawQuery(sql, null);
+        while (cursor.moveToNext()) {
+            return cursor.getLong(0);
+        }
+        return 0l;
+    }
 
-    public long getPlanRecordStartTimeByType(int type) {
+    public void deleteRecordInfoByPlanId(String planId) {
+        String deleteSql = "delete from " + Consts.TABLE_NAME_RECORD_DETAIL + " where " + Consts.PLAN_DETAIL_TABLE_COLUMN_PLAN_ID + "= '" + planId + "'";
+        TaskManager.getDbHelper().getWritableDatabase().execSQL(deleteSql);
+    }
+
+    /**
+     * 从数据库中初始化task list时，time duration，task最近一条记录状态处于recording or pause状态时，需要
+     * 计算已经进行的时长，赋值给time Duration；
+     *
+     * @param planId
+     * @return
+     */
+    public long getRecordTimeFromDb(String planId) {
+        TaskRecordInfo lastRecordInfo = getLatestRecordInfoFromDb(planId, -1);
+        TaskRecordInfo lastStopStateRecordInfo = getLatestRecordInStopStateFromDb(planId);
+        long timeDuration = 0;
+        if (lastRecordInfo.getRecordState() == Consts.RECORD_STATE_RECORDING) {
+            TaskRecordInfo lastSecondRecordInfo = getLatestRecordInfoFromDb(planId, lastRecordInfo.getBeginTime());
+            if (lastSecondRecordInfo.getRecordState() == Consts.RECORD_STATE_PAUSE) {
+                timeDuration += getTimeDurationInPauseStateFromDb(planId, lastStopStateRecordInfo.getBeginTime(), lastSecondRecordInfo.getBeginTime());
+            }
+            timeDuration += System.currentTimeMillis() - lastRecordInfo.getBeginTime();
+        } else if (lastRecordInfo.getRecordState() == Consts.RECORD_STATE_PAUSE) {
+            timeDuration = getTimeDurationInPauseStateFromDb(planId, lastStopStateRecordInfo.getBeginTime(), lastRecordInfo.getBeginTime());
+        }
+        return timeDuration;
+    }
+
+    public long getTimeDurationInPauseStateFromDb(String planId, long begin, long stop) {
+        String sql = "select sum(timeDuration) from " + Consts.TABLE_NAME_RECORD_DETAIL
+                + " where planId = '" + planId + "' and beginTime > " + begin + " and beginTime <= " + stop;
+        Cursor cursor = TaskManager.getInstance().getDb().rawQuery(sql, null);
+        long timeDuration = 0;
+        while (cursor.moveToNext()) {
+            timeDuration = cursor.getLong(0);
+        }
+        return timeDuration;
+    }
+
+    public TaskRecordInfo getLatestRecordInStopStateFromDb(String planId) {
+        String sql = "select recordId, max(beginTime), recordState from "
+                + Consts.TABLE_NAME_RECORD_DETAIL + " where planId = '" + planId + "' and recordState = " + Consts.RECORD_STATE_STOP;
+        TaskRecordInfo recordInfo = new TaskRecordInfo();
+        Cursor cursor = TaskManager.getInstance().getDb().rawQuery(sql, null);
+        while (cursor.moveToNext()) {
+            recordInfo.setRecordId(cursor.getString(0));
+            recordInfo.setBeginTime(cursor.getLong(1));
+            recordInfo.setRecordState(cursor.getInt(2));
+        }
+        return recordInfo;
+    }
+
+    /**
+     * 查询时间记录表中最近的一条记录
+     *
+     * @param planId
+     * @return
+     */
+    public TaskRecordInfo getLatestRecordInfoFromDb(String planId, long beginTime) {
+        TaskRecordInfo recordInfo = new TaskRecordInfo();
+        String partSql = "";
+        if (beginTime != -1) {
+            partSql = " and beginTime < " + beginTime;
+        }
+        String sql = "select recordId, max(beginTime), recordState from "
+                + Consts.TABLE_NAME_RECORD_DETAIL + " where planId = '" + planId + "'"
+                + partSql;
+        Cursor cursor = TaskManager.getInstance().getDb().rawQuery(sql, null);
+        while (cursor.moveToNext()) {
+            recordInfo.setRecordId(cursor.getString(0));
+            recordInfo.setBeginTime(cursor.getLong(1));
+            recordInfo.setRecordState(cursor.getInt(2));
+        }
+        return recordInfo;
+    }
+
+    public void getLongestRecordTimePerTime() {
+
+    }
+
+    public void getLatestOneRecordInfo(final String planId, final SimpleResultCallback<TaskRecordInfo> callback) {
+        if (TextUtils.isEmpty(planId)) {
+            return;
+        }
+        TaskManager.getInstance().getWorkHandler().post(new Runnable() {
+            @Override
+            public void run() {
+                TaskRecordInfo recordInfo = getLatestRecordInfoFromDb(planId, -1);
+                callback.onSuccess(recordInfo);
+            }
+        });
+    }
+
+
+    public long getRecordBeginTime(int type) {
         long beginTime = 0;
         switch (type) {
             case Consts.DAY_TYPE:
@@ -331,7 +328,7 @@ public class RecordTask extends ITask {
         return beginTime;
     }
 
-    public long getPlanRecordEndTimeByType(int type) {
+    public long getRecordEndTime(int type) {
         long endTime = System.currentTimeMillis();
         switch (type) {
             case Consts.DAY_TYPE:
@@ -389,7 +386,30 @@ public class RecordTask extends ITask {
         } finally {
             cursor.close();
         }
-
         return taskRecordInfoList;
+    }
+
+
+    public void getRecordTime(final String planId, final SimpleResultCallback<Long> callback) {
+        if (TextUtils.isEmpty(planId)) {
+            return;
+        }
+        TaskManager.getInstance().getInstance().getWorkHandler().post(new Runnable() {
+            @Override
+            public void run() {
+                TaskRecordInfo taskRecordInfo = getLatestRecordInfoFromDb(planId, -1);
+                TaskRecordInfo stopRecordInfo = getLatestRecordInStopStateFromDb(planId);
+                long timeDuration = 0;
+                if (taskRecordInfo.getRecordId() == null
+                        || taskRecordInfo.getRecordId() == null) {
+                    callback.onSuccess(timeDuration);
+                    return;
+                }
+                if (!taskRecordInfo.getRecordId().equals(stopRecordInfo.getRecordId())) {
+                    timeDuration = getTimeDurationInPauseStateFromDb(planId, stopRecordInfo.getBeginTime(), taskRecordInfo.getBeginTime());
+                }
+                callback.onSuccess(timeDuration);
+            }
+        });
     }
 }

@@ -4,6 +4,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.PieChart;
@@ -17,6 +18,7 @@ import com.github.tinkerti.ziwu.data.Consts;
 import com.github.tinkerti.ziwu.data.RecordTask;
 import com.github.tinkerti.ziwu.data.model.TaskRecordInfo;
 import com.github.tinkerti.ziwu.ui.utils.FormatTime;
+import com.github.tinkerti.ziwu.ui.widget.RecordSummaryView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,20 +27,31 @@ public class RecordChartActivity extends BaseActivity {
 
     private PieChart pieChart;
     private TextView totalRecordTimeView;
+    private LinearLayout summaryRecordView;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setNameText(getString(R.string.record_week_chart_title));
         setContentView(R.layout.activity_record_chart);
-
         pieChart = findViewById(R.id.pc_plan_record_pie);
         totalRecordTimeView = findViewById(R.id.tv_total_record_time);
+        summaryRecordView = findViewById(R.id.ll_record_summary_container);
         drawRecordPieChart(Consts.WEEK_TYPE);
+        initSummaryRecordView(Consts.WEEK_TYPE);
+    }
+
+    private void initSummaryRecordView(int recordType) {
+        List<TaskRecordInfo> taskRecordInfoList = RecordTask.getInstance().getRecordListByType(recordType);
+        RecordSummaryView recordSummaryView = new RecordSummaryView(this);
+        recordSummaryView.setList(taskRecordInfoList.subList(0, taskRecordInfoList.size() >= 3 ? 3 : taskRecordInfoList.size()));
+        recordSummaryView.setTitle(getString(R.string.record_time_longest));
+        summaryRecordView.addView(recordSummaryView);
+
     }
 
     private void drawRecordPieChart(int recordType) {
-        List<TaskRecordInfo> taskRecordInfoList = RecordTask.getInstance().getPlanHistoryTime(recordType);
+        List<TaskRecordInfo> taskRecordInfoList = RecordTask.getInstance().getRecordListByType(recordType);
         long totalRecordTime = RecordTask.getInstance().getPlanTotalRecordedTimeByType(recordType);
         totalRecordTimeView.setText(FormatTime.formatTimeToUnitString(totalRecordTime));
         float floatTotalRecordTime = totalRecordTime;
