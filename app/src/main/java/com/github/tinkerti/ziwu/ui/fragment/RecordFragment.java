@@ -93,7 +93,9 @@ public class RecordFragment extends Fragment {
                         itemModelList.add(recordListItemModel);
                     }
                 }
-                recordListAdapter.setModelList(itemModelList);
+                if (recordListAdapter != null) {
+                    recordListAdapter.setModelList(itemModelList);
+                }
             }
         });
     }
