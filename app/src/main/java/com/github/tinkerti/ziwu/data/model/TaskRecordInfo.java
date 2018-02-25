@@ -31,6 +31,8 @@ public class TaskRecordInfo extends TaskBaseInfo implements Parcelable {
     public TextView recordingTimeTextView;
     public TextView expandedRecordingTimeView;
 
+    public int select_state = Consts.READ_TO_SELECT;
+
     public long getTimeDurationPerRecord() {
         return timeDurationPerRecord;
     }

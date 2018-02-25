@@ -6,7 +6,6 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
 import android.support.v7.widget.RecyclerView;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,16 +16,11 @@ import android.widget.TextView;
 
 import com.github.tinkerti.ziwu.R;
 import com.github.tinkerti.ziwu.data.Consts;
-import com.github.tinkerti.ziwu.data.PlanTask;
 import com.github.tinkerti.ziwu.data.RecordTask;
-import com.github.tinkerti.ziwu.data.model.TaskDetailInfo;
 import com.github.tinkerti.ziwu.data.model.TaskRecordInfo;
 import com.github.tinkerti.ziwu.ui.activity.AddTaskActivity;
 import com.github.tinkerti.ziwu.ui.utils.FormatTime;
 import com.github.tinkerti.ziwu.ui.utils.ZLog;
-import com.github.tinkerti.ziwu.ui.widget.DeleteConfirmDialog;
-import com.github.tinkerti.ziwu.ui.widget.OptionsPopupDialog;
-import com.github.tinkerti.ziwu.ui.widget.RenameDialog;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,6 +32,8 @@ public class TaskListAdapter extends RecyclerView.Adapter {
     private static final int PLAN_CATEGORY_TYPE = 1;
     private static final int PLAN_SUMMARY_TYPE = 2;
     private static final int NO_PLAN_TYPE = 4;
+
+    private boolean selectState;
 
     public List<ItemModel> getModelList() {
         return modelList;
@@ -173,6 +169,10 @@ public class TaskListAdapter extends RecyclerView.Adapter {
             final TaskRecordInfo recordInfo = taskSummaryModel.recordInfo;
             String recordingTime = FormatTime.formatTimeToNumberString(recordInfo.getTimeDuration());
 
+            recordInfo.startButton = startButton;
+            recordInfo.recordingTimeTextView = recordingTimeTextView;
+            recordInfo.expandedRecordingTimeView = expandedRecordingTimeView;
+
             taskNameTextView.setText(recordInfo.getPlanName());
             recordingTimeTextView.setText(recordingTime);
             expandedRecordingTimeView.setText(recordingTime);
@@ -210,6 +210,14 @@ public class TaskListAdapter extends RecyclerView.Adapter {
                     || recordInfo.getRecordState() == Consts.RECORD_STATE_PAUSE) {
                 uiHandler.removeCallbacks(recordInfo.getRefreshUiRunnable());
             }
+
+            if (selectState) {
+                if (recordInfo.select_state == Consts.READ_TO_SELECT) {
+                    arrowImageView.setImageResource(R.mipmap.unselect_icon);
+                } else if (recordInfo.select_state == Consts.SELECTED) {
+                    arrowImageView.setImageResource(R.mipmap.selected_icon);
+                }
+            }
         }
 
         private void setListener(final int pos) {
@@ -218,27 +226,32 @@ public class TaskListAdapter extends RecyclerView.Adapter {
             planSummaryView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (!recordInfo.isExpand()) {
-                        recordContainer.setVisibility(View.VISIBLE);
-                        recordingTimeTextView.setVisibility(View.GONE);
-                        if (recordInfo.getRecordState() == Consts.RECORD_STATE_RECORDING
-                                || recordInfo.getRecordState() == Consts.RECORD_STATE_PAUSE) {
-                            expandedRecordingTimeView.setVisibility(View.VISIBLE);
-                        } else {
-                            expandedRecordingTimeView.setVisibility(View.GONE);
-                        }
-                        recordInfo.setExpand(true);
-                        RecordTask.getInstance().updateExpandState(recordInfo);
-                        arrowImageView.animate().setDuration(200).rotation(90).start();
+                    if (selectState) {
+                        recordInfo.select_state = Consts.SELECTED;
+                        notifyItemChanged(pos);
                     } else {
-                        recordContainer.setVisibility(View.GONE);
-                        if (recordInfo.getRecordState() == Consts.RECORD_STATE_RECORDING
-                                || recordInfo.getRecordState() == Consts.RECORD_STATE_PAUSE) {
-                            recordingTimeTextView.setVisibility(View.VISIBLE);
+                        if (!recordInfo.isExpand()) {
+                            recordContainer.setVisibility(View.VISIBLE);
+                            recordingTimeTextView.setVisibility(View.GONE);
+                            if (recordInfo.getRecordState() == Consts.RECORD_STATE_RECORDING
+                                    || recordInfo.getRecordState() == Consts.RECORD_STATE_PAUSE) {
+                                expandedRecordingTimeView.setVisibility(View.VISIBLE);
+                            } else {
+                                expandedRecordingTimeView.setVisibility(View.GONE);
+                            }
+                            recordInfo.setExpand(true);
+                            RecordTask.getInstance().updateExpandState(recordInfo);
+                            arrowImageView.animate().setDuration(200).rotation(90).start();
+                        } else {
+                            recordContainer.setVisibility(View.GONE);
+                            if (recordInfo.getRecordState() == Consts.RECORD_STATE_RECORDING
+                                    || recordInfo.getRecordState() == Consts.RECORD_STATE_PAUSE) {
+                                recordingTimeTextView.setVisibility(View.VISIBLE);
+                            }
+                            recordInfo.setExpand(false);
+                            RecordTask.getInstance().updateExpandState(recordInfo);
+                            arrowImageView.animate().setDuration(200).rotation(0).start();
                         }
-                        recordInfo.setExpand(false);
-                        RecordTask.getInstance().updateExpandState(recordInfo);
-                        arrowImageView.animate().setDuration(200).rotation(0).start();
                     }
                 }
             });
@@ -275,53 +288,8 @@ public class TaskListAdapter extends RecyclerView.Adapter {
             planSummaryView.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
-                    OptionsPopupDialog optionsPopupDialog = new OptionsPopupDialog(context);
-                    optionsPopupDialog.setListener(new OptionsPopupDialog.OptionPopupWindowClickListener() {
-                        @Override
-                        public void onClick(final int position) {
-                            switch (position) {
-                                case Consts.RENAME_PLAN:
-                                    RenameDialog renameDialog = new RenameDialog(context);
-                                    renameDialog.setListener(new RenameDialog.DialogClickListener() {
-                                        @Override
-                                        public void onOKClick(String planName) {
-                                            if (!TextUtils.isEmpty(planName)) {
-                                                TaskDetailInfo info = new TaskDetailInfo();
-                                                info.setPlanId(taskSummaryModel.recordInfo.getPlanId());
-                                                info.setPlanName(planName);
-                                                PlanTask.getInstance().renamePlan(info);
-                                                ((TaskSummaryModel) modelList.get(pos)).recordInfo.setPlanName(planName);
-                                                //注意需要更新adapter中的pos位置的数据，这样调用notifyItemChange才会刷新
-                                                //之前不刷新是因为更改的不是modelList中的数据；
-                                                notifyItemChanged(pos);
-                                            }
-                                        }
-                                    });
-                                    renameDialog.show();
-                                    renameDialog.setTextContent(taskSummaryModel.recordInfo.getPlanName());
-                                    break;
-                                case Consts.DELETE_PLAN:
-                                    DeleteConfirmDialog deleteConfirmDialog = new DeleteConfirmDialog(context);
-                                    deleteConfirmDialog.setListener(new DeleteConfirmDialog.DialogClickListener() {
-                                        @Override
-                                        public void onDeleteClick() {
-                                            PlanTask.getInstance().deletePlanDetailInfoById(taskSummaryModel.recordInfo.getPlanId());
-                                            RecordTask.getInstance().deleteRecordInfoByPlanId(taskSummaryModel.recordInfo.getPlanId());
-                                            modelList.remove(pos);
-                                            notifyDataSetChanged();
-                                        }
-                                    });
-                                    deleteConfirmDialog.show();
-                                    deleteConfirmDialog.setTitleView(taskSummaryModel.recordInfo.getPlanName());
-                                    break;
-                                case Consts.TRANSFER_PLAN:
-                                    break;
-                                case Consts.CHECK_DETAIL:
-                                    break;
-                            }
-                        }
-                    });
-                    optionsPopupDialog.show();
+                    selectState = true;
+                    notifyDataSetChanged();
                     return true;
                 }
             });

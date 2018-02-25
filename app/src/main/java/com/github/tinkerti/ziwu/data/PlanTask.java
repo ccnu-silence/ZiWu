@@ -2,7 +2,6 @@ package com.github.tinkerti.ziwu.data;
 
 import android.database.Cursor;
 
-import com.github.tinkerti.ziwu.data.model.AddTaskDetailInfo;
 import com.github.tinkerti.ziwu.data.model.TaskDetailInfo;
 import com.github.tinkerti.ziwu.data.model.TaskRecordInfo;
 
@@ -99,7 +98,7 @@ public class PlanTask extends ITask {
         return taskRecordInfoList;
     }
 
-    public void addPlanToDb(AddTaskDetailInfo info) {
+    public void addPlanToDb(TaskRecordInfo info) {
         //在插入的时候书写sql语句出现了问题，text类型的数据需要额外添加''引号来表示；
         String sql = "insert or replace into " + Consts.TABLE_NAME_PLAN_DETAIL +
                 " values ( '" +
@@ -111,7 +110,8 @@ public class PlanTask extends ITask {
                 info.getPlanTime() + ", '" +
                 info.getPlanJoinParentId() + "', '" +
                 info.getPlanTag() + "', '" +
-                info.getPlanNote() +
+                info.getPlanNote() + "', '" +
+                info.isExpand() +
                 "' )";
         TaskManager.getInstance().getDb().execSQL(sql);
     }
