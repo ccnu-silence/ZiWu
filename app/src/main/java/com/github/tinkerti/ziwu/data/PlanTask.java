@@ -63,7 +63,7 @@ public class PlanTask extends ITask {
                 "RecordDetail.endTime," +
                 "RecordDetail.timeDuration," +
                 "RecordDetail.recordState," +
-                "isExpand from " +
+                "PlanDetail.isExpand from " +
                 Consts.TABLE_NAME_PLAN_DETAIL +
                 " left join " + Consts.TABLE_NAME_RECORD_DETAIL + " on RecordDetail.planId = PlanDetail.planId "
                 + " where " + Consts.PLAN_DETAIL_TABLE_COLUMN_PLAN_TYPE
