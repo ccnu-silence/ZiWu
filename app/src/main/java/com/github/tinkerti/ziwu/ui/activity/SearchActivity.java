@@ -23,6 +23,7 @@ public class SearchActivity extends BaseActivity {
         setContentView(R.layout.activity_search);
         historyListView = findViewById(R.id.lv_search_history);
         TextView historyTitleView = findViewById(R.id.tv_search_history_title);
+        keywordList.add("test");
         ArrayAdapter<String> listAdapter = new ArrayAdapter<>(SearchActivity.this, R.layout.ad_search_history_item, keywordList);
         historyListView.setAdapter(listAdapter);
         int visibility = keywordList.size() == 0 ? View.GONE : View.VISIBLE;
