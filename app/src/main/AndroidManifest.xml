@@ -26,6 +26,7 @@
 
         <activity android:name=".ui.activity.ModifyRecordDetailActivity" />
         <activity android:name=".ui.activity.RecordChartActivity" />
+        <activity android:name=".ui.activity.SearchActivity" />
     </application>
 
 </manifest>

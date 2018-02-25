@@ -71,6 +71,10 @@ public class BaseActivity extends FragmentActivity {
     }
 
     public class TitleBar {
+        public void setTitleBackgroudColor(int color) {
+            titleBar.setBackgroundColor(color);
+        }
+
         public View onCreateTitle(int resId) {
             nameTextView.setVisibility(View.GONE);
             navigationImageView.setVisibility(View.GONE);

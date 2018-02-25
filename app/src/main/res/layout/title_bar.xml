@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/bar_rl_title_bar"
     android:layout_width="match_parent"
-    android:layout_height="45dp"
+    android:layout_height="@dimen/dimen_dp_44"
     android:background="@color/activity_title_bar_color">
     <!--标题栏，显示-->
     <ImageView

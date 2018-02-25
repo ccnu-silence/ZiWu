@@ -58,5 +58,6 @@
     <string name="record_week_chart_title">周记录</string>
     <string name="record_time_duration_name">时长</string>
     <string name="record_this_week">本周</string>
-    <string name="record_time_longest">时间最长</string>>
+    <string name="record_time_longest">时间最长</string>
+    <string name="search_history">历史记录</string>
 </resources>

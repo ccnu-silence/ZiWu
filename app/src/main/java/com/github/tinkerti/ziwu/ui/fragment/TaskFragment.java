@@ -15,13 +15,14 @@ import com.github.tinkerti.ziwu.data.Consts;
 import com.github.tinkerti.ziwu.data.PlanTask;
 import com.github.tinkerti.ziwu.data.SimpleResultCallback;
 import com.github.tinkerti.ziwu.data.model.TaskRecordInfo;
+import com.github.tinkerti.ziwu.ui.activity.SearchActivity;
 import com.github.tinkerti.ziwu.ui.adapter.TaskListAdapter;
 import com.github.tinkerti.ziwu.ui.utils.ZLog;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class TaskFragment extends Fragment {
+public class TaskFragment extends Fragment implements View.OnClickListener {
     private static final String TAG = "TaskFragment";
     TaskListAdapter taskListAdapter;
     int[] types;
@@ -44,7 +45,18 @@ public class TaskFragment extends Fragment {
         types = new int[]{Consts.TYPE_IS_VALID};
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(taskListAdapter);
+        view.findViewById(R.id.fl_search_container).setOnClickListener(this);
         return view;
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.fl_search_container:
+                Intent intent = new Intent(getActivity(), SearchActivity.class);
+                getActivity().startActivity(intent);
+                break;
+        }
     }
 
     private void getPlanListByType(int[] types) {
