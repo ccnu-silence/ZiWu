@@ -2,9 +2,7 @@ package com.github.tinkerti.ziwu.data.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.github.tinkerti.ziwu.data.Consts;
@@ -30,12 +28,8 @@ public class TaskRecordInfo extends TaskBaseInfo implements Parcelable {
     private String taskNote;
 
     public ImageView startButton;
-    public ImageView stopButton;
     public TextView recordingTimeTextView;
     public TextView expandedRecordingTimeView;
-    public RelativeLayout planSummaryView;
-    public FrameLayout startContainer;
-    public FrameLayout stopContainer;
 
     public long getTimeDurationPerRecord() {
         return timeDurationPerRecord;

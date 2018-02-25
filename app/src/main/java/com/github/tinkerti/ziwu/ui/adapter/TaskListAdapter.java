@@ -176,13 +176,7 @@ public class TaskListAdapter extends RecyclerView.Adapter {
             taskNameTextView.setText(recordInfo.getPlanName());
             recordingTimeTextView.setText(recordingTime);
             expandedRecordingTimeView.setText(recordingTime);
-            recordInfo.startButton = startButton;
-            recordInfo.stopButton = stopButton;
-            recordInfo.recordingTimeTextView = recordingTimeTextView;
-            recordInfo.expandedRecordingTimeView = expandedRecordingTimeView;
-            recordInfo.planSummaryView = planSummaryView;
-            recordInfo.startContainer = startContainer;
-            recordInfo.stopContainer = stopContainer;
+
 
             if (recordInfo.getRecordState() == Consts.RECORD_STATE_PAUSE
                     || recordInfo.getRecordState() == Consts.RECORD_STATE_RECORDING) {
@@ -221,7 +215,7 @@ public class TaskListAdapter extends RecyclerView.Adapter {
         private void setListener(final int pos) {
             final TaskSummaryModel taskSummaryModel = (TaskSummaryModel) modelList.get(pos);
             final TaskRecordInfo recordInfo = taskSummaryModel.recordInfo;
-            recordInfo.planSummaryView.setOnClickListener(new View.OnClickListener() {
+            planSummaryView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     if (!recordInfo.isExpand()) {
@@ -250,7 +244,7 @@ public class TaskListAdapter extends RecyclerView.Adapter {
             });
 
             //点击开始计时，如果处于计时进行中的状态，点击暂停计时
-            recordInfo.startContainer.setOnClickListener(new View.OnClickListener() {
+            startContainer.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     if (recordInfo.getRecordState() == Consts.RECORD_STATE_STOP) {
@@ -267,7 +261,7 @@ public class TaskListAdapter extends RecyclerView.Adapter {
             });
 
             //点击结束计时
-            recordInfo.stopContainer.setOnClickListener(new View.OnClickListener() {
+            stopContainer.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     //需要判断下记录状态，否则的话，点击stopButton会一致进行增加计时的操作；
@@ -278,7 +272,7 @@ public class TaskListAdapter extends RecyclerView.Adapter {
             });
 
             //计划item长按点击事件，可以对计划进行修改、删除操作和查看详情操作；
-            recordInfo.planSummaryView.setOnLongClickListener(new View.OnLongClickListener() {
+            planSummaryView.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
                     OptionsPopupDialog optionsPopupDialog = new OptionsPopupDialog(context);
